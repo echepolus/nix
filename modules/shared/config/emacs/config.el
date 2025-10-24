@@ -1,0 +1,1606 @@
+(setq user-full-name "Alexey Kotomin"
+  user-mail-address "a.kotominn@gmail.com")
+
+;;; Set default frame size and position 
+(setq inhibit-startup-screen t)
+(setq initial-scratch-message nil)
+(setq confirm-kill-emacs #'y-or-n-p)
+
+  ;; Smooth out garbage collection
+  (use-package gcmh
+    :ensure nil  ; Managed by Nix
+    :demand t
+    :config
+    (gcmh-mode 1))
+
+(require 'package)
+(unless (assoc-default "melpa" package-archives)
+   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t))
+(unless (assoc-default "nongnu" package-archives)
+   (add-to-list 'package-archives '("nongnu" . "https://elpa.nongnu.org/nongnu/") t))
+
+(defun system-is-mac ()
+  "Return true if system is darwin-based (Mac OS X)"
+  (string-equal system-type "darwin"))
+
+(defun system-is-linux ()
+  "Return true if system is GNU/Linux-based"
+  (string-equal system-type "gnu/linux"))
+
+;; Set path for darwin
+(when (system-is-mac)
+  (let ((home-dir (getenv "HOME")))
+    (setenv "PATH" (concat (getenv "PATH") ":" home-dir "/.nix-profile/bin:/usr/bin"))
+    (setq exec-path (append (list (concat home-dir "/bin")
+                                 "/profile/bin"
+                                 (concat home-dir "/.npm-packages/bin")
+                                 (concat home-dir "/.nix-profile/bin")
+                                 "/nix/var/nix/profiles/default/bin"
+                                 "/usr/local/bin"
+                                 "/usr/bin")
+                           exec-path))))
+
+;; Turn off UI junk
+(column-number-mode)
+(scroll-bar-mode 0)
+(menu-bar-mode -1)
+(tool-bar-mode 0)
+(winner-mode 1) ;; ctrl-c left, ctrl-c right for window undo/redo
+
+;; Для более плавной работы с оконным менеджером:
+(setq frame-resize-pixelwise t)  ; Точность в пикселях (может быть полезно)
+;; (setq frame-inhibit-implied-resize t)  ; Не менять размер автоматически
+
+(blink-cursor-mode -1)
+
+(use-package rainbow-delimiters
+  :hook (prog-mode . rainbow-delimiters-mode))
+
+(use-package nerd-icons)
+
+;; f.el - modern file API
+(use-package f
+  :ensure nil  ; Managed by Nix
+  :demand t)
+
+(use-package doom-modeline
+  :ensure nil  ; Managed by Nix
+  :after f
+  :init (doom-modeline-mode 1))
+
+(use-package treemacs
+  :config
+    (setq treemacs-is-never-other-window 1)
+  :bind
+    ("C-c t" . treemacs-find-file)
+    ("C-c b" . treemacs-bookmark))
+
+(use-package treemacs-icons-dired)
+(use-package treemacs-nerd-icons)
+(use-package treemacs-projectile)
+(use-package treemacs-magit)
+;; (use-package treemacs-evil)
+
+;; Remove binding for facemap-menu, use for ace-window instead
+(global-unset-key (kbd "M-o"))
+
+(use-package ace-window
+  :bind (("M-o" . ace-window))
+  :custom
+    (aw-scope 'frame)
+    (aw-keys '(?a ?r ?s ?t ?g ?m ?n ?e ?i ?o))
+    (aw-minibuffer-flag t)
+  :config
+    (ace-window-display-mode 1)
+    (advice-add 'ace-select-window :after #'win/auto-resize))
+
+(save-place-mode 1)
+(setq save-place-file "~/.local/state/emacs/saveplace")
+
+(savehist-mode 1)
+(setq savehist-additional-variables
+  '(search-ring
+    regexp-search-ring
+    kill-ring
+    register-alist
+    org-refile-history
+    org-capture-history))
+(setq savehist-file "~/.local/state/emacs/savehist")
+
+(use-package recentf
+  :ensure nil
+  :init
+  (setq recentf-max-saved-items 100
+    recentf-max-menu-items 50
+    recentf-save-file "~/.local/state/emacs/recentf")
+  :config
+    (recentf-mode 1))
+
+(global-set-key (kbd "C-x C-r") 'recentf-open-files)
+
+;;;; Fontaine (font configurations)
+(use-package fontaine
+  :ensure nil 
+  :hook
+  ;; Persist the latest font preset when closing/starting Emacs.
+  ((after-init . fontaine-mode)
+   (after-init . (lambda ()
+                   ;; Set last preset or fall back to desired style from `fontaine-presets'.
+                   (fontaine-set-preset (or (fontaine-restore-latest-preset) 'regular)))))
+  :bind (("C-c f" . fontaine-set-preset)
+         ("C-c F" . fontaine-toggle-preset))
+  :config
+;; Главные семейства для macOS
+(defconst my/mono "Geist Mono")
+(defconst my/var  "SF Pro Text") ; можно сменить на "San Francisco" / "Inter"
+
+;; Набор пресетов. Высоты — в “сотых” по классике Emacs: 140 ≈ 14pt.
+(setq fontaine-presets
+      `(
+        ;; компактный
+        (small
+         :default-family ,my/mono
+         :default-weight light 
+         :default-height 110
+         :fixed-pitch-family ,my/mono
+         :variable-pitch-family ,my/var)
+
+        ;; по умолчанию
+        (regular
+         :default-family ,my/mono
+         :default-weight light 
+         :default-height 140
+         :fixed-pitch-family ,my/mono
+         :variable-pitch-family ,my/var)
+
+        ;; слегка крупнее
+        (medium
+         :inherit regular
+         :default-height 150)
+
+        ;; заметно крупнее — удобно на ретине/диване
+        (large
+         :inherit regular
+         :default-height 170)
+
+        ;; для выступлений
+        (presentation
+         :inherit regular
+         :default-height 190)
+
+        ;; максимальный
+        (jumbo
+         :inherit regular
+         :default-height 230)
+
+        ;; пресет для кодинга: немного компактнее боксы UI
+        (coding
+         :inherit regular
+         :default-height 135)
+
+        ;; опционально: если захочешь попробовать Aporetic
+        (aporetic
+         :default-family "Aporetic Sans Mono"
+         :default-height 140
+         :fixed-pitch-family "Aporetic Serif Mono"
+         :variable-pitch-family "Aporetic Serif")
+
+        ;; fallback по умолчанию (используется как база для наследования)
+        (t
+         :default-family ,my/mono
+         :default-weight light 
+         :default-slant normal
+         :default-width normal
+         :default-height 140
+
+         :fixed-pitch-family ,my/mono
+         :fixed-pitch-height 1.0
+
+         :variable-pitch-family ,my/var
+         :variable-pitch-height 1.0
+
+         :mode-line-active-height 1.0
+         :mode-line-inactive-height 1.0
+         :header-line-height 1.0
+         :line-number-height 1.0
+         :tab-bar-height 1.0
+         :tab-line-height 1.0
+         :bold-weight bold
+         :italic-slant italic)))
+
+  (with-eval-after-load 'pulsar
+    (add-hook 'fontaine-set-preset-hook #'pulsar-pulse-line)))
+
+(require 'spacious-padding)
+
+;; These are the default values, but I keep them here for visibility.
+(setq spacious-padding-widths
+      '( :internal-border-width 15
+         :header-line-width 4
+         :mode-line-width 6
+         :tab-width 4
+         :right-divider-width 30
+         :scroll-bar-width 8
+         :fringe-width 8))
+
+;; Read the doc string of `spacious-padding-subtle-mode-line' as it
+;; is very flexible and provides several examples.
+(setq spacious-padding-subtle-frame-lines
+      `( :mode-line-active 'default
+         :mode-line-inactive vertical-border))
+
+(spacious-padding-mode 1)
+
+;; Set a key binding if you need to toggle spacious padding.
+(define-key global-map (kbd "<f8>") #'spacious-padding-mode)
+
+(use-package minibuffer
+  :ensure nil
+  :config
+  (setq completion-styles '(basic substring initials flex orderless)) ; also see `completion-category-overrides'
+  (setq completion-pcm-leading-wildcard t)) ; Emacs 31: make `partial-completion' behave like `substring'
+
+;; settings to ignore letter casing
+(setq completion-ignore-case t)
+(setq read-buffer-completion-ignore-case t)
+(setq-default case-fold-search t)   ; For general regexp
+(setq read-file-name-completion-ignore-case t)
+(file-name-shadow-mode 1)
+
+(use-package mb-depth
+  :ensure nil
+  :hook (after-init . minibuffer-depth-indicate-mode)
+  :config
+  (setq read-minibuffer-restore-windows nil) ; Emacs 28
+  (setq enable-recursive-minibuffers t))
+
+(use-package orderless
+  :ensure nil 
+  :demand t
+  :after minibuffer
+  :config
+  (setq orderless-matching-styles '(orderless-prefixes orderless-regexp))
+  (setq orderless-smart-case nil)
+
+  ;; SPC should never complete: use it for `orderless' groups.
+  ;; The `?' is a regexp construct.
+  :bind ( :map minibuffer-local-completion-map
+          ("SPC" . nil)
+          ("?" . nil)))
+
+(use-package vertico
+  :ensure nil
+  :config
+  (setq vertico-cycle t)
+  (setq vertico-resize nil)
+  (vertico-mode 1)
+  (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy))
+
+;; Enable rich annotations using the Marginalia package
+(use-package marginalia
+  ;; Bind `marginalia-cycle' locally in the minibuffer.  To make the binding
+  ;; available in the *Completions* buffer, add it to the
+  ;; `completion-list-mode-map'.
+  :bind (:map minibuffer-local-map
+              ("M-A" . marginalia-cycle))
+
+  ;; The :init section is always executed.
+  :init
+
+  ;; Marginalia must be activated in the :init section of use-package such that
+  ;; the mode gets enabled right away. Note that this forces loading the
+  ;; package.
+  (marginalia-mode))
+
+;; Example configuration for Consult
+(use-package consult
+  ;; Replace bindings. Lazily loaded by `use-package'.
+  :bind (;; C-c bindings in `mode-specific-map'
+         ("C-c M-x" . consult-mode-command)
+         ("C-c h" . consult-history)
+         ("C-c k" . consult-kmacro)
+         ("C-c m" . consult-man)
+         ("C-c i" . consult-info)
+         ([remap Info-search] . consult-info)
+         ;; C-x bindings in `ctl-x-map'
+         ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
+         ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
+         ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
+         ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
+         ("C-x t b" . consult-buffer-other-tab)    ;; orig. switch-to-buffer-other-tab
+         ("C-x r b" . consult-bookmark)            ;; orig. bookmark-jump
+         ("C-x p b" . consult-project-buffer)      ;; orig. project-switch-to-buffer
+         ;; Custom M-# bindings for fast register access
+         ("M-#" . consult-register-load)
+         ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
+         ("C-M-#" . consult-register)
+         ;; Other custom bindings
+         ("M-y" . consult-yank-pop)                ;; orig. yank-pop
+         ;; M-g bindings in `goto-map'
+         ("M-g e" . consult-compile-error)
+         ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
+         ("M-g g" . consult-goto-line)             ;; orig. goto-line
+         ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
+         ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
+         ("M-g m" . consult-mark)
+         ("M-g k" . consult-global-mark)
+         ("M-g i" . consult-imenu)
+         ("M-g I" . consult-imenu-multi)
+         ;; M-s bindings in `search-map'
+         ("M-s d" . consult-find)                  ;; Alternative: consult-fd
+         ("M-s c" . consult-locate)
+         ("M-s g" . consult-grep)
+         ("M-s G" . consult-git-grep)
+         ("M-s r" . consult-ripgrep)
+         ("M-s l" . consult-line)
+         ("M-s L" . consult-line-multi)
+         ("M-s k" . consult-keep-lines)
+         ("M-s u" . consult-focus-lines)
+         ;; Isearch integration
+         ("M-s e" . consult-isearch-history)
+         :map isearch-mode-map
+         ("M-e" . consult-isearch-history)         ;; orig. isearch-edit-string
+         ("M-s e" . consult-isearch-history)       ;; orig. isearch-edit-string
+         ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
+         ("M-s L" . consult-line-multi)            ;; needed by consult-line to detect isearch
+         ;; Minibuffer history
+         :map minibuffer-local-map
+         ("M-s" . consult-history)                 ;; orig. next-matching-history-element
+         ("M-r" . consult-history))                ;; orig. previous-matching-history-element
+
+  ;; Enable automatic preview at point in the *Completions* buffer. This is
+  ;; relevant when you use the default completion UI.
+  :hook (completion-list-mode . consult-preview-at-point-mode)
+
+  ;; The :init configuration is always executed (Not lazy)
+  :init
+
+  ;; Tweak the register preview for `consult-register-load',
+  ;; `consult-register-store' and the built-in commands.  This improves the
+  ;; register formatting, adds thin separator lines, register sorting and hides
+  ;; the window mode line.
+  (advice-add #'register-preview :override #'consult-register-window)
+  (setq register-preview-delay 0.5)
+
+  ;; Use Consult to select xref locations with preview
+  (setq xref-show-xrefs-function #'consult-xref
+        xref-show-definitions-function #'consult-xref)
+
+  ;; Configure other variables and modes in the :config section,
+  ;; after lazily loading the package.
+  :config
+
+  ;; Optionally configure preview. The default value
+  ;; is 'any, such that any key triggers the preview.
+  ;; (setq consult-preview-key 'any)
+  ;; (setq consult-preview-key "M-.")
+  ;; (setq consult-preview-key '("S-<down>" "S-<up>"))
+  ;; For some commands and buffer sources it is useful to configure the
+  ;; :preview-key on a per-command basis using the `consult-customize' macro.
+  (consult-customize
+   consult-theme :preview-key '(:debounce 0.2 any)
+   consult-ripgrep consult-git-grep consult-grep consult-man
+   consult-bookmark consult-recent-file consult-xref
+   consult--source-bookmark consult--source-file-register
+   consult--source-recent-file consult--source-project-recent-file
+   ;; :preview-key "M-."
+   :preview-key '(:debounce 0.4 any))
+
+  (setq consult-narrow-key "<") ;; "C-+"
+
+  ;; Optionally make narrowing help available in the minibuffer.
+  ;; You may want to use `embark-prefix-help-command' or which-key instead.
+  ;; (keymap-set consult-narrow-map (concat consult-narrow-key " ?") #'consult-narrow-help)
+)
+
+;;; Extended minibuffer actions and more (embark.el)
+(use-package embark
+  :ensure nil
+  :bind (("C-." . embark-act)
+         :map minibuffer-local-map
+         ("C-c C-c" . embark-collect)
+         ("C-c C-e" . embark-export)))
+
+;; Needed for correct exporting while using Embark with Consult
+;; commands.
+(use-package embark-consult
+  :ensure nil)
+
+;; The `wgrep' packages lets us edit the results of a grep search
+;; while inside a `grep-mode' buffer.  All we need is to toggle the
+;; editable mode, make the changes, and then type C-c C-c to confirm
+;; or C-c C-k to abort.
+;;
+;; Further reading: https://protesilaos.com/emacs/dotemacs#h:9a3581df-ab18-4266-815e-2edd7f7e4852
+(use-package wgrep
+  :ensure t
+  :bind ( :map grep-mode-map
+          ("e" . wgrep-change-to-wgrep-mode)
+          ("C-x C-q" . wgrep-change-to-wgrep-mode)
+          ("C-c C-c" . wgrep-finish-edit)))
+
+(use-package dashboard
+  :ensure nil  ; Managed by Nix
+  :config
+  (dashboard-setup-startup-hook)
+  (setq dashboard-startup-banner 'ascii
+        dashboard-center-content t
+        dashboard-items '((projects . 5)
+                           (recents  . 5)))
+  (setq dashboard-set-footer nil))
+
+  (setq dashboard-banner-logo-title "This is your life")
+  (setq dashboard-set-file-icons t)
+  (setq dashboard-projects-backend 'projectile)
+
+  (setq initial-buffer-choice (lambda ()
+                                  (get-buffer-create "*dashboard*")
+                                  (dashboard-refresh-buffer)))
+  (setq dashboard-projects-switch-function 'counsel-projectile-switch-project-by-name)
+
+(global-set-key (kbd "<C-tab>") 'next-buffer)
+
+;; Needed for `:after char-fold' to work
+(use-package char-fold
+  :custom
+  (char-fold-symmetric t)
+  (search-default-mode #'char-fold-to-regexp))
+
+(use-package reverse-im
+  :ensure nil 
+  :demand t ; always load it
+  :after char-fold ; but only after `char-fold' is loaded
+  :bind
+  ("M-T" . reverse-im-translate-word) ; to fix a word written in the wrong layout
+  :custom
+  ;; cache generated keymaps
+  (reverse-im-cache-file (locate-user-emacs-file "reverse-im-cache.el"))
+  ;; use lax matching
+  (reverse-im-char-fold t)
+  ;; advice read-char to fix commands that use their own shortcut mechanism
+  (reverse-im-read-char-advice-function #'reverse-im-read-char-include)
+  ;; translate these methods
+  (reverse-im-input-methods '("russian-computer" "greek"))
+  :config
+  (reverse-im-mode t)) ; turn the mode on
+
+(when (require 'meow nil t)             
+(require 'meow-tree-sitter nil t)   
+(when (fboundp 'meow-setup)
+  (meow-setup)
+  (meow-global-mode 1)))
+
+;; (     require 'modus-themes) 
+
+;; ;; In all of the following, WEIGHT is a symbol such as `semibold',
+;; ;; `light', `bold', or anything mentioned in `modus-themes-weights'.
+;; (setq modus-themes-italic-constructs t
+;;       modus-themes-bold-constructs t 
+;;       modus-themes-mixed-fonts t
+;;       modus-themes-variable-pitch-ui nil 
+;;       modus-themes-custom-auto-reload t
+;;       modus-themes-disable-other-themes t
+
+;;       ;; Options for `modus-themes-prompts' are either nil (the
+;;       ;; default), or a list of properties that may include any of those
+;;       ;; symbols: `italic', `WEIGHT'
+;;       modus-themes-prompts '(italic medium)
+
+;;       ;; The `modus-themes-completions' is an alist that reads two
+;;       ;; keys: `matches', `selection'.  Each accepts a nil value (or
+;;       ;; empty list) or a list of properties that can include any of
+;;       ;; the following (for WEIGHT read further below):
+;;       ;;
+;;       ;; `matches'   :: `underline', `italic', `WEIGHT'
+;;       ;; `selection' :: `underline', `italic', `WEIGHT'
+;;       modus-themes-completions
+;;       '((matches . (semibold))
+;;         (selection . (bold italic text-also)))
+
+;;       modus-themes-org-blocks 'tinted-background
+
+;;       modus-themes-to-toggle '(modus-vivendi modus-vivendi-tinted)
+
+;;       ;; The `modus-themes-headings' is an alist: read the manual's
+;;       ;; node about it or its doc string.  Basically, it supports
+;;       ;; per-level configurations for the optional use of
+;;       ;; `variable-pitch' typography, a height value as a multiple of
+;;       ;; the base font size (e.g. 1.5), and a `WEIGHT'.
+;;       modus-themes-headings
+;;       '((1 . (variable-pitch 1.5))
+;;         (2 . (1.3))
+;;         (agenda-date . (1.3))
+;;         (agenda-structure . (variable-pitch light 1.8))
+;;         (t . (1.1))))
+
+;; ;; Maybe define some palette overrides, such as by using our presets
+;; (setq modus-themes-common-palette-overrides
+;;       modus-themes-preset-overrides-intense)
+
+;; (mapc #'disable-theme custom-enabled-themes)
+
+;; ;; Load the theme of your choice:
+;; (load-theme 'modus-vivendi :no-confirm)
+
+;; (define-key global-map (kbd "<f5>") #'modus-themes-toggle)
+
+;; Make customisations that affect Emacs faces BEFORE loading a theme
+;; (any change needs a theme re-load to take effect).
+(require 'ef-themes)
+
+;; If you like two specific themes and want to switch between them, you
+;; can specify them in `ef-themes-to-toggle' and then invoke the command
+;; `ef-themes-toggle'.  All the themes are included in the variable
+;; `ef-themes-collection'.
+(setq ef-themes-to-toggle '(ef-tritanopia-dark ef-winter))
+
+(setq ef-themes-headings ; read the manual's entry or the doc string
+      '((0 variable-pitch regular 1.9)
+        (1 variable-pitch regular 1.8)
+        (2 variable-pitch light 1.7)
+        (3 variable-pitch light 1.6)
+        (4 variable-pitch light 1.5)
+        (5 variable-pitch light 1.4) ; absence of weight means `bold'
+        (6 variable-pitch light 1.3)
+        (7 variable-pitch light 1.2)
+        (t variable-pitch light 1.1)))
+
+;; They are nil by default...
+(setq ef-themes-mixed-fonts t
+      ef-themes-variable-pitch-ui t)
+
+;; Disable all other themes to avoid awkward blending:
+(mapc #'disable-theme custom-enabled-themes)
+
+;; Load the theme of choice:
+(load-theme 'ef-winter :no-confirm)
+
+(define-key global-map (kbd "<f5>") #'ef-themes-toggle)
+
+;;;; Pulsar
+;; Read the pulsar manual: <https://protesilaos.com/emacs/pulsar>.
+(use-package pulsar
+  :ensure nil
+  :config
+  (setq pulsar-pulse t
+        pulsar-delay 0.055
+        pulsar-iterations 5
+        pulsar-face 'pulsar-green
+        pulsar-region-face 'pulsar-cyan
+        pulsar-highlight-face 'pulsar-magenta)
+  ;; Pulse after `pulsar-pulse-region-functions'.
+  (setq pulsar-pulse-region-functions pulsar-pulse-region-common-functions)
+  :hook
+  ;; There are convenience functions/commands which pulse the line using
+  ;; a specific colour: `pulsar-pulse-line-red' is one of them.
+  ((next-error . (pulsar-pulse-line-red pulsar-recenter-top pulsar-reveal-entry))
+   (minibuffer-setup . pulsar-pulse-line-red)
+   ;; Pulse right after the use of `pulsar-pulse-functions' and
+   ;; `pulsar-pulse-region-functions'.  The default value of the
+   ;; former user option is comprehensive.
+   (after-init . pulsar-global-mode))
+  :bind
+  ;; pulsar does not define any key bindings.  This is just my personal
+  ;; preference.  Remember to read the manual on the matter.  Evaluate:
+  ;;
+  ;; (info "(elisp) Key Binding Conventions")
+  (("C-x l" . pulsar-pulse-line) ; override `count-lines-page'
+   ("C-x L" . pulsar-highlight-dwim))) ; or use `pulsar-highlight-line'
+
+;; The desired ratio of the focused window's size.
+(setopt auto-resize-ratio 0.7)
+
+(defun win/auto-resize ()
+  (let* (
+         (height (floor (* auto-resize-ratio (frame-height))))
+         (width (floor (* auto-resize-ratio (frame-width))))
+         ;; INFO We need to calculate by how much we should enlarge
+         ;; focused window because Emacs does not allow setting the
+         ;; window dimensions directly.
+         (h-diff (max 0 (- height (window-height))))
+         (w-diff (max 0 (- width (window-width)))))
+    (enlarge-window h-diff)
+    (enlarge-window w-diff t)))
+(setopt window-min-height 10)
+(setopt window-min-width 10)
+
+(advice-add 'other-window :after (lambda (&rest args)
+                                   (win/auto-resize)))
+
+(advice-add 'windmove-up    :after 'win/auto-resize)
+(advice-add 'windmove-down  :after 'win/auto-resize)
+(advice-add 'windmove-right :after 'win/auto-resize)
+(advice-add 'windmove-left  :after 'win/auto-resize)
+
+(setq use-short-answers t)
+  (global-visual-line-mode t) ;; Wraps lines everywhere
+  (global-auto-revert-mode t) ;; Auto refresh buffers from disk
+
+  ;; Настройка подсветки скобок
+  (show-paren-mode t)  ;; Включить режим
+  (setq show-paren-style 'mixed) ;; Лучшая видимость (выделение всей пары или одной)
+  (setq show-paren-delay 0)      ;; Мгновенная подсветка 
+
+  (setq warning-minimum-level :error)
+
+  ;; Нумерация
+  (global-display-line-numbers-mode t)
+  (setq display-line-numbers-type 'relative)
+
+  ;; Подсветка отступов (требует установки highlight-indent-guides)
+  ;; (use-package highlight-indent-guides
+  ;;   :ensure nil 
+  ;;   :hook (prog-mode . highlight-indent-guides-mode)  ;; Автоматическое включение для языков программирования
+  ;;   :custom
+  ;;   (highlight-indent-guides-method 'character)
+  ;;   (highlight-indent-guides-character ?·)
+  ;;   (highlight-indent-guides-responsive 'top)
+  ;;   (highlight-indent-guides-delay 0)
+  ;;   (highlight-indent-guides-auto-enabled t))  ;; Автовключение
+
+
+
+;; (defun my-highlight-indent-guides-gradient-fade ()
+;;   "Градиентная подсветка с постепенным затуханием."
+;;   (let ((base-color 220)   ;; светло-серый: чем выше, тем светлее
+;;         (steps 10))        ;; количество градаций
+;;     (dotimes (i steps)
+;;       (let* ((shade (format "#%02x%02x%02x" 
+;;                             (+ base-color (* i 3)) 
+;;                             (+ base-color (* i 3)) 
+;;                             (+ base-color (* i 3))))
+;;              (face-name (intern (format "highlight-indent-guides-fade-face-%d" i))))
+;;         (unless (facep face-name)
+;;           (make-face face-name)
+;;           (set-face-foreground face-name shade)))))
+;;   ;; текущий уровень — яркий
+;;   (unless (facep 'highlight-indent-guides-fade-face-current)
+;;     (make-face 'highlight-indent-guides-fade-face-current)
+;;     (set-face-foreground 'highlight-indent-guides-fade-face-current "#ff9900")))
+
+;; (my-highlight-indent-guides-gradient-fade)
+
+;; (setq highlight-indent-guides-character-face-function
+;;       (lambda (level responsive display)
+;;         (let ((steps 10))
+;;           (if (and responsive (eq display 'top))
+;;               'highlight-indent-guides-fade-face-current
+;;             (intern (format "highlight-indent-guides-fade-face-%d"
+;;                             (mod (1- level) steps)))))))
+
+;; ESC will also cancel/quit/etc.
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+(use-package general
+  :config
+	;; (general-evil-setup t)
+	(general-create-definer dl/leader-keys
+	:keymaps '(normal visual emacs)
+	:prefix ","))
+
+(defvar current-time-format "%H:%M:%S"
+  "Format of date to insert with `insert-current-time' func.
+Note the weekly scope of the command's precision.")
+
+(defun dl/find-file (path)
+  "Helper function to open a file in a buffer"
+  (interactive)
+  (find-file path))
+
+(defun dl/load-buffer-with-emacs-config ()
+  "Open the emacs configuration"
+  (interactive)
+  (dl/find-file "~/.local/share/src/nixos-config/modules/shared/config/emacs/config.org"))
+
+(defun dl/load-buffer-with-nix-config ()
+  "Open the emacs configuration"
+  (interactive)
+  (dl/find-file "~/.local/share/src/nixos-config/modules/shared/home-manager.nix"))
+
+(defun dl/reload-emacs ()
+  "Reload the emacs configuration"
+  (interactive)
+  (load "~/.emacs.d/init.el"))
+
+;; Emacs relates shortcuts
+(dl/leader-keys
+  "e"  '(:ignore t :which-key "emacs")
+  "ee" '(dl/load-buffer-with-emacs-config :which-key "open emacs config")
+  "er" '(dl/reload-emacs :which-key "reload emacs"))
+
+(setq org-roam-capture-templates
+ '(("d" "default" plain
+    "%?"
+    :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n\n")
+    :unnarrowed t)))
+
+(use-package org-modern
+  :ensure nil 
+  :config
+    ;; Choose some fonts
+    ;; (set-face-attribute 'default nil :family "Iosevka")
+    ;; (set-face-attribute 'variable-pitch nil :family "Iosevka Aile")
+    ;; (set-face-attribute 'org-modern-symbol nil :family "Iosevka")
+
+    ;; Add frame borders and window dividers
+    (modify-all-frames-parameters
+    '((right-divider-width . 40)
+    (internal-border-width . 40)))
+    (dolist (face '(window-divider
+                    window-divider-first-pixel
+                    window-divider-last-pixel))
+    (face-spec-reset-face face)
+    (set-face-foreground face (face-attribute 'default :background)))
+    (set-face-background 'fringe (face-attribute 'default :background))
+
+    (setq
+    ;; Edit settings
+    org-auto-align-tags nil
+    org-tags-column 0
+    org-catch-invisible-edits 'show-and-error
+    org-special-ctrl-a/e t
+    org-insert-heading-respect-content t
+
+    ;; Org styling, hide markup etc.
+    org-hide-emphasis-markers t
+    org-pretty-entities t
+    org-agenda-tags-column 0
+    org-ellipsis "…")
+
+    (global-org-modern-mode))
+
+;; (defun dl/evil-hook ()
+;;   (dolist (mode '(eshell-mode
+;;                   git-rebase-mode
+;;                   dashboard-mode
+;;                   term-mode))
+;;   (add-to-list 'evil-emacs-state-modes mode))) ;; no evil mode for these modes
+
+
+;; (use-package evil
+;;   :init
+;;     (setq evil-want-integration t) ;; TODO: resear;; ch what this does
+;;     (setq evil-want-keybinding nil) ;; Required for evil-collection
+;;     (setq evil-want-fine-undo 'fine) ;; undo/redo each motion
+;;     (setq evil-want-Y-yank-to-eol t) ;; Y copies to end of line like vim
+;;     (setq evil-want-C-u-scroll t) ;; vim like scroll up
+;;   :config
+;;     (evil-mode 1)
+;;     (dl/evil-hook)
+;;     ;; Emacs "cancel" == vim "cancel"
+;;     (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state))
+
+;;   ;; Gives me vim bindings elsewhere in emacs
+;;   (use-package evil-collection
+;;     :after evil
+;;     :init
+;;   (setq evil-want-keybinding nil)
+;;     ;; Define the variable before use
+;;     (defvar evil-collection-mode-list nil)
+;;     :config
+;;     (setq evil-collection-mode-list (remove 'magit evil-collection-mode-list))
+;;     (evil-collection-init))
+
+;;   ;; Keybindings in org mode
+;;   (use-package evil-org
+;;   :after evil
+;;   :hook
+;;       (org-mode . evil-org-mode)
+;;   :config
+;;       (require 'evil-org-agenda)
+;;       (evil-org-agenda-set-keys)
+;;       ;; 🔑 включаем все ключевые темы
+;;       (evil-org-set-key-theme '(navigation insert textobjects additional shift todo heading)))
+
+;;   ;; Branching undo system
+;;   (use-package undo-tree
+;;     :after evil
+;;     :diminish
+;;     :config
+;;     (evil-set-undo-system 'undo-tree)
+;;     (global-undo-tree-mode 1))
+
+;;   (use-package evil-commentary
+;;     :after evil
+;;     :config
+;;     (evil-commentary-mode))
+
+  ;; Keep undo files from littering directories
+  (setq undo-tree-history-directory-alist '(("." . "~/.local/state/emacs/undo")))
+
+(use-package nerd-icons-dired)
+
+(use-package dired
+  :ensure nil
+  :defer 1
+  :commands (dired dired-jump)
+  :config
+    (setq dired-listing-switches "-agho --group-directories-first")
+    (setq dired-hide-details-hide-symlink-targets nil)
+    (put 'dired-find-alternate-file 'disabled nil)
+    (setq delete-by-moving-to-trash t)
+    (add-hook 'dired-load-hook
+          (lambda ()
+            (interactive)
+            (dired-collapse)))
+    (add-hook 'dired-mode-hook
+          (lambda ()
+            (interactive)
+            (nerd-icons-dired-mode 1)
+            (hl-line-mode 1))))
+    (add-hook 'dired-mode-hook 'dired-hide-details-mode)t
+
+(use-package dired-ranger)
+(use-package dired-collapse)
+
+(require 'key-chord)
+(key-chord-mode 1)
+
+(key-chord-define-global "dd" (lambda() (interactive)
+(find-file "/Users/alexeykotomin/Downloads/")))
+
+;; (evil-collection-define-key 'normal 'dired-mode-map
+;;   "h" 'dired-up-directory
+;;   "c" 'find-file
+;;   "H" 'dired-omit-mode
+;;   "l" 'dired-find-file
+;;   "y" 'dired-ranger-copy
+;;   "X" 'dired-ranger-move
+;;   "p" 'dired-ranger-paste
+;;   (kbd "RET") 'dired-find-file
+;;   (kbd "<return>") 'dired-find-file)
+
+;; Darwin needs ls from coreutils for dired to work
+(when (system-is-mac)
+  (setq insert-directory-program
+    (expand-file-name ".nix-profile/bin/ls" (getenv "HOME"))))
+
+(use-package org-download
+  :after org
+  :custom
+  (org-download-image-dir (expand-file-name "files" "~/.local/share/org-roam/"))
+  :hook
+  (dired-mode . org-download-enable))
+
+(setq backup-directory-alist
+      `((".*" . "~/.local/state/emacs/backup"))
+      backup-by-copying t    ; Don't delink hardlinks
+      version-control t      ; Use version numbers on backups
+      delete-old-versions t) ; Automatically delete excess backups
+
+(setq auto-save-file-name-transforms
+      `((".*" "~/.local/state/emacs/" t)))
+(setq lock-file-name-transforms
+      `((".*" "~/.local/state/emacs/lock-files/" t)))
+
+(use-package ripgrep)
+(use-package projectile
+  :config (projectile-mode)
+  :custom
+    ((projectile-completion-system 'ivy))
+  :bind-keymap
+	    ("C-c p" . projectile-command-map)
+    :init
+    (setq projectile-enable-caching t)
+    (setq projectile-sort-order 'recently-active)
+    (setq projectile-switch-project-action #'projectile-dired))
+
+    ;; Пути к кэшу и списку проектов в ~/.config/emacs/
+    (setq projectile-cache-file
+      (expand-file-name "projectile.cache" ak/config-dir))
+    (setq projectile-known-projects-file
+      (expand-file-name "projectile-bookmarks.eld" ak/config-dir))
+
+(setq projectile-project-root-files-bottom-up '("package.json" ".projectile" ".project" ".git"))
+(setq projectile-ignored-projects '("~/.emacs.d/"))
+(setq projectile-globally-ignored-directories '("dist" "node_modules" ".log" ".git"))
+
+;; Gives me Ivy options in the Projectile menus
+(use-package counsel-projectile 
+  :after projectile
+  :config
+  (counsel-projectile-mode 1))
+
+;; Project-wide search keybindings
+(defun my/swiper-project ()
+  "Search across all files in current project using ripgrep."
+  (interactive)
+  (counsel-rg nil (projectile-project-root)))
+
+;; Search keybindings for projectile
+(dl/leader-keys
+  "/"   '(counsel-projectile-rg :which-key "search project")
+  "?"   '(my/swiper-project :which-key "search project (alt)")
+  "a"   '(:ignore t :which-key "search")
+  "aa"  '(swiper-all :which-key "search buffers") 
+  "ap"  '(counsel-projectile-rg :which-key "search project")
+  "ag"  '(counsel-projectile-grep :which-key "grep project")
+  "af"  '(counsel-projectile-find-file :which-key "find file")
+  "ad"  '(counsel-projectile-find-dir :which-key "find directory"))
+
+;; Alternative global keybindings for quick access
+(global-set-key (kbd "C-c C-s") 'counsel-projectile-rg)
+(global-set-key (kbd "C-c s p") 'my/swiper-project)
+(global-set-key (kbd "C-c s a") 'swiper-all)
+
+(setq persp-mode-prefix-key (kbd "C-x j"))
+(persp-mode 1)
+
+(when (system-is-mac)
+  (with-eval-after-load "ispell"
+    (setq ispell-program-name (executable-find "hunspell"))
+    (setq ispell-dictionary "en_US")
+    (setq ispell-local-dictionary-alist
+      '(
+        ("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8)
+        ("ru_RU" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "ru_RU") nil utf-8)
+        ("el_GR" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "el_GR") nil utf-8)
+      ))
+    (setq ispell-personal-dictionary
+          (expand-file-name "~/.local/share/dict/user/hunspell_personal"))))
+
+
+(use-package flyspell-correct
+	:after flyspell
+	:bind nil)
+
+(dl/leader-keys
+  "s" '(flyspell-correct-wrapper :which-key "correct word"))
+
+(use-package flyspell-correct-ivy
+  :after flyspell-correct)
+
+(add-hook 'git-commit-mode-hook  'turn-on-flyspell)
+(add-hook 'text-mode-hook        'flyspell-mode)
+(add-hook 'org-mode-hook         'flyspell-mode)
+(add-hook 'prog-mode-hook        'flyspell-prog-mode)
+
+(defun spell() (interactive) (flyspell-mode 1))
+
+;; Auto scroll the buffer as we compile
+(setq compilation-scroll-output t)
+
+;; By default, eshell doesn't support ANSI colors. Enable them for compilation.
+(require 'ansi-color)
+(defun colorize-compilation-buffer ()
+  (let ((inhibit-read-only t))
+    (ansi-color-apply-on-region (point-min) (point-max))))
+(add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
+
+(use-package lsp-mode
+  :commands lsp lsp-deferred
+  :init
+    (setq lsp-keymap-prefix "C-c l")
+    (setq lsp-restart 'ignore)
+    (setq lsp-headerline-breadcrumb-enable nil)
+    (setq lsp-auto-guess-root t)
+    (setq lsp-enable-which-key-integration t))
+
+(use-package lsp-ui
+  :hook (lsp-mode . lsp-ui-mode)
+  :custom
+    (lsp-ui-doc-position 'bottom))
+
+(use-package lsp-treemacs
+  :after lsp)
+
+(use-package company
+  :after lsp-mode
+  :hook (lsp-mode . company-mode)
+  :bind (:map company-active-map
+        ("<tab>" . company-complete-selection))
+        (:map lsp-mode-map
+        ("<tab>" . company-indent-or-complete-common))
+   :custom
+     (company-minimum-prefix-length 1)
+     (company-idle-delay 0.0))
+
+(use-package company-box
+  :hook (company-mode . company-box-mode))
+
+(add-hook 'lsp-mode-hook #'lsp-headerline-breadcrumb-mode)
+
+(defun dl/lsp-find-references-other-window ()
+  (interactive)
+  (switch-to-buffer-other-window (current-buffer))
+  (lsp-find-references))
+
+(defun dl/lsp-find-implementation-other-window ()
+  (interactive)
+  (switch-to-buffer-other-window (current-buffer))
+  (lsp-find-implementation))
+
+(defun dl/lsp-find-definition-other-window ()
+  (interactive)
+  (switch-to-buffer-other-window (current-buffer))
+  (lsp-find-definition))
+
+(dl/leader-keys
+"l"  '(:ignore t :which-key "lsp")
+"lf" '(dl/lsp-find-references-other-window :which-key "find references")
+"lc" '(dl/lsp-find-implementation-other-window :which-key "find implementation")
+"ls" '(lsp-treemacs-symbols :which-key "list symbols")
+"lt" '(flycheck-list-errors :which-key "list errors")
+"lh" '(lsp-treemacs-call-hierarchy :which-key "call hierarchy")
+"lF" '(lsp-format-buffer :which-key "format buffer")
+"li" '(lsp-organize-imports :which-key "organize imports")
+"ll" '(lsp :which-key "enable lsp mode")
+"lr" '(lsp-rename :which-key "rename")
+"ld" '(dl/lsp-find-definition-other-window :which-key "goto definition"))
+
+(use-package lsp-pyright
+  :ensure nil  ; Managed by Nix
+  :hook (python-mode . (lambda ()
+    (require 'lsp-pyright)
+    (lsp-deferred))))  ; or lsp-deferred
+
+(setq python-indent-offset 2)
+
+(use-package blacken
+  :ensure nil)
+
+(setq blacken-line-length '88)
+(setq blacken-allow-py36 t)
+(setq blacken-executable "black")
+(setq blacken-fast-unsafe t)
+
+(add-hook 'python-mode-hook 'blacken-mode)
+
+(add-to-list 'auto-mode-alist '("\\.env" . shell-script-mode))
+
+(use-package yaml-mode
+  :commands (markdown-mode gfm-mode)
+  :mode (("\\.yml\\'" . yaml-mode)))
+
+;; Ассоциируем файлы .kbd с lisp-mode
+(add-to-list 'auto-mode-alist '("\\.kbd\\'" . lisp-mode))
+
+;; This uses Github Flavored Markdown for README files
+(use-package markdown-mode
+  :commands (markdown-mode gfm-mode)
+  :mode (("README\\.md\\'" . gfm-mode)
+    ("\\.md\\'" . markdown-mode)
+    ("\\.markdown\\'" . markdown-mode))
+  :init (setq markdown-command "pandoc")
+  :config
+  ;; Enable syntax highlighting
+  (setq markdown-fontify-code-blocks-natively t)
+  ;; Enable inline code highlighting
+  (setq markdown-enable-highlighting-syntax t)
+  ;; Optional: customize faces for better visibility
+  (custom-set-faces
+   '(markdown-code-face ((t (:inherit fixed-pitch :background "#2d2d2d"))))
+   '(markdown-inline-code-face ((t (:inherit (font-lock-constant-face fixed-pitch) :background "#2d2d2d"))))))
+
+(add-to-list 'auto-mode-alist '("\\.mdx\\'" . markdown-mode))
+
+(use-package emmet-mode)
+(add-hook 'sgml-mode-hook 'emmet-mode)
+(add-hook 'css-mode-hook  'emmet-mode)
+(define-key emmet-mode-keymap [tab] 'emmet-expand-line)
+(add-to-list 'emmet-jsx-major-modes 'jsx-mode)
+
+(use-package rainbow-mode)
+
+(use-package magit
+  :commands (magit-status magit-get-current-branch)
+  ;; :config
+  ;; Enable vim-style navigation in Magit
+  ;; (evil-set-initial-state 'magit-mode 'normal)
+  ;; (evil-set-initial-state 'magit-status-mode 'normal)
+  ;; (evil-set-initial-state 'magit-diff-mode 'normal)
+  ;; (evil-set-initial-state 'magit-log-mode 'normal)
+  ;; (evil-define-key 'normal magit-mode-map
+  ;;   "j" 'magit-section-forward
+  ;;   "k" 'magit-section-backward
+  ;;   "h" 'magit-section-hide
+  ;;   "l" 'magit-section-show
+  ;;   "n" 'magit-section-forward-sibling
+  ;;   "p" 'magit-section-backward-sibling
+  ;;   "J" 'magit-section-forward-sibling
+  ;;   "K" 'magit-section-backward-sibling
+  ;;   "gg" 'beginning-of-buffer
+  ;;   "G" 'end-of-buffer
+  ;;   "q" 'magit-mode-bury-buffer)
+  ;; ;; Also set for specific magit modes
+  ;; (evil-define-key 'normal magit-status-mode-map
+  ;;   "j" 'magit-section-forward
+  ;;   "k" 'magit-section-backward)
+  ;; (evil-define-key 'normal magit-diff-mode-map
+  ;;   "j" 'magit-section-forward
+  ;;   "k" 'magit-section-backward)
+  ;; (evil-define-key 'normal magit-log-mode-map
+  ;;   "j" 'magit-section-forward
+  ;;   "k" 'magit-section-backward))
+(define-key magit-hunk-section-map (kbd "RET") 'magit-diff-visit-file-other-window)
+(global-set-key (kbd "C-x G") 'magit-log-buffer-file)
+
+(use-package nix-mode
+  :mode "\\.nix\\'")
+
+(use-package which-key
+  :ensure nil  ; Managed by Nix
+  :init
+  (setq which-key-idle-delay 0.3
+        which-key-idle-secondary-delay 0.1)
+  :config
+  (which-key-mode))
+
+(use-package helpful
+  :ensure nil  ; Managed by Nix
+  :commands (helpful-callable helpful-variable helpful-key)
+  :bind
+  ([remap describe-function] . helpful-callable)
+  ([remap describe-command]  . helpful-callable)
+  ([remap describe-variable] . helpful-variable)
+  ([remap describe-key]      . helpful-key))
+
+(with-eval-after-load 'org
+  (org-babel-do-load-languages
+  'org-babel-load-languages
+  '(
+    (emacs-lisp . t)
+    (python . t)
+    (sql . t)
+    (shell . t)))
+ )
+
+;; -*- lexical-binding: t; -*-
+(use-package gptel
+  ;; :straight (:local-repo "~/.local/share/git/gptel/")
+  :ensure nil 
+  :commands (gptel gptel-send)
+  :hook ((gptel-pre-response . my/gptel-easy-page))
+  :bind (("C-c C-<return>" . gptel-menu)
+         ("C-c <return>" . gptel-send)
+         ("C-c j" . gptel-menu)
+         ("C-c C-g" . gptel-abort)
+         ("C-c SPC" . my/gptel-easy-page)
+         :map gptel-mode-map
+         ("C-c C-x t" . gptel-set-topic)
+         :map embark-region-map
+         ("+" . gptel-add))
+  :config
+  (auth-source-pass-enable)  
+  (setq-default gptel-model 'gpt-4.1-nano
+                gptel-backend gptel--openai
+                gptel-display-buffer-action '(pop-to-buffer-same-window))
+
+  (defalias 'my/gptel-easy-page
+    (let ((map (define-keymap
+               "RET" 'gptel-end-of-response
+               "n"   'gptel-end-of-response
+               "p"   'gptel-beginning-of-response))
+          (scrolling (propertize "SCRL" 'face '(:inherit highlight))))
+      (require 'pixel-scroll)
+      (lambda ()
+      (interactive)
+      (when (eq (window-buffer (selected-window)) (current-buffer))
+          (add-to-list 'mode-line-format scrolling)
+          (set-transient-map
+           map t
+           (lambda ()
+             (setq mode-line-format
+                   (delete scrolling mode-line-format))))))))
+
+  (defun my/gptel-remove-headings (beg end)
+    (when (derived-mode-p 'org-mode)
+      (save-excursion
+        (goto-char beg)
+        (while (re-search-forward org-heading-regexp end t)
+          (forward-line 0)
+          (delete-char (1+ (length (match-string 1))))
+          (insert-and-inherit "*")
+          (end-of-line)
+          (skip-chars-backward " \t\r")
+          (insert-and-inherit "*")))))
+  (defun my/gptel-latex-preview (beg end)
+    (when (derived-mode-p 'org-mode)
+      (org-latex-preview--preview-region 'dvisvgm beg end)))
+  (add-hook 'gptel-post-response-functions #'my/gptel-latex-preview)
+  (add-hook 'gptel-post-response-functions #'my/gptel-remove-headings)
+  
+  ;; (with-eval-after-load 'gptel-transient
+  ;;   (transient-suffix-put 'gptel-menu (kbd "-m") :key "M")
+  ;;   (transient-suffix-put 'gptel-menu (kbd "-c") :key "C")
+  ;;   (transient-suffix-put 'gptel-menu (kbd "-n") :key "N")
+  ;;   (transient-suffix-put 'gptel-menu (kbd "-t") :key "T"))
+
+  (setq gptel--system-message (alist-get 'default gptel-directives)
+        gptel-default-mode 'org-mode)
+  (setf (alist-get 'org-mode gptel-prompt-prefix-alist) "*Prompt*: "
+        (alist-get 'org-mode gptel-response-prefix-alist) "*Response*:\n"
+        (alist-get 'markdown-mode gptel-prompt-prefix-alist) "#### ")
+  (with-eval-after-load 'gptel-org
+    (setq-default gptel-org-branching-context t))
+
+  (with-eval-after-load 'popper
+      (add-to-list 'popper-reference-buffers "\\*gptel-log\\*"))
+  (setf (alist-get "\\*gptel-log\\*" display-buffer-alist nil nil #'equal)
+        `((display-buffer-reuse-window display-buffer-in-side-window)
+          (side . right)
+          (window-width . 72)
+          (slot . 20)
+          (body-function . ,(lambda (win)
+                              (select-window win)
+                              (my/easy-page)))))
+
+  (cl-pushnew '(:propertize
+                (:eval
+                 (when (local-variable-p 'gptel--system-message)
+                   (concat
+                    "["
+                    (if-let ((n (car-safe (rassoc gptel--system-message gptel-directives))))
+			(symbol-name n)
+                      (gptel--describe-directive gptel--system-message 12))
+                    "]")))
+                'face 'gptel-rewrite-highlight-face)
+              mode-line-misc-info)
+  (add-to-list
+   'mode-line-misc-info
+   '(:eval
+     (unless gptel-mode
+       (when (and (local-variable-p 'gptel-model)
+		  (not (eq gptel-model (default-value 'gptel-model))))
+	 (concat "[" (gptel--model-name gptel-model) "]"))))))
+
+(use-package gptel
+  :after gptel
+  :config
+  (gptel-make-deepseek "Groq"
+    :host "api.groq.com"
+    :endpoint "/openai/v1/chat/completions"
+    :stream t
+    :key #'gptel-api-key-from-auth-source
+    :models '(deepseek-r1-distill-llama-70b
+              llama-3.3-70b-versatile llama-3.1-8b-instant
+              mixtral-8x7b-32768 gemma-7b-it))
+  
+  (defvar gptel--anthropic
+    (gptel-make-anthropic "Claude" :key gptel-api-key :stream t))
+
+  (gptel-make-anthropic "Claude-thinking"
+    :key #'gptel-api-key-from-auth-source
+    :stream t
+    :models '(claude-sonnet-4-20250514 claude-3-7-sonnet-20250219)
+    :request-params '(:thinking (:type "enabled" :budget_tokens 1024)
+                      :max_tokens 2048))
+
+  (defvar gptel--togetherai
+    (gptel-make-openai "TogetherAI"
+      :host "api.together.xyz"
+      :key gptel-api-key
+      :stream t
+      :models '(mistralai/Mixtral-8x7B-Instruct-v0.1
+                codellama/CodeLlama-13b-Instruct-hf
+                codellama/CodeLlama-34b-Instruct-hf)))
+
+  (gptel-make-deepseek "Deepseek"
+    :key #'gptel-api-key-from-auth-source
+    :stream t)
+
+  (gptel-make-perplexity "Perplexity"
+    :stream t
+    :key #'gptel-api-key-from-auth-source)
+
+  (gptel-make-openai "OpenRouter"
+    :host "openrouter.ai"
+    :endpoint "/api/v1/chat/completions"
+    :stream t
+    :key #'gptel-api-key-from-auth-source
+    :models '(deepseek/deepseek-r1-distill-llama-70b:free
+              deepseek/deepseek-r1-distill-llama-70b:free))
+
+  (gptel-make-openai "Github Models"
+    :host "models.inference.ai.azure.com"
+    :endpoint "/chat/completions?api-version=2024-05-01-preview"
+    :stream t
+    :key (lambda () (auth-source-pass-get 'secret "api/api.github.com"))
+    :models '(DeepSeek-R1 gpt-4o-mini))
+
+  (defvar gptel--gemini
+    (gptel-make-gemini "Gemini" :key gptel-api-key :stream t))
+
+  (with-eval-after-load 'gptel-ollama
+    (defvar gptel--ollama
+      (gptel-make-ollama
+          "Ollama"
+        :host "192.168.1.11:11434"
+        :models '(qwen3:4b llama3.1:8b qwen3:8b
+                  (llava:7b :description Llava 1.6: Vision capable model
+                   :capabilities (media)
+                   :mime-types ("image/jpeg" "image/png")))
+        :stream t)))
+
+  (defvar gptel--gpt4all
+    (gptel-make-gpt4all
+        "GPT4All"
+      :protocol "http"
+      :host "localhost:4891"
+      :models '(mistral-7b-openorca.Q4_0.gguf))))
+
+(use-package gptel-prompts
+  :quelpa (gptel-prompts :fetcher github :repo "jwiegley/gptel-prompts")
+  ;; :ensure (:host github :repo "jwiegley/gptel-prompts")
+  :after gptel
+  :config (gptel-prompts-update))
+
+(use-package gptel
+  :after gptel
+  :config
+  (gptel-make-preset 'default
+    :description "My default settings for gptel"
+    :system 'default
+    :backend "ChatGPT"
+    :model 'gpt-4.1-mini
+    :tools nil :temperature nil :stream t
+    :include-reasoning 'ignore)
+
+  (gptel-make-preset 'nostream
+    :description "No streaming"
+    :stream nil)
+
+  (gptel-make-preset 'prog
+    :description "Claude Sonnet, with context, generates only code"
+    :backend "Claude" :model 'claude-3-7-sonnet-20250219 :system 'programmer
+    :tools nil :stream t :temperature nil :max-tokens nil :use-context 'system
+    :include-reasoning nil)
+
+  (gptel-make-preset 'sonar-gen
+    :description "Sonar (non pro) with default instructions"
+    :system 'default
+    :backend "Perplexity"
+    :model 'sonar :stream nil
+    :tools nil :temperature 0.66)
+
+  (gptel-make-preset 'cliwhiz
+    :description "Haiku, no context, generates CLI commands" :backend "Claude"
+    :model 'claude-3-5-haiku-20241022 :system 'cliwhiz :tools nil :stream t
+    :temperature 0.66 :max-tokens nil :use-context 'nil :include-reasoning nil)
+
+  (gptel-make-preset 'websearch
+    :description "Add basic web search tools"
+    :tools '(:append "search_web" "read_url" "get_youtube_meta"))
+
+  (gptel-make-preset 'files
+    :description "Add filesystem tools"
+    :tools '("filesystem"))
+
+  (gptel-make-preset 'tutor
+    :description "Get Claude Sonnet to teach using hints"
+    :system 'tutor
+    :backend "Claude"
+    :model 'claude-3-7-sonnet-20250219
+    :tools nil :temperature 0.7
+    :max-tokens 600)
+
+  (gptel-make-preset 'pro
+    :description "Sonnet 4, no-holds bared"
+    :system 'default
+    :backend "Claude"
+    :model 'claude-sonnet-4-20250514
+    :tools nil
+    :include-reasoning nil)
+
+  (gptel-make-preset 'explain
+    :description "Deepseek-R1, explains the prompt text"
+    :backend "Deepseek" :model 'deepseek-reasoner :system 'explain :tools nil
+    :stream t :temperature nil :max-tokens nil
+    :use-context 'system :include-reasoning nil))
+
+(use-package gptel-rewrite
+  :after gptel
+  :bind (:map gptel-rewrite-actions-map
+         ("C-c C-i" . gptel--rewrite-inline-diff))
+  :config
+  (defun gptel--rewrite-inline-diff (&optional ovs)
+    (interactive (list (gptel--rewrite-overlay-at)))
+    (unless (require 'inline-diff nil t)
+      (user-error "Inline diffs require the inline-diff package."))
+    (when-let* ((ov-buf (overlay-buffer (or (car-safe ovs) ovs)))
+                ((buffer-live-p ov-buf)))
+      (with-current-buffer ov-buf
+        (cl-loop for ov in (ensure-list ovs)
+                 for ov-beg = (overlay-start ov)
+                 for ov-end = (overlay-end ov)
+                 for response = (overlay-get ov 'gptel-rewrite)
+                 do (delete-overlay ov)
+                 (inline-diff-words
+                  ov-beg ov-end response)))))
+  
+  (when (boundp 'gptel--rewrite-dispatch-actions)
+    (add-to-list
+     'gptel--rewrite-dispatch-actions '(?i "inline-diff")
+     'append))
+
+  (setf (alist-get 'infill gptel-directives) #'my/gptel-code-infill)
+  (defun my/gptel-code-infill ()
+    "Fill in code at point based on buffer context.  Note: Sends the whole buffer."
+    (let ((lang (gptel--strip-mode-suffix major-mode)))
+      `(,(format "You are a %s programmer and assistant in a code buffer in a text editor.
+
+Follow my instructions and generate %s code to be inserted at the cursor.
+For context, I will provide you with the code BEFORE and AFTER the cursor.
+
+
+Generate %s code and only code without any explanations or markdown code fences.  NO markdown.
+You may include code comments.
+
+Do not repeat any of the BEFORE or AFTER code." lang lang lang)
+        nil
+        "What is the code AFTER the cursor?"
+        ,(format "AFTER\n```\n%s\n```\n"
+          (buffer-substring-no-properties
+           (if (use-region-p) (max (point) (region-end)) (point))
+           (point-max)))
+        "And what is the code BEFORE the cursor?"
+        ,(format "BEFORE\n```%s\n%s\n```\n" lang
+          (buffer-substring-no-properties
+           (point-min)
+           (if (use-region-p) (min (point) (region-beginning)) (point))))
+        ,@(when (use-region-p) "What should I insert at the cursor?")))))
+
+(use-package gptel-ask
+  :after gptel
+  :bind (:map help-map
+         ("C-q" . gptel-ask)
+         :map embark-url-map
+         ("?" . gptel-kagi-summarize))
+  :config
+  (defvar gptel--kagi
+    (gptel-make-kagi
+        "Kagi"
+      :key (lambda () (auth-source-pass-get 'secret "api/kagi-ai.com")))
+    "Kagi source for gptel")
+
+  (setf (alist-get "^\\*gptel-ask\\*" display-buffer-alist
+                   nil nil #'equal)
+        '((display-buffer-reuse-window display-buffer-in-side-window)
+          (side . right) (slot . 10) (window-width . 0.25)
+          (window-parameters (no-delete-other-windows . t))
+          (post-command-select-window . t)
+          (bump-use-time . t)))
+
+  (defun gptel-kagi-summarize (url)
+    (interactive "sSummarize url: ")
+    (let ((gptel-backend gptel--kagi)
+          (gptel-model "summarize:agnes")
+          (gptel-use-curl)
+          (gptel-use-context))
+      (gptel-request url
+        :callback
+        (lambda (response info)
+          (if response
+              (progn
+                (gptel--prepare-ask-buffer)
+                (let ((scroll-conservatively 0))
+                  (with-current-buffer gptel-ask--buffer-name
+                    (insert "\n" url "\nSummary:\n\n"
+                            response "\n\n----")
+                    (display-buffer (current-buffer)))))
+            (message "gptel-request failed with message: %s"
+                     (plist-get info :status)))))
+      (message "Generating summary for: %s" url))))
+
+(use-package gptel-quick
+  :quelpa (gptel-quick :fetcher github :repo "karthink/gptel-quick")
+  :bind (:map embark-general-map
+         ("?" . gptel-quick)))
+
+(use-package project
+  :after (popper visual-fill-column)
+  :bind (:map project-prefix-map
+         ("C" . gptel-project))
+  :config
+  (setf (alist-get ".*Chat.org$" display-buffer-alist nil nil #'equal)
+        `((display-buffer-below-selected)
+          (window-height . 0.5)
+          (body-function . ,#'select-window)))
+  (defun gptel-project ()
+    "Open the ChatGPT file for the current project."
+    (interactive)
+    (let ((default-directory (or (project-root (project-current))
+                                 default-directory)))
+      (find-file "Chat.org")
+      (require 'gptel)
+      (unless gptel-mode
+        (gptel-mode 1))
+      (unless visual-fill-column-mode
+        (visual-fill-column-mode 1))
+      (unless (equal popper-popup-status 'user-popup)
+        (popper-toggle-type)))))
+
+(use-package gptel
+  :hook ((eshell-mode . my/gptel-eshell-keys))
+  :config
+  (defun my/gptel-eshell-send (&optional arg)
+    (interactive "P")
+    (if (use-region-p)
+        (gptel-send arg)
+      (push-mark)
+      (or (eshell-previous-prompt 0)
+          (eshell-previous-prompt 1))
+      (activate-mark)
+      (gptel-send arg)
+      (exchange-point-and-mark)
+      (deactivate-mark)))
+  (defun my/gptel-eshell-keys ()
+    (define-key eshell-mode-map (kbd "C-c <return>")
+                #'my/gptel-eshell-send)))
+
+(use-package gptel
+  :after (gptel git-commit)
+  :hook ((git-commit-setup . my/gptel-commit-summary))
+  :config
+  (gptel-make-preset 'commit-summary
+    :description "For generating commit message summaries"
+    :system (lambda () (with-temp-buffer
+                    (insert-file-contents
+                     (expand-file-name
+                      "commit-summary.txt" user-emacs-directory))
+                    (buffer-string)))
+    :backend "ChatGPT"
+    :model 'gpt-4.1-nano
+    :include-reasoning nil
+    :tools nil)
+  (defun my/gptel-commit-summary ()
+    "Insert a commit message header line in the format I use, followed by a
+standard magit (GNU style) changelog.
+
+Don't get the LLM to write the commit message itself, because it's bad
+at inferring my intent.
+
+Intended to be placed in `git-commit-setup-hook'."
+    (gptel-with-preset 'commit-summary
+      (let ((commit-buffer (current-buffer))) ;commit message buffer
+
+        (when (looking-at-p "[\n[:blank:]]+") ;Heuristic for blank message
+          (with-temp-buffer
+            (vc-git-command             ;insert diff
+             (current-buffer) 1 nil
+             "diff-index" "--exit-code" "--patch"
+             (and (magit-anything-staged-p) "--cached")
+             "HEAD" "--")
+
+            (gptel-request nil          ;Run request on diff buffer contents
+              :context commit-buffer
+              :callback
+              (lambda (resp info)
+                (if (not (stringp resp))
+                    (message "Git commit summary generation failed")
+                  (with-current-buffer (plist-get info :context)
+                    (save-excursion
+                      (goto-char (point-min))
+                      (insert resp "\n\n")
+                      (magit-generate-changelog))))))))))))
+
+(use-package llm-tool-collection
+  :quelpa (llm-tool-collection :fetcher github :repo "skissue/llm-tool-collection")
+  :config (mapcar (apply-partially #'apply #'gptel-make-tool)
+                  (llm-tool-collection-get-all))
+  :defer)
+
+(use-package mcp
+  :after gptel
+  :ensure nil 
+  :config
+  (require 'gptel-integrations)
+  (setq mcp-hub-servers
+        `(("github"
+           :command "github-mcp-server"
+           :args ("stdio")
+           :env (:GITHUB_PERSONAL_ACCESS_TOKEN
+                 ,(auth-source-pass-get 'secret "api/api.github.com")))
+          ("filesystem"
+           :command "mcp-server-filesystem"
+           :args (,(expand-file-name "~/dotnix/")))
+          ("memory"
+           :command "mcp-server-memory")
+          ("nixos"
+           :command "nix"
+           :args ("run" "github:utensils/mcp-nixos" "--")))))
+
+(provide 'setup-gptel)
+
+;; Local Variables:
+;; outline-regexp: ";; \\*+"
+;; End:
