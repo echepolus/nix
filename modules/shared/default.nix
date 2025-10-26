@@ -1,7 +1,7 @@
 { config, pkgs, callPackage, ... }:
 
 let
-  emacsOverlaySha256 = "0s1rpm7q0wj8l1kxpc0nvnlv6md0cf4rccvgqmm9gsasdqv9sqip";
+  emacsOverlaySha256 = "09d6g9xx3afr7h8614z6hlsv2qkmbv2majzi5ar7g7brjc8d8jkf";
   myEmacs = import ./emacs.nix { inherit pkgs; };
 in
 {
