@@ -5,6 +5,7 @@
   "wireshark-app"
   "tailscale-app"
   "font-hack-nerd-font"
+  "orbstack"
 
   # Communication Tools
   "zoom"

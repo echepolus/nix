@@ -8,42 +8,21 @@ let user = "alexeykotomin"; in
     ];
 
     secrets = {
-      "syncthing-cert" = {
+      "id_github" = {
         symlink = true;
-        path = "/home/${user}/.config/syncthing/cert.pem";
-        file =  "${secrets}/nixos-syncthing-cert.age";
-        mode = "600";
-        owner = "${user}";
-        group = "users";
-      };
-
-      "syncthing-key" = {
-        symlink = true;
-        path = "/home/${user}/.config/syncthing/key.pem";
-        file =  "${secrets}/nixos-syncthing-key.age";
-        mode = "600";
-        owner = "${user}";
-        group = "users";
-      };
-
-      "github-ssh-key" = {
-        symlink = false;
         path = "/home/${user}/.ssh/id_github";
-        file =  "${secrets}/github-ssh-key.age";
+        file =  "${secrets}/id_github.age";
         mode = "600";
         owner = "${user}";
-        group = "wheel";
       };
 
-      "github-signing-key" = {
+      "sign_github" = {
         symlink = false;
-        path = "/home/${user}/.ssh/pgp_github.key";
-        file =  "${secrets}/github-signing-key.age";
+        path = "/home/${user}/.gnupg/private-keys-v1.d/sign_github.key";
+        file =  "${secrets}/sign_github.age";
         mode = "600";
         owner = "${user}";
-        group = "wheel";
       };
     };
   };
-
 }
