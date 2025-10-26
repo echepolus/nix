@@ -30,7 +30,7 @@ let user = "alexeykotomin";
   time.timeZone = "America/New_York";
 
   networking = {
-    hostName = "%HOST%"; # Define your hostname.
+    hostName = "nixos"; # Define your hostname.
     # Modern networking configuration - no need to explicitly set useDHCP = false
     interfaces."%INTERFACE%".useDHCP = true;
   };
