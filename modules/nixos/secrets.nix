@@ -14,6 +14,7 @@ let user = "alexeykotomin"; in
         file =  "${secrets}/id_github.age";
         mode = "600";
         owner = "${user}";
+        group = "wheel";
       };
 
       "sign_github" = {
@@ -22,6 +23,7 @@ let user = "alexeykotomin"; in
         file =  "${secrets}/sign_github.age";
         mode = "600";
         owner = "${user}";
+        group = "wheel";
       };
     };
   };
