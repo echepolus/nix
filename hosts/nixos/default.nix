@@ -1,14 +1,14 @@
 { config, inputs, pkgs, agenix, ... }:
 
 let user = "alexeykotomin";
-    # keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOk8iAnIaa1deoc7jw8YACPNVka1ZFJxhnU4G74TmS+p" ]; in
+    keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA+na0ir1Zt5lK307bu4krXTCEDNSF7VGOboMfRwIHh+ a.kotominn@gmail.com" ]; in
 in
 {
   imports = [
-    # ../../modules/nixos/secrets.nix
-    # ../../modules/nixos/disk-config.nix
+    ../../modules/nixos/secrets.nix
+    ../../modules/nixos/disk-config.nix
     ../../modules/shared
-    # agenix.nixosModules.default
+    agenix.nixosModules.default
   ];
 
   # Use the systemd-boot EFI boot loader.
