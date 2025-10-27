@@ -5,8 +5,8 @@ let user = "alexeykotomin";
 in
 {
   imports = [
-    # ../../modules/nixos/secrets.nix
-    # ../../modules/nixos/disk-config.nix
+    ../../modules/nixos/secrets.nix
+    ../../modules/nixos/disk-config.nix
     ../../modules/shared
     agenix.nixosModules.default
   ];
