@@ -275,7 +275,7 @@ in
   fonts.packages = with pkgs; [
     dejavu_fonts
     emacs-all-the-icons-fonts
-    feather-font # from overlay
+    # feather-font # from overlay
     jetbrains-mono
     font-awesome
     noto-fonts
