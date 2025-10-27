@@ -94,7 +94,7 @@ with pkgs; [
   ncurses # Terminal control library with terminfo database
   neofetch # System information tool
   neovim
-  ngrok # Secure tunneling service
+  # ngrok # Secure tunneling service
   nodejs
   nodePackages.live-server # Development server with live reload
   nodePackages.nodemon # Node.js file watcher
