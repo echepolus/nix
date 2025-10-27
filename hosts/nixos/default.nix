@@ -1,7 +1,7 @@
 { config, inputs, pkgs, agenix, ... }:
 
 let user = "alexeykotomin";
-    keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA+na0ir1Zt5lK307bu4krXTCEDNSF7VGOboMfRwIHh+ a.kotominn@gmail.com" ]; in
+    keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA+na0ir1Zt5lK307bu4krXTCEDNSF7VGOboMfRwIHh+ a.kotominn@gmail.com" ];
 in
 {
   imports = [
