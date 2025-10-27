@@ -28,12 +28,12 @@ in
   };
 
   # Set your time zone.
-  time.timeZone = "America/New_York";
+  time.timeZone = "Europe/Moscow";
 
   networking = {
     hostName = "nixos"; # Define your hostname.
     # Modern networking configuration - no need to explicitly set useDHCP = false
-    interfaces."%INTERFACE%".useDHCP = true;
+    interfaces.enp2s0.useDHCP = true;
   };
 
   nix = {
@@ -288,5 +288,5 @@ in
     inetutils
   ];
 
-  system.stateVersion = "21.05"; # Don't change this
+  system.stateVersion = "25.05"; # Don't change this
 }
