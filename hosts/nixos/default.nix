@@ -6,7 +6,7 @@ in
 {
   imports = [
     # ../../modules/nixos/secrets.nix
-    ../../modules/nixos/disk-config.nix
+    # ../../modules/nixos/disk-config.nix
     ../../modules/shared
     agenix.nixosModules.default
   ];
