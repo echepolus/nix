@@ -5,7 +5,6 @@
   "wireshark-app"
   "tailscale-app"
   "font-hack-nerd-font"
-  "orbstack"
 
   # Communication Tools
   "zoom"
@@ -29,6 +28,9 @@
   # C
   "clash-verge-rev"
   "chatgpt"
+  
+  # G
+  "ghostty"
 
   # H
   "homerow"
@@ -42,7 +44,7 @@
   "leader-key"
   # "input-source-pro"
   "espanso"
-  "kawa"
+  "kawa-app"
 
   # L
 
