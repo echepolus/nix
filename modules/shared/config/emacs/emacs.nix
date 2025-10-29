@@ -82,8 +82,6 @@ let
     org-transclusion
     org-download
     org-roam
-    emacsql
-    sqlite3
     visual-fill-column
     
     # Writing
@@ -108,32 +106,22 @@ let
     yaml-mode
     lua-mode
     markdown-mode
-    web-mode
-    typescript-mode
     tree-sitter
     tree-sitter-langs
-    tide
     prettier-js
-    emmet-mode
     rainbow-mode
     
     # Python
-    lsp-pyright
-    blacken
     
     # PHP
-    php-mode
     
     # Infrastructure
-    dockerfile-mode
-    # terraform-mode
     
     # Other tools
     f  # File manipulation library
     rotate
     exec-path-from-shell
     # transient  # Required for claude-code.el (0.7.5+)
-    eat  # Terminal emulator for claude-code.el
     pdf-tools   
 
     # AI

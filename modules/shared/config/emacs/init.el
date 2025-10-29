@@ -12,7 +12,7 @@
 ;; -------------------------
 (defvar org-config-file "~/.config/nix/modules/shared/config/emacs/config.org")
 (defvar default-config-file "~/.emacs.d/default-config.org")
-(defvar default-config-url "https://raw.githubusercontent.com/dustinlyons/nixos-config/9ad810c818b895c1f67f4daf21bbef31d8b5e8cd/shared/config/emacs/config.org")
+(defvar default-config-url "https://raw.githubusercontent.com/echepolus/nix/refs/heads/main/modules/shared/config/emacs/config.org")
 
 ;; -------------------------
 ;; Package Manager Setup
