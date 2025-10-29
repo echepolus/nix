@@ -26,19 +26,16 @@
       url = "github:homebrew/homebrew-cask";
       flake = false;
     };
-    disko = {
-      url = "github:nix-community/disko";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     secrets = {
       url = "git+ssh://git@github.com/echepolus/nix-secrets.git";
       flake = false;
     };
-    nur = {
-      url = "github:nix-community/NUR";
+    chaotic = {
+      url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
-  outputs = { self, darwin, nix-homebrew, homebrew-bundle, homebrew-core, homebrew-cask, home-manager, nixpkgs, flake-utils, disko, agenix, secrets, nur }@inputs:
+  outputs = { self, darwin, nix-homebrew, homebrew-bundle, homebrew-core, homebrew-cask, home-manager, nixpkgs, flake-utils, chaotic, agenix, secrets }@inputs:
     let
       user = "alexeykotomin";
       linuxSystems = [ "x86_64-linux" "aarch64-linux" ];
@@ -67,19 +64,12 @@
       mkLinuxApps = system: {
         "apply" = mkApp "apply" system;
         "build-switch" = mkApp "build-switch" system;
-        "copy-keys" = mkApp "copy-keys" system;
-        "create-keys" = mkApp "create-keys" system;
-        "check-keys" = mkApp "check-keys" system;
-        "install" = mkApp "install" system;
-        "install-with-secrets" = mkApp "install-with-secrets" system;
       };
       mkDarwinApps = system: {
         "apply" = mkApp "apply" system;
         "build" = mkApp "build" system;
         "build-switch" = mkApp "build-switch" system;
-        "copy-keys" = mkApp "copy-keys" system;
-        "create-keys" = mkApp "create-keys" system;
-        "check-keys" = mkApp "check-keys" system;
+        "build-switch-emacs" = mkApp "build-switch-emacs" system;
         "rollback" = mkApp "rollback" system;
       };
     in
@@ -113,20 +103,25 @@
         }
       );
 
-      nixosConfigurations = nixpkgs.lib.genAttrs linuxSystems (system: nixpkgs.lib.nixosSystem {
-        inherit system;
-        specialArgs = inputs;
-        modules = [
-          disko.nixosModules.disko
-          home-manager.nixosModules.home-manager {
-            home-manager = {
-              useGlobalPkgs = true;
-              useUserPackages = true;
-              users.${user} = import ./modules/nixos/home-manager.nix;
-            };
+      nixosConfigurations =
+        nixpkgs.lib.genAttrs linuxSystems (system:
+          nixpkgs.lib.nixosSystem {
+            inherit system;
+            specialArgs = inputs // { inherit user; };
+            modules = [
+              chaotic.nixosModules.default
+              home-manager.nixosModules.home-manager {
+                home-manager = {
+                  useGlobalPkgs = true;
+                  useUserPackages = true;
+                  users.${user} = { config, pkgs, lib, ... }:
+                    import ./modules/nixos/home-manager.nix { inherit config pkgs lib inputs; };
+                };
+              }
+              ./hosts/nixos
+            ];
           }
-          ./hosts/nixos
-        ];
-     });
-  };
+        )
+     };
 }
+
