@@ -7,8 +7,8 @@ in
 {
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
-    ./hardware-configuration.nix
     ../../modules/shared
+    ./hardware-configuration.nix
   ];
 
   # Set your time zone.
@@ -32,7 +32,7 @@ in
   programs = {
     zsh.enable = true;
     firefox.enable = true;
-    hyprland.enable = { # or wayland.windowManager.hyprland
+    hyprland = { # or wayland.windowManager.hyprland
       enable = true;
       xwayland.enable = true;
     };
@@ -40,24 +40,32 @@ in
 
   # Console configuration for virtual terminals
   console.useXkbConfig = true;
+  virtualisation.vmware.guest.enable = true;
 
   # Services configuration
   services = {
+
+    xserver.displayManager.gdm.enable = true;
+    xserver.desktopManager.gnome.enable = true;
+    xserver.xkb = {
+      layout = "us";
+      variant = "";
+    };
 
     emacs = {
       enable = true;
       package = myEmacs;
     };
 
-    displayManager = {
-      sddm.enable = true;
-      autoLogin = {
-        enable = true;
-        user = "alexeykotomin";
-      };
-    };
-
-    desktopManager.plasma6.enable = true;
+    # displayManager = {
+    #   sddm.enable = true;
+    #   autoLogin = {
+    #     enable = true;
+    #     user = "alexeykotomin";
+    #   };
+    # };
+    #
+    # desktopManager.plasma6.enable = true;
 
     # Enable CUPS to print documents.
     printing.enable = true;
@@ -133,7 +141,7 @@ in
     ];
   };
 
-  # Fonts
+  # Font s
   fonts.packages = import ../../modules/shared/fonts.nix { inherit pkgs; };
 
   # Configure Nix settings for flakes
