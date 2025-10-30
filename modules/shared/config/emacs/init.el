@@ -77,7 +77,7 @@
 (defun system-is-mac () (string-equal system-type "darwin"))
 (defun system-is-linux () (string-equal system-type "gnu/linux"))
 
-(defun dl/window-setup ()
+(defun ak/window-setup ()
   (condition-case nil
       (progn
         (column-number-mode)
@@ -88,15 +88,15 @@
         (when (system-is-mac)
           (add-to-list 'default-frame-alist '(ns-transparent-titlebar . nil))
           ;; (add-to-list 'default-frame-alist '(ns-appearance . dark))
-          ;; (add-to-list 'default-frame-alist '(undecorated . t))
+          (add-to-list 'default-frame-alist '(undecorated-round . t))
           (setq ns-use-proxy-icon t))
         (setq frame-title-format nil)
         (message "Window and UI setup completed successfully."))
     (error (message "Error occurred in Window and UI setup."))))
-(dl/window-setup)
+(ak/window-setup)
 
 ;; Function to set transparency and styling
-(defun dl/setup-transparency-and-styling ()
+(defun ak/setup-transparency-and-styling ()
     (when (system-is-mac)
 	;; Values: 0-100 (0 = fully transparent, 100 = opaque)
 	(set-frame-parameter nil 'alpha-background 50) ; For Emacs 29+
@@ -215,7 +215,7 @@
 (setq bookmark-default-file (expand-file-name "bookmarks" ak/config-dir))
 (setq bookmark-save-flag 1) ;; Автосохранение закладок
 
-;; projectile (если используешь)
+;; projectile
 (when (boundp 'projectile-cache-file)
   (setq projectile-cache-file (expand-file-name "projectile.cache" ak/config-dir)))
 (when (boundp 'projectile-known-projects-file)
@@ -239,7 +239,7 @@
   (message "Loaded custom.el for customize interface."))
 
 ;; -------------------------
-;; Умная авто-подгрузка local.el и custom.el с префиксом ak
+;; Умная авто-подгрузка local.el и custom.el
 ;; -------------------------
 (defun ak/smart-reload-config (file)
   (when (file-exists-p file)
