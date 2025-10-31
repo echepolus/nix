@@ -37,7 +37,7 @@ in
       "check"
       "gcc"
       "pkgconf"
-      "glibc"
+      "glib"
     ];
     masApps = {
       #"1password" = 1333542190;
