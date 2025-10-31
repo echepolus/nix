@@ -31,9 +31,12 @@ in
       "speedtest-cli"
       "gitlab-runner"
       "rbenv"
-      "bear"
-      "llvm"
+      # "bear"
+      # "llvm"
       "syncthing"
+      "check"
+      "gcc"
+      "pkgconf"
     ];
     masApps = {
       #"1password" = 1333542190;
