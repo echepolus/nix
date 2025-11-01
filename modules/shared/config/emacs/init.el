@@ -265,4 +265,3 @@
 
 ;; Хук для автоматической перезагрузки при сохранении
 (add-hook 'after-save-hook #'ak/auto-reload-config-on-save)
-
