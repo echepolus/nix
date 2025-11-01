@@ -123,6 +123,7 @@ with pkgs; [
   # tabby
   tmux # Terminal multiplexer
   tree # Directory tree viewer
+  tgpt # GPT in terminal 
 
   # U
   unrar # RAR archive extractor
