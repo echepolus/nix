@@ -30,12 +30,8 @@
       url = "git+ssh://git@github.com/echepolus/nix-secrets.git";
       flake = false;
     };
-    chaotic = {
-      url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
-  outputs = { self, darwin, nix-homebrew, homebrew-bundle, homebrew-core, homebrew-cask, home-manager, nixpkgs, flake-utils, chaotic, agenix, secrets }@inputs:
+  outputs = { self, darwin, nix-homebrew, homebrew-bundle, homebrew-core, homebrew-cask, home-manager, nixpkgs, flake-utils, agenix, secrets }@inputs:
     let
       user = "alexeykotomin";
       linuxSystems = [ "x86_64-linux" "aarch64-linux" ];
@@ -115,7 +111,6 @@
             inherit system;
             specialArgs = inputs // { inherit user; };
             modules = [
-              chaotic.nixosModules.default
               home-manager.nixosModules.home-manager {
                 home-manager = {
                   useGlobalPkgs = true;
