@@ -168,24 +168,32 @@ in
 
   git = {
     enable = true;
+
+    settings = {
+      user = {
+        name = name;
+        mail = email;
+      };
+  
+
+      extraConfig = {
+        init.defaultBranch = "main";
+        gpg.format = "openpgp";
+        user.signingkey = "8EF70D99CF2ACEE8";
+        commit.gpgsign = true;
+
+        core = {
+          editor = "vim";
+          autocrlf = "input";
+        };
+        pull.rebase = true;
+        rebase.autoStash = true;
+      };
+    };
+
     ignores = [ "*.swp" ];
-    userName = name;
-    userEmail = email;
     lfs.enable = true;
 
-    extraConfig = {
-      init.defaultBranch = "main";
-      gpg.format = "openpgp";
-      user.signingkey = "E1B118D1257F1B258F5F06921C864AA57BADB4C3";
-      commit.gpgsign = true;
-
-      core = {
-        editor = "vim";
-        autocrlf = "input";
-      };
-      pull.rebase = true;
-      rebase.autoStash = true;
-    };
   };
 
   vim = {
