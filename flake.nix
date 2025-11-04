@@ -120,8 +120,11 @@
                 };
               }
               ./hosts/nixos
+              ./hosts/nixos
+              ./hosts/nixos/hardware-configuration.nix
             ];
-          });
-     };
+            }
+          );
+    };
 }
 
