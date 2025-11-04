@@ -400,7 +400,8 @@ This enables recentf-mode so we can quickly reopen files you visited recently. I
     (marginalia-mode))
 #+END_SRC
 
-**** Consult
+****
+Consult
 #+NAME: consult 
 #+BEGIN_SRC emacs-lisp
 

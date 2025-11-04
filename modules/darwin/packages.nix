@@ -7,6 +7,4 @@ shared-packages ++ [
   fswatch # File change monitor
   # jankyborders
   aerospace
-  clang-tools
-  rsync
 ]

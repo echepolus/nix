@@ -54,7 +54,7 @@ with pkgs; [
   fzf # Fuzzy finder
  
   # G
-  # gcc # GNU Compiler Collection
+  gcc # GNU Compiler Collection
   gh # GitHub CLI
   glow # Markdown renderer for terminal
   gnupg # GNU Privacy Guard
@@ -98,6 +98,7 @@ with pkgs; [
   nodePackages.live-server # Development server with live reload
   nodePackages.nodemon # Node.js file watcher
   (hiPrio nodePackages.prettier) # Code formatter
+  # nyxt  # The Hacker's Browser not yet ported
 
   # O
   openssh # SSH client and server
@@ -123,7 +124,6 @@ with pkgs; [
   # tabby
   tmux # Terminal multiplexer
   tree # Directory tree viewer
-  tgpt # GPT in terminal 
 
   # U
   unrar # RAR archive extractor
@@ -153,14 +153,14 @@ with pkgs; [
   zsh-fzf-tab
 
   # C package
-  # clang-tools
-  # cmake
-  # codespell
-  # conan
-  # cppcheck
-  # doxygen
-  # gtest
-  # lcov
-  # vcpkg
+  clang-tools
+  cmake
+  codespell
+  conan
+  cppcheck
+  doxygen
+  gtest
+  lcov
+  vcpkg
 
 ] ++ myFonts
