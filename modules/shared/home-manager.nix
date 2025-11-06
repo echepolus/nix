@@ -178,7 +178,7 @@ in
       extraConfig = {
         init.defaultBranch = "main";
         gpg.format = "openpgp";
-        # user.signingkey = "E6C38CC7A3EC02D5"; # work with vm
+        user.signingkey = "E6C38CC7A3EC02D5"; # work with vm
         # user.signingkey = "8EF70D99CF2ACEE8"; # work with mac
         commit.gpgsign = true;
 
