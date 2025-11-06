@@ -83,14 +83,6 @@ in
 
   programs = shared-programs // { 
     gpg.enable = true;
-    # neovim = {
-    #   enable = true;
-    #   viAlias = true;
-    #   vimAlias = true;
-    #   withNodeJs = true;
-    #   withPython3 = true;
-    #   withRuby = false;
-    # };
   };
 
 }
