@@ -74,7 +74,9 @@ in
 
     xserver.enable = true;
 
-    desktopManager.gnome.enable = true;
+    # desktopManager.gnome.enable = true;
+    displayManager.sddm.enable = true;
+    desktopManager.plasma6.enable = true;
 
     xserver.xkb = {
       layout = "us";
@@ -135,8 +137,8 @@ in
     vim
     git
     myEmacs
-    # wl-clipboard     # Wayland clipboard utilities
-    # wayland-utils    # Wayland utilities
+    wl-clipboard     # Wayland clipboard utilities
+    wayland-utils    # Wayland utilities
     # lm_sensors       # Hardware monitoring sensors
     btop             # Modern resource monitor
     open-vm-tools
