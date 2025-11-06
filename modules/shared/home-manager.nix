@@ -314,23 +314,23 @@ in
         "/Users/${user}/.ssh/config_external"
       )
     ];
-   matchBlocks = {
-     "*" = {
-       sendEnv = [ "LANG" "LC_*" ];
-       hashKnownHosts = true;
-     };
-     "github.com" = {
-       identitiesOnly = true;
-       identityFile = [
-          (lib.mkIf pkgs.stdenv.hostPlatform.isLinux
-            "/home/${user}/.ssh/id_github"
-          )
-          (lib.mkIf pkgs.stdenv.hostPlatform.isDarwin
-            "/Users/${user}/.ssh/id_github"
-          )
-        ];
-      };
-    };
+   # matchBlocks = {
+   #   "*" = {
+   #     sendEnv = [ "LANG" "LC_*" ];
+   #     hashKnownHosts = true;
+   #   };
+   #   "github.com" = {
+   #     identitiesOnly = true;
+   #     identityFile = [
+   #        (lib.mkIf pkgs.stdenv.hostPlatform.isLinux
+   #          "/home/${user}/.ssh/id_github"
+   #        )
+   #        (lib.mkIf pkgs.stdenv.hostPlatform.isDarwin
+   #          "/Users/${user}/.ssh/id_github"
+   #        )
+   #      ];
+   #    };
+   #  };
   };
 
   neovim = {
