@@ -7,6 +7,11 @@
     flake-utils.url = "github:numtide/flake-utils";
     agenix.url = "github:ryantm/agenix";
     home-manager.url = "github:nix-community/home-manager";
+    plasma-manager = {
+      url = "github:nix-community/plasma-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
+    };
     darwin = {
       url = "github:LnL7/nix-darwin/master";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -30,12 +35,8 @@
       url = "git+ssh://git@github.com/echepolus/nix-secrets.git";
       flake = false;
     };
-    chaotic = {
-      url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
-  outputs = { self, darwin, nix-homebrew, homebrew-bundle, homebrew-core, homebrew-cask, home-manager, nixpkgs, flake-utils, chaotic, agenix, secrets }@inputs:
+  outputs = { self, darwin, nix-homebrew, homebrew-bundle, homebrew-core, homebrew-cask, home-manager, plasma-manager, nixpkgs, flake-utils, agenix, secrets }@inputs:
     let
       user = "alexeykotomin";
       linuxSystems = [ "x86_64-linux" "aarch64-linux" ];
@@ -64,12 +65,21 @@
       mkLinuxApps = system: {
         "apply" = mkApp "apply" system;
         "build-switch" = mkApp "build-switch" system;
+        "check-keys" = mkApp "check-keys" system;
+        "copy-keys" = mkApp "copy-keys" system;
+        "create-keys" = mkApp "create-keys" system;
+        "clean" = mkApp "clean" system;
+        "rollback" = mkApp "rollback" system;
       };
       mkDarwinApps = system: {
         "apply" = mkApp "apply" system;
         "build" = mkApp "build" system;
         "build-switch" = mkApp "build-switch" system;
         "build-switch-emacs" = mkApp "build-switch-emacs" system;
+        "check-keys" = mkApp "check-keys" system;
+        "copy-keys" = mkApp "copy-keys" system;
+        "create-keys" = mkApp "create-keys" system;
+        "clean" = mkApp "clean" system;
         "rollback" = mkApp "rollback" system;
       };
     in
@@ -109,9 +119,9 @@
             inherit system;
             specialArgs = inputs // { inherit user; };
             modules = [
-              chaotic.nixosModules.default
               home-manager.nixosModules.home-manager {
                 home-manager = {
+                  sharedModules = [ plasma-manager.homeModules.plasma-manager ];
                   useGlobalPkgs = true;
                   useUserPackages = true;
                   users.${user} = { config, pkgs, lib, ... }:
@@ -119,8 +129,6 @@
                 };
               }
               ./hosts/nixos
-              ./hosts/nixos
-              ./hosts/nixos/hardware-configuration.nix
             ];
           }
         );
