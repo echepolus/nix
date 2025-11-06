@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 set -e
 
-<<<<<<< HEAD
 setup_ssh_directory() {
   export SSH_DIR=$HOME/.ssh
   sudo mkdir -p $SSH_DIR
