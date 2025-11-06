@@ -36,13 +36,11 @@ with pkgs; [
 
   # C
   coreutils # Basic file/text/shell utilities
-  colima # Container runtime
 
   # D
   direnv # Environment variable management per directory
   difftastic # Structural diff tool
   du-dust # Disk usage analyzer
-  docker
 
   # E
 #  espanso # Cross-platform Text Expander written in Rust
@@ -54,10 +52,8 @@ with pkgs; [
   fzf # Fuzzy finder
  
   # G
-  gcc # GNU Compiler Collection
   gh # GitHub CLI
   glow # Markdown renderer for terminal
-  gnupg # GNU Privacy Guard
 
   # H
   htop # Interactive process viewer
@@ -77,11 +73,9 @@ with pkgs; [
   # K
   killall # Kill processes by name
   # kmonad
-  kanata-with-cmd
 
   # L
   lnav # Log file navigator
-  libgccjit
   libpng
   lazygit
 
@@ -92,13 +86,12 @@ with pkgs; [
   # N
   ncurses # Terminal control library with terminfo database
   neofetch # System information tool
-  neovim
+  # neovim
   # ngrok # Secure tunneling service
   nodejs
   nodePackages.live-server # Development server with live reload
   nodePackages.nodemon # Node.js file watcher
   (hiPrio nodePackages.prettier) # Code formatter
-  # nyxt  # The Hacker's Browser not yet ported
 
   # O
   openssh # SSH client and server
@@ -118,10 +111,8 @@ with pkgs; [
   # S
   sqlite # SQL database engine
   symlinks
-  # starship
 
   # T
-  # tabby
   tmux # Terminal multiplexer
   tree # Directory tree viewer
 
@@ -131,11 +122,9 @@ with pkgs; [
   uv # Python package installer
 
   # V
-  # vial # Ergo keyboard setup tool
 
   # W
   wget # File downloader
-  wezterm
 
   # X
 
@@ -153,14 +142,11 @@ with pkgs; [
   zsh-fzf-tab
 
   # C package
-  clang-tools
   cmake
   codespell
-  conan
-  cppcheck
-  doxygen
-  gtest
+  # conan
+  # cppcheck
+  # doxygen
   lcov
-  vcpkg
-
+  # vcpkg
 ] ++ myFonts

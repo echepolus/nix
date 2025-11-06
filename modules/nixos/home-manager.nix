@@ -6,23 +6,6 @@ let
   shared-programs = import ../shared/home-manager.nix { inherit config pkgs lib; };
   shared-files = import ../shared/files.nix { inherit config pkgs; };
 
-  polybar-user_modules = builtins.readFile (pkgs.replaceVars ./config/polybar/user_modules.ini {
-    packages = "${xdg_configHome}/polybar/bin/check-nixos-updates.sh";
-    searchpkgs = "${xdg_configHome}/polybar/bin/search-nixos-updates.sh";
-    launcher = "${xdg_configHome}/polybar/bin/launcher.sh";
-    powermenu = "${xdg_configHome}/rofi/bin/powermenu.sh";
-    calendar = "${xdg_configHome}/polybar/bin/popup-calendar.sh";
-  });
-
-  polybar-config = pkgs.replaceVars ./config/polybar/config.ini {
-    font0 = "DejaVu Sans:size=12;3";
-    font1 = "feather:size=12;3"; # from overlay
-  };
-
-  polybar-modules = builtins.readFile ./config/polybar/modules.ini;
-  polybar-bars = builtins.readFile ./config/polybar/bars.ini;
-  polybar-colors = builtins.readFile ./config/polybar/colors.ini;
-
 in
 {
   home = {
@@ -49,22 +32,8 @@ in
 
   # Screen lock
   services = {
-    screen-locker = {
-      enable = true;
-      inactiveInterval = 10;
-      lockCmd = "${pkgs.i3lock-fancy-rapid}/bin/i3lock-fancy-rapid 10 15";
-    };
-
     # Auto mount devices
     udiskie.enable = true;
-
-    polybar = {
-      enable = true;
-      config = polybar-config;
-      extraConfig = polybar-bars + polybar-colors + polybar-modules + polybar-user_modules;
-      package = pkgs.polybarFull;
-      script = "polybar main &";
-    };
 
     dunst = {
       enable = true;
@@ -112,6 +81,16 @@ in
     };
   };
 
-  programs = shared-programs // { gpg.enable = true; };
+  programs = shared-programs // { 
+    gpg.enable = true;
+    # neovim = {
+    #   enable = true;
+    #   viAlias = true;
+    #   vimAlias = true;
+    #   withNodeJs = true;
+    #   withPython3 = true;
+    #   withRuby = false;
+    # };
+  };
 
 }

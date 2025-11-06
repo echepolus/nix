@@ -1,28 +1,34 @@
-{ config, pkgs, agenix, secrets, ... }:
+{ config, pkgs, agenix, secrets, lib, ... }:
 
-let user = "alexeykotomin"; in
+let
+  user = "alexeykotomin";
+  sshPath = if pkgs.stdenv.hostPlatform.isLinux then "/home/${user}/.ssh/id_ed25519"
+            else "/Users/${user}/.ssh/id_ed25519";
+  signKeyPath = if pkgs.stdenv.hostPlatform.isLinux then "/home/${user}/.gnupg/private-keys-v1.d/sign_github.key"
+                else "/Users/${user}/.gnupg/private-keys-v1.d/sign_github.key";
+in
 {
-  age = { 
+  age = {
     identityPaths = [
-      "/home/${user}/.ssh/id_ed25519"
+      sshPath
     ];
 
     secrets = {
       "id_github" = {
         symlink = true;
-        path = "/home/${user}/.ssh/id_github";
-        file =  "${secrets}/id_github.age";
+        path = sshPath;
+        file = "${secrets}/id_github.age";
         mode = "600";
-        owner = "${user}";
+        owner = user;
         group = "wheel";
       };
 
       "sign_github" = {
         symlink = false;
-        path = "/home/${user}/.gnupg/private-keys-v1.d/sign_github.key";
-        file =  "${secrets}/sign_github.age";
+        path = signKeyPath;
+        file = "${secrets}/sign_github.age";
         mode = "600";
-        owner = "${user}";
+        owner = user;
         group = "wheel";
       };
     };

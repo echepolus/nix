@@ -168,24 +168,31 @@ in
 
   git = {
     enable = true;
+
+    settings = {
+      user = {
+        name = name;
+        email = email;
+      };
+
+      extraConfig = {
+        init.defaultBranch = "main";
+        gpg.format = "openpgp";
+        user.signingkey = "E6C38CC7A3EC02D5";
+        commit.gpgsign = true;
+
+        core = {
+          editor = "vim";
+          autocrlf = "input";
+        };
+        pull.rebase = true;
+        rebase.autoStash = true;
+      };
+    };
+
     ignores = [ "*.swp" ];
-    userName = name;
-    userEmail = email;
     lfs.enable = true;
 
-    extraConfig = {
-      init.defaultBranch = "main";
-      gpg.format = "openpgp";
-      user.signingkey = "E1B118D1257F1B258F5F06921C864AA57BADB4C3";
-      commit.gpgsign = true;
-
-      core = {
-        editor = "vim";
-        autocrlf = "input";
-      };
-      pull.rebase = true;
-      rebase.autoStash = true;
-    };
   };
 
   vim = {
@@ -306,19 +313,31 @@ in
         "/Users/${user}/.ssh/config_external"
       )
     ];
-   #matchBlocks = {
-    #   "github.com" = {
-    #     identitiesOnly = true;
-    #     identityFile = [
-    #       (lib.mkIf pkgs.stdenv.hostPlatform.isLinux
-    #         "/home/${user}/.ssh/id_github"
-    #       )
-    #       (lib.mkIf pkgs.stdenv.hostPlatform.isDarwin
-    #         "/Users/${user}/.ssh/id_github"
-    #       )
-    #     ];
-    #   };
-    # };
+   matchBlocks = {
+     "*" = {
+       sendEnv = [ "LANG" "LC_*" ];
+       hashKnownHosts = true;
+     };
+     "github.com" = {
+       identitiesOnly = true;
+       identityFile = [
+          (lib.mkIf pkgs.stdenv.hostPlatform.isLinux
+            "/home/${user}/.ssh/id_github"
+          )
+          (lib.mkIf pkgs.stdenv.hostPlatform.isDarwin
+            "/Users/${user}/.ssh/id_github"
+          )
+        ];
+      };
+    };
+  };
+
+  neovim = {
+    enable = true;
+    viAlias = true;
+    vimAlias = true;
+    withNodeJs = true;
+    withPython3 = true;
   };
 
   tmux = {
