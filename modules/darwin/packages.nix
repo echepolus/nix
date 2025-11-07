@@ -10,10 +10,18 @@ shared-packages ++ [
   # colima # Container runtime
   # docker
   kanata-with-cmd
-  clang-tools
+  # clang-tools
   # wezterm
   # vial # Ergo keyboard setup tool
   # tabby
   # starship
   gnupg # GNU Privacy Guard
+
+  libgccjit
+  binutils
+  check
+  cmake
+  pkg-config
+  gnumake
+
 ]

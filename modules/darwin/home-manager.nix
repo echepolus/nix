@@ -32,7 +32,7 @@ in
       "gitlab-runner"
       "rbenv"
       "bear"
-      "llvm"
+      # "llvm"
       "syncthing"
     ];
     masApps = {
