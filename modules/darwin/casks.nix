@@ -14,7 +14,7 @@
   "pearcleaner"
 
   # Entertainment Tools
-  "vlc"
+  # "vlc"
   
   # Productivity Tools
   

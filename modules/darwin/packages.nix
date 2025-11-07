@@ -23,6 +23,4 @@ shared-packages ++ [
   cmake
   pkg-config
   gnumake
-  valgrind
-
 ]
