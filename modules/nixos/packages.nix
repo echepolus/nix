@@ -17,23 +17,25 @@ shared-packages ++ [
 
   # File and system utilities
   libnotify
-  pcmanfm # File browser
+  # pcmanfm # File browser
 
   # PDF viewer
   zathura
 
   # C
-  cmake
-  check
   chatgpt-cli
 
   # G
-  gcc # GNU Compiler Collection
-  gnumake
+  # gcc # GNU Compiler Collection
 
   # L
-  lcov
+  # lcov
   libgccjit
+  binutils
+  check
+  cmake
+  pkg-config
+  gnumake
 
   # M
   mako
@@ -41,7 +43,6 @@ shared-packages ++ [
   nyxt  # The Hacker's Browser not yet ported
 
   # P
-  pkg-config
 
   # S
   swaybg

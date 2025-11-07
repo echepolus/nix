@@ -142,11 +142,11 @@ with pkgs; [
   zsh-fzf-tab
 
   # C package
-  cmake
-  codespell
+  # cmake
+  # codespell
   # conan
   # cppcheck
   # doxygen
-  lcov
+  # lcov
   # vcpkg
 ] ++ myFonts
