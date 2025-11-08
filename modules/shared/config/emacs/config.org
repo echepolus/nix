@@ -619,6 +619,7 @@ Consult
 
 ** Display options
 *** Themes
+
 ****Modus-themes
 #+NAME: modus-themes-autothemer
 #+BEGIN_SRC emacs-lisp 

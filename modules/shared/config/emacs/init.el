@@ -88,7 +88,7 @@
         (when (system-is-mac)
           (add-to-list 'default-frame-alist '(ns-transparent-titlebar . nil))
           ;; (add-to-list 'default-frame-alist '(ns-appearance . dark))
-          ;; (add-to-list 'default-frame-alist '(undecorated . t))
+          (add-to-list 'default-frame-alist '(undecorated . t))
           (setq ns-use-proxy-icon t))
         (setq frame-title-format nil)
         (message "Window and UI setup completed successfully."))
