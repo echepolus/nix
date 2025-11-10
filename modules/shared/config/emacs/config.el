@@ -930,58 +930,6 @@ Note the weekly scope of the command's precision.")
 ;; Ассоциируем файлы .kbd с lisp-mode
 (add-to-list 'auto-mode-alist '("\\.kbd\\'" . lisp-mode))
 
-;; This uses Github Flavored Markdown for README files
-(use-package markdown-mode
-  :commands (markdown-mode gfm-mode)
-  :mode (("README\\.md\\'" . gfm-mode)
-    ("\\.md\\'" . markdown-mode)
-    ("\\.markdown\\'" . markdown-mode))
-  :init (setq markdown-command "pandoc")
-  :config
-  ;; Enable syntax highlighting
-  (setq markdown-fontify-code-blocks-natively t)
-  ;; Enable inline code highlighting
-  (setq markdown-enable-highlighting-syntax t)
-  ;; Optional: customize faces for better visibility
-  (custom-set-faces
-   '(markdown-code-face ((t (:inherit fixed-pitch :background "#2d2d2d"))))
-   '(markdown-inline-code-face ((t (:inherit (font-lock-constant-face fixed-pitch) :background "#2d2d2d"))))))
-
-(add-to-list 'auto-mode-alist '("\\.mdx\\'" . markdown-mode))
-
-(use-package magit
-  :commands (magit-status magit-get-current-branch)
-  ;; :config
-  ;; Enable vim-style navigation in Magit
-  ;; (evil-set-initial-state 'magit-mode 'normal)
-  ;; (evil-set-initial-state 'magit-status-mode 'normal)
-  ;; (evil-set-initial-state 'magit-diff-mode 'normal)
-  ;; (evil-set-initial-state 'magit-log-mode 'normal)
-  ;; (evil-define-key 'normal magit-mode-map
-  ;;   "j" 'magit-section-forward
-  ;;   "k" 'magit-section-backward
-  ;;   "h" 'magit-section-hide
-  ;;   "l" 'magit-section-show
-  ;;   "n" 'magit-section-forward-sibling
-  ;;   "p" 'magit-section-backward-sibling
-  ;;   "J" 'magit-section-forward-sibling
-  ;;   "K" 'magit-section-backward-sibling
-  ;;   "gg" 'beginning-of-buffer
-  ;;   "G" 'end-of-buffer
-  ;;   "q" 'magit-mode-bury-buffer)
-  ;; ;; Also set for specific magit modes
-  ;; (evil-define-key 'normal magit-status-mode-map
-  ;;   "j" 'magit-section-forward
-  ;;   "k" 'magit-section-backward)
-  ;; (evil-define-key 'normal magit-diff-mode-map
-  ;;   "j" 'magit-section-forward
-  ;;   "k" 'magit-section-backward)
-  ;; (evil-define-key 'normal magit-log-mode-map
-  ;;   "j" 'magit-section-forward
-  ;;   "k" 'magit-section-backward))
-(define-key magit-hunk-section-map (kbd "RET") 'magit-diff-visit-file-other-window)
-(global-set-key (kbd "C-x G") 'magit-log-buffer-file)
-
 (use-package nix-mode
   :mode "\\.nix\\'")
 
