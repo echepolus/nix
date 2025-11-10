@@ -147,7 +147,7 @@
         ;; по умолчанию
         (regular
          :default-family ,my/mono
-         :default-weight light 
+         :default-weight regular 
          :default-height 140
          :fixed-pitch-family ,my/mono
          :variable-pitch-family ,my/var)
@@ -180,7 +180,7 @@
         ;; fallback по умолчанию (используется как база для наследования)
         (t
          :default-family ,my/mono
-         :default-weight light 
+         :default-weight regular
          :default-slant normal
          :default-width normal
          :default-height 140
@@ -517,7 +517,7 @@
 ;; (define-key global-map (kbd "<f5>") #'modus-themes-toggle)
 
 (require 'ef-themes)
-(setq ef-themes-to-toggle '(ef-tritanopia-dark ef-winter))
+(setq ef-themes-to-toggle '(ef-owl ef-maris-dark))
 (setq ef-themes-headings ; read the manual's entry or the doc string
       '((0 variable-pitch regular 1.9)
         (1 variable-pitch regular 1.8)
@@ -534,7 +534,7 @@
 
 (mapc #'disable-theme custom-enabled-themes)
 
-(load-theme 'ef-winter :no-confirm)
+(load-theme 'ef-owl :no-confirm)
 
 (define-key global-map (kbd "<f5>") #'ef-themes-toggle)
 
@@ -766,6 +766,12 @@ Note the weekly scope of the command's precision.")
 
 (key-chord-define-global "dd" (lambda() (interactive)
 (find-file "/Users/alexeykotomin/Downloads/")))
+(key-chord-define-global "ee" (lambda() (interactive)
+(find-file "/Users/alexeykotomin/.config/nix/modules/shared/config/emacs/")))
+(key-chord-define-global "bb" (lambda() (interactive)
+(find-file "/Users/alexeykotomin/Library/Mobile Documents/com~apple~CloudDocs/Библиотека/")))
+(key-chord-define-global "ss" (lambda() (interactive)
+(find-file "/Users/alexeykotomin/s21_projects/")))
 
 (when (system-is-mac)
   (setq insert-directory-program
@@ -781,6 +787,43 @@ Note the weekly scope of the command's precision.")
       `((".*" "~/.local/state/emacs/" t)))
 (setq lock-file-name-transforms
       `((".*" "~/.local/state/emacs/lock-files/" t)))
+
+;; Remember that the website version of this manual shows the latest
+;; developments, which may not be available in the package you are
+;; using.  Instead of copying from the web site, refer to the version
+;; of the documentation that comes with your package.  Evaluate:
+;;
+;;     (info "(denote) Sample configuration")
+(use-package denote
+  :ensure nil
+  :hook (dired-mode . denote-dired-mode)
+  :bind
+  (("C-c n n" . denote)
+   ("C-c n r" . denote-rename-file)
+   ("C-c n l" . denote-link)
+   ("C-c n b" . denote-backlinks)
+   ("C-c n d" . denote-dired)
+   ("C-c n g" . denote-grep))
+  :config
+  (setq denote-directory (expand-file-name "~/Documents/notes/"))
+
+  ;; Automatically rename Denote buffers when opening them so that
+  ;; instead of their long file name they have, for example, a literal
+  ;; "[D]" followed by the file's title.  Read the doc string of
+  ;; `denote-rename-buffer-format' for how to modify this.
+  (denote-rename-buffer-mode 1))
+
+(use-package citar
+:custom
+(citar-bibliography '("~/bib/references.bib")))
+
+(use-package pdf-tools
+:ensure nil
+:config
+(pdf-loader-install))
+(add-hook 'pdf-view-mode-hook
+        (lambda ()
+          (display-line-numbers-mode -1)))
 
 (use-package ripgrep)
 (use-package projectile

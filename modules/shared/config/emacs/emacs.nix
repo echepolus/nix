@@ -91,31 +91,26 @@ let
     flyspell-correct
     flyspell-correct-ivy
     reverse-im
-
+    denote
+    citar
+    
     # Version control
-    magit
+    # magit
     
     # Programming - Language servers
     lsp-mode
     lsp-ui
     lsp-treemacs
-    company
-    company-box
     
-    # Programming - Languages
-    # go-mode
+    # Progr   eamming - Languages
     nix-mode
     yaml-mode
     lua-mode
-    markdown-mode
-    web-mode
-    typescript-mode
     tree-sitter
     tree-sitter-langs
     tide
     prettier-js
     emmet-mode
-    rainbow-mode
     
     # Python
     lsp-pyright
@@ -124,18 +119,13 @@ let
     # PHP
     php-mode
     
-    # Infrastructure
-    dockerfile-mode
-    # terraform-mode
-    
     # Other tools
     f  # File manipulation library
     rotate
     exec-path-from-shell
-    # transient  # Required for claude-code.el (0.7.5+)
-    eat  # Terminal emulator for claude-code.el
     pdf-tools   
-
+    tablist # required by pdf-tools
+    
     # AI
     gptel
     mcp

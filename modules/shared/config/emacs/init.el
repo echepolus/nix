@@ -110,16 +110,16 @@
 	(set-frame-parameter nil 'undecorated-round t)
 	(add-to-list 'default-frame-alist '(undecorated-round . t)))))
 
-;; Apply transparency settings
-(when (display-graphic-p)
-    (dl/setup-transparency-and-styling))
+;; ;; Apply transparency settings
+;; (when (display-graphic-p)
+;;     (dl/setup-transparency-and-styling))
 
-;; Apply to new frames created by emacsclient
-(when (daemonp)
-    (add-hook 'after-make-frame-functions
-	    (lambda (frame)
-		(select-frame frame)
-		(dl/setup-transparency-and-styling))))
+;; ;; Apply to new frames created by emacsclient
+;; (when (daemonp)
+;;     (add-hook 'after-make-frame-functions
+;; 	    (lambda (frame)
+;; 		(select-frame frame)
+;; 		(dl/setup-transparency-and-styling))))
 
 ;; Keybinding to toggle transparency
 (defun dl/toggle-transparency ()

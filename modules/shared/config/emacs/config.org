@@ -220,7 +220,7 @@ This enables recentf-mode so we can quickly reopen files you visited recently. I
           ;; по умолчанию
           (regular
            :default-family ,my/mono
-           :default-weight light 
+           :default-weight regular 
            :default-height 140
            :fixed-pitch-family ,my/mono
            :variable-pitch-family ,my/var)
@@ -253,7 +253,7 @@ This enables recentf-mode so we can quickly reopen files you visited recently. I
           ;; fallback по умолчанию (используется как база для наследования)
           (t
            :default-family ,my/mono
-           :default-weight light 
+           :default-weight regular
            :default-slant normal
            :default-width normal
            :default-height 140
@@ -673,7 +673,7 @@ This enables recentf-mode so we can quickly reopen files you visited recently. I
 #+BEGIN_SRC emacs-lisp 
 
   (require 'ef-themes)
-  (setq ef-themes-to-toggle '(ef-tritanopia-dark ef-winter))
+  (setq ef-themes-to-toggle '(ef-owl ef-maris-dark))
   (setq ef-themes-headings ; read the manual's entry or the doc string
         '((0 variable-pitch regular 1.9)
           (1 variable-pitch regular 1.8)
@@ -690,7 +690,7 @@ This enables recentf-mode so we can quickly reopen files you visited recently. I
 
   (mapc #'disable-theme custom-enabled-themes)
 
-  (load-theme 'ef-winter :no-confirm)
+  (load-theme 'ef-owl :no-confirm)
 
   (define-key global-map (kbd "<f5>") #'ef-themes-toggle)
 
@@ -831,41 +831,42 @@ Use 'golden-ratio-toggle-widescreen' if splits are too wide
     "ee" '(dl/load-buffer-with-emacs-config :which-key "open emacs config")
     "er" '(dl/reload-emacs :which-key "reload emacs"))
 
-  #+END_SRC
+#+END_SRC
 
 *** UI improvements
 **** Org-modern 
 #+NAME::org-mode-visuals
 #+BEGIN_SRC emacs-lisp
-(use-package org-modern
-  :ensure nil 
-  :config
-    ;; Add frame borders and window dividers
-    (modify-all-frames-parameters
-    '((right-divider-width . 40)
-    (internal-border-width . 40)))
-    (dolist (face '(window-divider
-                    window-divider-first-pixel
-                    window-divider-last-pixel))
-    (face-spec-reset-face face)
-    (set-face-foreground face (face-attribute 'default :background)))
-    (set-face-background 'fringe (face-attribute 'default :background))
+  
+  (use-package org-modern
+    :ensure nil 
+    :config
+      ;; Add frame borders and window dividers
+      (modify-all-frames-parameters
+      '((right-divider-width . 40)
+      (internal-border-width . 40)))
+      (dolist (face '(window-divider
+                      window-divider-first-pixel
+                      window-divider-last-pixel))
+      (face-spec-reset-face face)
+      (set-face-foreground face (face-attribute 'default :background)))
+      (set-face-background 'fringe (face-attribute 'default :background))
 
-    (setq
-    ;; Edit settings
-    org-auto-align-tags nil
-    org-tags-column 0
-    org-catch-invisible-edits 'show-and-error
-    org-special-ctrl-a/e t
-    org-insert-heading-respect-content t
+      (setq
+      ;; Edit settings
+      org-auto-align-tags nil
+      org-tags-column 0
+      org-catch-invisible-edits 'show-and-error
+      org-special-ctrl-a/e t
+      org-insert-heading-respect-content t
 
-    ;; Org styling, hide markup etc.
-    org-hide-emphasis-markers t
-    org-pretty-entities t
-    org-agenda-tags-column 0
-    org-ellipsis "…")
+      ;; Org styling, hide markup etc.
+      org-hide-emphasis-markers t
+      org-pretty-entities t
+      org-agenda-tags-column 0
+      org-ellipsis "…")
 
-    (global-org-modern-mode))
+      (global-org-modern-mode))
 
 #+END_SRC
 
@@ -873,6 +874,7 @@ Use 'golden-ratio-toggle-widescreen' if splits are too wide
 *** Install package
 #+NAME: evil-packages
 #+BEGIN_SRC emacs-lisp
+  
   ;; (defun dl/evil-hook ()
   ;;   (dolist (mode '(eshell-mode
   ;;                   git-rebase-mode
@@ -931,6 +933,7 @@ Use 'golden-ratio-toggle-widescreen' if splits are too wide
 
     ;; Keep undo files from littering directories
     (setq undo-tree-history-directory-alist '(("." . "~/.local/state/emacs/undo")))
+
 #+END_SRC
 
 ** Managing files
@@ -966,6 +969,12 @@ Use 'golden-ratio-toggle-widescreen' if splits are too wide
 
     (key-chord-define-global "dd" (lambda() (interactive)
     (find-file "/Users/alexeykotomin/Downloads/")))
+    (key-chord-define-global "ee" (lambda() (interactive)
+    (find-file "/Users/alexeykotomin/.config/nix/modules/shared/config/emacs/")))
+    (key-chord-define-global "bb" (lambda() (interactive)
+    (find-file "/Users/alexeykotomin/Library/Mobile Documents/com~apple~CloudDocs/Библиотека/")))
+    (key-chord-define-global "ss" (lambda() (interactive)
+    (find-file "/Users/alexeykotomin/s21_projects/")))
 
     (when (system-is-mac)
       (setq insert-directory-program
@@ -974,7 +983,6 @@ Use 'golden-ratio-toggle-widescreen' if splits are too wide
 
 *** Backups and auto-save
 These settings keep emacs from littering the filesystem with buffer backups. These files look like ~#yourfilename.txt#~ and would otherwise be dropped in your working directory.
-
 #+NAME: backup-files
 #+BEGIN_SRC emacs-lisp
 (setq backup-directory-alist
@@ -990,6 +998,48 @@ These settings keep emacs from littering the filesystem with buffer backups. The
       `((".*" "~/.local/state/emacs/" t)))
 (setq lock-file-name-transforms
       `((".*" "~/.local/state/emacs/lock-files/" t)))
+#+END_SRC
+
+*** Books & Docs
+#+NAME: pdfs
+#+BEGIN_SRC emacs-lisp
+
+  ;; Remember that the website version of this manual shows the latest
+  ;; developments, which may not be available in the package you are
+  ;; using.  Instead of copying from the web site, refer to the version
+  ;; of the documentation that comes with your package.  Evaluate:
+  ;;
+  ;;     (info "(denote) Sample configuration")
+  (use-package denote
+    :ensure nil
+    :hook (dired-mode . denote-dired-mode)
+    :bind
+    (("C-c n n" . denote)
+     ("C-c n r" . denote-rename-file)
+     ("C-c n l" . denote-link)
+     ("C-c n b" . denote-backlinks)
+     ("C-c n d" . denote-dired)
+     ("C-c n g" . denote-grep))
+    :config
+    (setq denote-directory (expand-file-name "~/Documents/notes/"))
+
+    ;; Automatically rename Denote buffers when opening them so that
+    ;; instead of their long file name they have, for example, a literal
+    ;; "[D]" followed by the file's title.  Read the doc string of
+    ;; `denote-rename-buffer-format' for how to modify this.
+    (denote-rename-buffer-mode 1))
+
+  (use-package citar
+  :custom
+  (citar-bibliography '("~/bib/references.bib")))
+
+  (use-package pdf-tools
+  :ensure nil
+  :config
+  (pdf-loader-install))
+  (add-hook 'pdf-view-mode-hook
+          (lambda ()
+            (display-line-numbers-mode -1)))
 #+END_SRC
 
 ** Managing projects
@@ -1050,7 +1100,6 @@ These settings keep emacs from littering the filesystem with buffer backups. The
 ** Coding
 *** Compile buffers
 Everything related to ~M-x compile~.
-
 #+NAME: compilation-buffer
 #+BEGIN_SRC emacs-lisp
 ;; Auto scroll the buffer as we compile
