@@ -99,9 +99,9 @@
 (defun dl/setup-transparency-and-styling ()
     (when (system-is-mac)
 	;; Values: 0-100 (0 = fully transparent, 100 = opaque)
-	(set-frame-parameter nil 'alpha-background 50) ; For Emacs 29+
+	(set-frame-parameter nil 'alpha-background 100) ; For Emacs 29+
 	(set-frame-parameter nil 'alpha '(85 . 80))     ; For older Emacs versions
-	(add-to-list 'default-frame-alist '(alpha-background . 50))
+	(add-to-list 'default-frame-alist '(alpha-background . 100))
 	(add-to-list 'default-frame-alist '(alpha . (85 . 80)))
 	;; Enable rounded corners carefully to not interfere with window management
 	(when (and (boundp 'ns-appearance)

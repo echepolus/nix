@@ -17,10 +17,11 @@ shared-packages ++ [
   # starship
   gnupg # GNU Privacy Guard
 
-  libgccjit
-  binutils
+  gcc
+  # binutils
   check
   cmake
   pkg-config
   gnumake
+  libclang
 ]

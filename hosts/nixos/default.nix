@@ -10,7 +10,7 @@ in
     (modulesPath + "/installer/scan/not-detected.nix")
     ../../modules/shared
     # ../../modules/nixos/secrets.nix
-    # ../../modules/shared/cachix
+    ../../modules/shared/cachix
     ./hardware-configuration.nix
     # agenix.nixosModules.default
   ];

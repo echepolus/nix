@@ -1,7 +1,7 @@
 { pkgs }:
 let
   emacsPackage = if pkgs.stdenv.isDarwin
-    then pkgs.emacs-unstable 
+    then pkgs.emacs
     else pkgs.emacs-unstable-pgtk;
 
   emacsWithPackages = (pkgs.emacsPackagesFor emacsPackage).emacsWithPackages (epkgs: with epkgs; [
