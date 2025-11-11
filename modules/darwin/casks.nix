@@ -56,4 +56,6 @@
   "sfm"
   "sf-symbols"
 
+  # Z
+  "zen"
 ]
