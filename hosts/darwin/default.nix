@@ -45,6 +45,7 @@ in
   environment.systemPackages = with pkgs; [
     myEmacs 
     agenix.packages."${pkgs.system}".default
+    # texliveBasic
   ] ++ (import ../../modules/shared/packages.nix { inherit pkgs; })
     ++ (import ../../modules/darwin/packages.nix { inherit pkgs; });
 

@@ -16,6 +16,11 @@ let
     xdebug
   ]));
 
+  myTex = with pkgs; [
+    texlivePackages.latex
+    texlivePackages.dvipng
+  ];
+
   myFonts = import ./fonts.nix { inherit pkgs; };
 in
 
@@ -32,7 +37,6 @@ with pkgs; [
   # B
   bash-completion # Bash completion scripts
   bat # Cat clone with syntax highlighting
-  btop # System monitor and process viewer
 
   # C
   coreutils # Basic file/text/shell utilities
@@ -40,16 +44,14 @@ with pkgs; [
   # D
   direnv # Environment variable management per directory
   difftastic # Structural diff tool
-  du-dust # Disk usage analyzer
   djvulibre
 
   # E
-#  espanso # Cross-platform Text Expander written in Rust
 
   # F
   fd # Fast find alternative
-  ffmpeg # Multimedia framework
-  ffmpegthumbnailer
+  # ffmpeg # Multimedia framework
+  # ffmpegthumbnailer
   fzf # Fuzzy finder
  
   # G
@@ -96,6 +98,7 @@ with pkgs; [
   pass # Stores, retrieves, generates, synchronizes passwords
   pandoc # Document converter
   poppler # PDF to plain text tool
+
   # R
   ripgrep # Fast text search tool
 
@@ -104,8 +107,9 @@ with pkgs; [
   symlinks
 
   # T
-  tmux # Terminal multiplexer
   tree # Directory tree viewer
+  texliveSmall # LaTeX support
+  texlivePackages.dvipng
 
   # U
   unrar # RAR archive extractor
@@ -132,12 +136,4 @@ with pkgs; [
   zlib
   zsh-fzf-tab
 
-  # C package
-  # cmake
-  # codespell
-  # conan
-  # cppcheck
-  # doxygen
-  # lcov
-  # vcpkg
 ] ++ myFonts

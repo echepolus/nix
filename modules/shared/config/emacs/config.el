@@ -647,6 +647,9 @@ Note the weekly scope of the command's precision.")
   "ee" '(dl/load-buffer-with-emacs-config :which-key "open emacs config")
   "er" '(dl/reload-emacs :which-key "reload emacs"))
 
+(use-package org-pandoc-import
+ :ensure nil) ;; важно!
+
 (use-package org-modern
   :ensure nil 
   :config
@@ -769,7 +772,7 @@ Note the weekly scope of the command's precision.")
 (key-chord-define-global "ee" (lambda() (interactive)
 (find-file "/Users/alexeykotomin/.config/nix/modules/shared/config/emacs/")))
 (key-chord-define-global "bb" (lambda() (interactive)
-(find-file "/Users/alexeykotomin/Library/Mobile Documents/com~apple~CloudDocs/Библиотека/")))
+(find-file "/Users/alexeykotomin/Documents/library/")))
 (key-chord-define-global "ss" (lambda() (interactive)
 (find-file "/Users/alexeykotomin/s21_projects/")))
 

@@ -831,6 +831,9 @@ Use 'golden-ratio-toggle-widescreen' if splits are too wide
     "ee" '(dl/load-buffer-with-emacs-config :which-key "open emacs config")
     "er" '(dl/reload-emacs :which-key "reload emacs"))
 
+  (use-package org-pandoc-import
+   :ensure nil) ;; важно!
+
 #+END_SRC
 
 *** UI improvements
@@ -972,7 +975,7 @@ Use 'golden-ratio-toggle-widescreen' if splits are too wide
     (key-chord-define-global "ee" (lambda() (interactive)
     (find-file "/Users/alexeykotomin/.config/nix/modules/shared/config/emacs/")))
     (key-chord-define-global "bb" (lambda() (interactive)
-    (find-file "/Users/alexeykotomin/Library/Mobile Documents/com~apple~CloudDocs/Библиотека/")))
+    (find-file "/Users/alexeykotomin/Documents/library/")))
     (key-chord-define-global "ss" (lambda() (interactive)
     (find-file "/Users/alexeykotomin/s21_projects/")))
 

@@ -4,7 +4,40 @@ let
     then pkgs.emacs
     else pkgs.emacs-unstable-pgtk;
 
-  emacsWithPackages = (pkgs.emacsPackagesFor emacsPackage).emacsWithPackages (epkgs: with epkgs; [
+  emacsWithPackages = (pkgs.emacsPackagesFor emacsPackage).emacsWithPackages (epkgs:
+    let
+      org-pandoc-import = epkgs.trivialBuild {
+        pname = "org-pandoc-import";
+        version = "2024-01-01";
+        src = pkgs.fetchFromGitHub {
+          owner = "tecosaur";
+          repo = "org-pandoc-import";
+          rev = "master";
+          sha256 = "sha256-sMqismW2YkSGcjL8oJIawA05ivOoc+z9RPLCHJXC4ac=";
+        };
+        # Указываем какие файлы Emacs должен видеть
+        files = [
+          "*.el"
+        ];
+        
+      # Теперь копируем filters и preprocessors вручную
+      buildPhase = ''
+        runHook preBuild
+        mkdir -p $out/share/emacs/site-lisp
+        cp *.el $out/share/emacs/site-lisp/
+
+        mkdir -p $out/share/emacs/site-lisp/filters
+        cp -r filters/* $out/share/emacs/site-lisp/filters/
+
+        mkdir -p $out/share/emacs/site-lisp/preprocessors
+        cp -r preprocessors/* $out/share/emacs/site-lisp/preprocessors/
+
+        runHook postBuild
+      '';
+      };
+    in      
+      with epkgs; [
+        org-pandoc-import
     gcmh
     general
     evil
@@ -35,7 +68,6 @@ let
     nerd-icons-ibuffer
     nerd-icons-ivy-rich
     tab-line-nerd-icons
-    modus-themes
     fontaine
     pulsar
     spacious-padding
@@ -125,11 +157,6 @@ let
     exec-path-from-shell
     pdf-tools   
     tablist # required by pdf-tools
-    
-    # AI
-    gptel
-    mcp
-
   ]);
 in 
 emacsWithPackages
