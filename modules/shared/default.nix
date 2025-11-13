@@ -2,7 +2,7 @@
 
 let
   emacsOverlaySha256 = "0x2ydiz3n7afb9i05fb22rqib43kx2b3dd9vbhkicxfqgjz4adfn";
-  myEmacs = import ./emacs.nix { inherit pkgs; };
+  myEmacs = import ./config/emacs/emacs.nix { inherit pkgs; };
 in
 {
   nixpkgs = {

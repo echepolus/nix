@@ -3,6 +3,7 @@ let
   myPython = pkgs.python3.withPackages (ps: with ps; [
     slpp
     pip
+    # pan
     rich
     virtualenv
     black
@@ -10,16 +11,20 @@ let
     sexpdata
     six
     inflect
+    unidecode
+    pyaml
+    # pyaml-env
+    pypandoc
   ]);
 
   myPHP = pkgs.php82.withExtensions ({ enabled, all }: enabled ++ (with all; [
     xdebug
   ]));
 
-  myTex = with pkgs; [
-    texlivePackages.latex
-    texlivePackages.dvipng
-  ];
+  myTex = pkgs.texlive.withPackages (ps: with ps; [
+      latex
+      dvipng
+  ]);
 
   myFonts = import ./fonts.nix { inherit pkgs; };
 in
@@ -82,6 +87,8 @@ with pkgs; [
   # M
   myPHP # Custom PHP with extensions
   myPython # Custom Python with packages
+  myTex # LaTeX with packages
+  math-preview
 
   # N
   ncurses # Terminal control library with terminfo database
@@ -93,11 +100,15 @@ with pkgs; [
 
   # O
   openssh # SSH client and server
+  obsidian-export
 
   # P
   pass # Stores, retrieves, generates, synchronizes passwords
   pandoc # Document converter
   poppler # PDF to plain text tool
+
+  # Q
+  qmk
 
   # R
   ripgrep # Fast text search tool
@@ -108,8 +119,6 @@ with pkgs; [
 
   # T
   tree # Directory tree viewer
-  texliveSmall # LaTeX support
-  texlivePackages.dvipng
 
   # U
   unrar # RAR archive extractor

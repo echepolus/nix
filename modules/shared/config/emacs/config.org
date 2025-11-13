@@ -796,10 +796,10 @@ Use 'golden-ratio-toggle-widescreen' if splits are too wide
   (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
   (use-package general
     :config
-  	;; (general-evil-setup t)
-  	(general-create-definer dl/leader-keys
-  	:keymaps '(normal visual emacs)
-  	:prefix ","))
+    ;; (general-evil-setup t)
+    (general-create-definer dl/leader-keys
+      :keymaps '(normal visual emacs)
+      :prefix ","))
 
   (defvar current-time-format "%H:%M:%S"
     "Format of date to insert with `insert-current-time' func.
@@ -831,8 +831,42 @@ Use 'golden-ratio-toggle-widescreen' if splits are too wide
     "ee" '(dl/load-buffer-with-emacs-config :which-key "open emacs config")
     "er" '(dl/reload-emacs :which-key "reload emacs"))
 
-  (use-package org-pandoc-import
-   :ensure nil) ;; важно!
+  (with-eval-after-load 'org
+    (let ((png (cdr (assoc 'dvipng org-preview-latex-process-alist))))
+      (plist-put png :latex-compiler
+  	       '("latex -interaction nonstopmode -output-directory %o %F"))
+      (plist-put png :image-converter
+  	       '("dvipng -D %D -T tight -o %O %F"))
+      (plist-put png :transparent-image-converter
+  	       '("dvipng -D %D -T tight -bg Transparent -o %O %F"))))
+
+  (use-package math-preview
+    :custom (math-preview-command "/Users/alexeykotomin/.nix-profile/bin/math-preview"))
+
+  (use-package obsidian
+    :config
+    (global-obsidian-mode t)
+    (obsidian-backlinks-mode t)
+    :custom
+    ;; location of obsidian vault
+    (obsidian-directory "~/Documents/notes/obsidian")
+    ;; Default location for new notes from `obsidian-capture'
+    (obsidian-inbox-directory "Inbox")
+    ;; Useful if you're going to be using wiki links
+    (markdown-enable-wiki-links t)
+
+    ;; These bindings are only suggestions; it's okay to use other bindings
+    :bind (:map obsidian-mode-map
+                ;; Create note
+                ("C-c C-n" . obsidian-capture)
+                ;; If you prefer you can use `obsidian-insert-wikilink'
+                ("C-c C-l" . obsidian-insert-link)
+                ;; Open file pointed to by link at point
+                ("C-c C-o" . obsidian-follow-link-at-point)
+                ;; Open a different note from vault
+                ("C-c C-p" . obsidian-jump)
+                ;; Follow a backlink for the current file
+                ("C-c C-b" . obsidian-backlink-jump)))
 
 #+END_SRC
 
@@ -1032,6 +1066,13 @@ These settings keep emacs from littering the filesystem with buffer backups. The
     ;; `denote-rename-buffer-format' for how to modify this.
     (denote-rename-buffer-mode 1))
 
+  (use-package denote-markdown
+   :ensure nil
+   ;; Bind these commands to key bindings of your choice.
+   :commands ( denote-markdown-convert-links-to-file-paths
+     denote-markdown-convert-links-to-denote-type
+     denote-markdown-convert-links-to-obsidian-type
+     denote-markdown-convert-obsidian-links-to-denote-type ))
   (use-package citar
   :custom
   (citar-bibliography '("~/bib/references.bib")))

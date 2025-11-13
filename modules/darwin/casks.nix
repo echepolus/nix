@@ -14,7 +14,7 @@
   "pearcleaner"
 
   # Entertainment Tools
-  # "vlc"
+  "vlc"
   
   # Productivity Tools
   
@@ -39,6 +39,7 @@
   # "jordanbaird-ice"
   
   # J
+  "jan"
 
   # Keyboard
   "leader-key"
@@ -50,11 +51,15 @@
 
   # O
 
+  # Q
+  "qmk-toolbox"
+
   # R
 
   # S
   "sfm"
   "sf-symbols"
+  "sirimote"
 
   # Z
   "zen"
