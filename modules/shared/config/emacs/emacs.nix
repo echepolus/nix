@@ -18,6 +18,7 @@ let
         meow
         meow-tree-sitter
         denote-markdown
+        vterm
         
         # UI and themes
         ef-themes

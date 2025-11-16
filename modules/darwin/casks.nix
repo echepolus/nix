@@ -36,15 +36,14 @@
   "homerow"
 
   # I
-  # "jordanbaird-ice"
   
   # J
-  "jan"
+  # "jan"
 
   # Keyboard
   "leader-key"
   # "input-source-pro"
-  "espanso"
+  # "espanso"
   "kawa-app"
 
   # L
@@ -52,14 +51,14 @@
   # O
 
   # Q
-  "qmk-toolbox"
+  # "qmk-toolbox"
 
   # R
 
   # S
-  "sfm"
-  "sf-symbols"
-  "sirimote"
+  # "sfm"
+  # "sf-symbols"
+  "utm"
 
   # Z
   "zen"

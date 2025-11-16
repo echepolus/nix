@@ -796,7 +796,6 @@ Use 'golden-ratio-toggle-widescreen' if splits are too wide
   (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
   (use-package general
     :config
-    ;; (general-evil-setup t)
     (general-create-definer dl/leader-keys
       :keymaps '(normal visual emacs)
       :prefix ","))
@@ -830,15 +829,6 @@ Use 'golden-ratio-toggle-widescreen' if splits are too wide
     "e"  '(:ignore t :which-key "emacs")
     "ee" '(dl/load-buffer-with-emacs-config :which-key "open emacs config")
     "er" '(dl/reload-emacs :which-key "reload emacs"))
-
-  (with-eval-after-load 'org
-    (let ((png (cdr (assoc 'dvipng org-preview-latex-process-alist))))
-      (plist-put png :latex-compiler
-  	       '("latex -interaction nonstopmode -output-directory %o %F"))
-      (plist-put png :image-converter
-  	       '("dvipng -D %D -T tight -o %O %F"))
-      (plist-put png :transparent-image-converter
-  	       '("dvipng -D %D -T tight -bg Transparent -o %O %F"))))
 
   (use-package math-preview
     :custom (math-preview-command "/Users/alexeykotomin/.nix-profile/bin/math-preview"))
@@ -880,8 +870,8 @@ Use 'golden-ratio-toggle-widescreen' if splits are too wide
     :config
       ;; Add frame borders and window dividers
       (modify-all-frames-parameters
-      '((right-divider-width . 40)
-      (internal-border-width . 40)))
+      '((right-divider-width . 20)
+      (internal-border-width . 20)))
       (dolist (face '(window-divider
                       window-divider-first-pixel
                       window-divider-last-pixel))
@@ -904,72 +894,6 @@ Use 'golden-ratio-toggle-widescreen' if splits are too wide
       org-ellipsis "…")
 
       (global-org-modern-mode))
-
-#+END_SRC
-
-** Evil mode (aka Vim mode)
-*** Install package
-#+NAME: evil-packages
-#+BEGIN_SRC emacs-lisp
-  
-  ;; (defun dl/evil-hook ()
-  ;;   (dolist (mode '(eshell-mode
-  ;;                   git-rebase-mode
-  ;;                   dashboard-mode
-  ;;                   term-mode))
-  ;;   (add-to-list 'evil-emacs-state-modes mode))) ;; no evil mode for these modes
-
-
-  ;; (use-package evil
-  ;;   :init
-  ;;     (setq evil-want-integration t) ;; TODO: resear;; ch what this does
-  ;;     (setq evil-want-keybinding nil) ;; Required for evil-collection
-  ;;     (setq evil-want-fine-undo 'fine) ;; undo/redo each motion
-  ;;     (setq evil-want-Y-yank-to-eol t) ;; Y copies to end of line like vim
-  ;;     (setq evil-want-C-u-scroll t) ;; vim like scroll up
-  ;;   :config
-  ;;     (evil-mode 1)
-  ;;     (dl/evil-hook)
-  ;;     ;; Emacs "cancel" == vim "cancel"
-  ;;     (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state))
-
-  ;;   ;; Gives me vim bindings elsewhere in emacs
-  ;;   (use-package evil-collection
-  ;;     :after evil
-  ;;     :init
-  ;;   (setq evil-want-keybinding nil)
-  ;;     ;; Define the variable before use
-  ;;     (defvar evil-collection-mode-list nil)
-  ;;     :config
-  ;;     (setq evil-collection-mode-list (remove 'magit evil-collection-mode-list))
-  ;;     (evil-collection-init))
-
-  ;;   ;; Keybindings in org mode
-  ;;   (use-package evil-org
-  ;;   :after evil
-  ;;   :hook
-  ;;       (org-mode . evil-org-mode)
-  ;;   :config
-  ;;       (require 'evil-org-agenda)
-  ;;       (evil-org-agenda-set-keys)
-  ;;       ;; 🔑 включаем все ключевые темы
-  ;;       (evil-org-set-key-theme '(navigation insert textobjects additional shift todo heading)))
-
-  ;;   ;; Branching undo system
-  ;;   (use-package undo-tree
-  ;;     :after evil
-  ;;     :diminish
-  ;;     :config
-  ;;     (evil-set-undo-system 'undo-tree)
-  ;;     (global-undo-tree-mode 1))
-
-  ;;   (use-package evil-commentary
-  ;;     :after evil
-  ;;     :config
-  ;;     (evil-commentary-mode))
-
-    ;; Keep undo files from littering directories
-    (setq undo-tree-history-directory-alist '(("." . "~/.local/state/emacs/undo")))
 
 #+END_SRC
 
@@ -1019,14 +943,15 @@ Use 'golden-ratio-toggle-widescreen' if splits are too wide
 #+END_SRC
 
 *** Backups and auto-save
-These settings keep emacs from littering the filesystem with buffer backups. These files look like ~#yourfilename.txt#~ and would otherwise be dropped in your working directory.
 #+NAME: backup-files
 #+BEGIN_SRC emacs-lisp
-(setq backup-directory-alist
-      `((".*" . "~/.local/state/emacs/backup"))
-      backup-by-copying t    ; Don't delink hardlinks
-      version-control t      ; Use version numbers on backups
-      delete-old-versions t) ; Automatically delete excess backups
+  (setq backup-directory-alist
+        `((".*" . "~/.local/state/emacs/backup"))
+        backup-by-copying t    ; Don't delink hardlinks
+        version-control t      ; Use version numbers on backups
+        delete-old-versions t) ; Automatically delete excess backups
+  
+  (setq undo-tree-history-directory-alist '(("." . "~/.local/state/emacs/undo")))
 #+END_SRC
 
 #+NAME: local-file-transforms
@@ -1254,14 +1179,6 @@ Leader keys for ~lsp-mode~.
 #+NAME: shell-scripts
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'auto-mode-alist '("\\.env" . shell-script-mode))
-#+END_SRC
-
-**** YAML
-#+NAME: yaml-mode
-#+BEGIN_SRC emacs-lisp
-  (use-package yaml-mode
-    :commands (markdown-mode gfm-mode)
-    :mode (("\\.yml\\'" . yaml-mode)))
 #+END_SRC
 
 **** kbd 

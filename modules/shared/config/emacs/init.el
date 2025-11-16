@@ -22,7 +22,6 @@
       '(("melpa" . "https://melpa.org/packages/")
         ("gnu"   . "http://elpa.gnu.org/packages/")))
 
-
 (unless (assoc-default "melpa" package-archives)
   (message "Warning: MELPA source not found. Adding MELPA to package-archives.")
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t))
@@ -110,35 +109,6 @@
 	(set-frame-parameter nil 'undecorated-round t)
 	(add-to-list 'default-frame-alist '(undecorated-round . t)))))
 
-;; ;; Apply transparency settings
-;; (when (display-graphic-p)
-;;     (dl/setup-transparency-and-styling))
-
-;; ;; Apply to new frames created by emacsclient
-;; (when (daemonp)
-;;     (add-hook 'after-make-frame-functions
-;; 	    (lambda (frame)
-;; 		(select-frame frame)
-;; 		(dl/setup-transparency-and-styling))))
-
-;; Keybinding to toggle transparency
-(defun dl/toggle-transparency ()
-    "Toggle frame transparency between opaque and transparent."
-    (interactive)
-    (let ((alpha (frame-parameter nil 'alpha-background)))
-	(if (or (not alpha) (>= alpha 90))
-	    (progn
-		(set-frame-parameter nil 'alpha-background 85)
-		(set-frame-parameter nil 'alpha '(85 . 80))
-		(message "Frame transparency enabled"))
-	    (progn
-		(set-frame-parameter nil 'alpha-background 100)
-		(set-frame-parameter nil 'alpha '(100 . 100))
-		(message "Frame transparency disabled")))))
-
-;; Optional: Keybinding for transparency toggle
-(global-set-key (kbd "C-c C-t") 'dl/toggle-transparency)
-
 ;; -------------------------
 ;; Copy to Clipboard in TTY 
 ;; -------------------------
@@ -147,6 +117,11 @@
   :config
   (global-clipetty-mode 1))
 
+;; -------------------------
+;; TTY emulator 
+;; -------------------------
+(use-package vterm
+    :ensure nil)
 ;; -------------------------
 ;; Org Mode Setup
 ;; -------------------------
