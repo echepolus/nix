@@ -23,7 +23,7 @@ let
         # UI and themes
         ef-themes
         doom-modeline
-        # all-the-icons
+        all-the-icons
         # all-the-icons-ivy
         # all-the-icons-dired
         dashboard
@@ -62,15 +62,15 @@ let
         # swiper
         
         # File management
-        treemacs
-        treemacs-evil
-        treemacs-projectile
-        treemacs-icons-dired
-        treemacs-magit
-        treemacs-nerd-icons
+        # treemacs
+        # treemacs-evil
+        # treemacs-projectile
+        # treemacs-icons-dired
+        # treemacs-magit
+        # treemacs-nerd-icons
         dired-ranger
         dired-collapse
-        perspective
+        # perspective
         key-chord
         
         # Project management
@@ -85,9 +85,9 @@ let
         org-transclusion
         org-download
         org-roam
-        emacsql
-        sqlite3
-        visual-fill-column
+        # emacsql
+        # sqlite3
+        # visual-fill-column
         
         # Writing
         writeroom-mode
@@ -103,17 +103,17 @@ let
         # Programming - Language servers
         lsp-mode
         lsp-ui
-        lsp-treemacs
+        # lsp-treemacs
         
-        # Progr   eamming - Languages
+        # Programming - Languages
         nix-mode
-        yaml-mode
-        lua-mode
-        tree-sitter
-        tree-sitter-langs
-        tide
-        prettier-js
-        emmet-mode
+        # yaml-mode
+        # lua-mode
+        # tree-sitter
+        # tree-sitter-langs
+        # tide
+        # prettier-js
+        # emmet-mode
         
         # Python
         lsp-pyright
