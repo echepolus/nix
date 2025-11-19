@@ -1,18 +1,6 @@
 (setq user-full-name "Alexey Kotomin"
   user-mail-address "a.kotominn@gmail.com")
 
-;;; Set default frame size and position 
-(setq inhibit-startup-screen t)
-(setq initial-scratch-message nil)
-(setq confirm-kill-emacs #'y-or-n-p)
-
-  ;; Smooth out garbage collection
-  (use-package gcmh
-    :ensure nil  ; Managed by Nix
-    :demand t
-    :config
-    (gcmh-mode 1))
-
 (require 'package)
 (unless (assoc-default "melpa" package-archives)
    (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t))
@@ -67,19 +55,6 @@
   :after f
   :init (doom-modeline-mode 1))
 
-(use-package treemacs
-  :config
-    (setq treemacs-is-never-other-window 1)
-  :bind
-    ("C-c t" . treemacs-find-file)
-    ("C-c b" . treemacs-bookmark))
-
-(use-package treemacs-icons-dired)
-(use-package treemacs-nerd-icons)
-(use-package treemacs-projectile)
-(use-package treemacs-magit)
-;; (use-package treemacs-evil)
-
 ;; Remove binding for facemap-menu, use for ace-window instead
 (global-unset-key (kbd "M-o"))
 
@@ -92,6 +67,18 @@
   :config
     (ace-window-display-mode 1)
     (advice-add 'ace-select-window :after #'win/auto-resize))
+
+;;; Set default frame size and position 
+(setq inhibit-startup-screen t)
+(setq initial-scratch-message nil)
+(setq confirm-kill-emacs #'y-or-n-p)
+
+  ;; Smooth out garbage collection
+  (use-package gcmh
+    :ensure nil  ; Managed by Nix
+    :demand t
+    :config
+    (gcmh-mode 1))
 
 (save-place-mode 1)
 (setq save-place-file "~/.local/state/emacs/saveplace")
@@ -278,10 +265,6 @@
 
   ;; The :init section is always executed.
   :init
-
-  ;; Marginalia must be activated in the :init section of use-package such that
-  ;; the mode gets enabled right away. Note that this forces loading the
-  ;; package.
   (marginalia-mode))
 
 ;; Example configuration for Consult
@@ -423,12 +406,11 @@
 
   (setq dashboard-banner-logo-title "This is your life")
   (setq dashboard-set-file-icons t)
-  (setq dashboard-projects-backend 'projectile)
+  ;; (setq dashboard-projects-backend 'projectile)
 
   (setq initial-buffer-choice (lambda ()
                                   (get-buffer-create "*dashboard*")
                                   (dashboard-refresh-buffer)))
-  (setq dashboard-projects-switch-function 'counsel-projectile-switch-project-by-name)
 
 (global-set-key (kbd "<C-tab>") 'next-buffer)
 
@@ -461,60 +443,6 @@
 (when (fboundp 'meow-setup)
   (meow-setup)
   (meow-global-mode 1)))
-
-;; (     require 'modus-themes) 
-
-;; ;; In all of the following, WEIGHT is a symbol such as `semibold',
-;; ;; `light', `bold', or anything mentioned in `modus-themes-weights'.
-;; (setq modus-themes-italic-constructs t
-;;       modus-themes-bold-constructs t 
-;;       modus-themes-mixed-fonts t
-;;       modus-themes-variable-pitch-ui nil 
-;;       modus-themes-custom-auto-reload t
-;;       modus-themes-disable-other-themes t
-
-;;       ;; Options for `modus-themes-prompts' are either nil (the
-;;       ;; default), or a list of properties that may include any of those
-;;       ;; symbols: `italic', `WEIGHT'
-;;       modus-themes-prompts '(italic medium)
-
-;;       ;; The `modus-themes-completions' is an alist that reads two
-;;       ;; keys: `matches', `selection'.  Each accepts a nil value (or
-;;       ;; empty list) or a list of properties that can include any of
-;;       ;; the following (for WEIGHT read further below):
-;;       ;;
-;;       ;; `matches'   :: `underline', `italic', `WEIGHT'
-;;       ;; `selection' :: `underline', `italic', `WEIGHT'
-;;       modus-themes-completions
-;;       '((matches . (semibold))
-;;         (selection . (bold italic text-also)))
-
-;;       modus-themes-org-blocks 'tinted-background
-
-;;       modus-themes-to-toggle '(modus-vivendi modus-vivendi-tinted)
-
-;;       ;; The `modus-themes-headings' is an alist: read the manual's
-;;       ;; node about it or its doc string.  Basically, it supports
-;;       ;; per-level configurations for the optional use of
-;;       ;; `variable-pitch' typography, a height value as a multiple of
-;;       ;; the base font size (e.g. 1.5), and a `WEIGHT'.
-;;       modus-themes-headings
-;;       '((1 . (variable-pitch 1.5))
-;;         (2 . (1.3))
-;;         (agenda-date . (1.3))
-;;         (agenda-structure . (variable-pitch light 1.8))
-;;         (t . (1.1))))
-
-;; ;; Maybe define some palette overrides, such as by using our presets
-;; (setq modus-themes-common-palette-overrides
-;;       modus-themes-preset-overrides-intense)
-
-;; (mapc #'disable-theme custom-enabled-themes)
-
-;; ;; Load the theme of your choice:
-;; (load-theme 'modus-vivendi :no-confirm)
-
-;; (define-key global-map (kbd "<f5>") #'modus-themes-toggle)
 
 (require 'ef-themes)
 (setq ef-themes-to-toggle '(ef-owl ef-maris-dark))
@@ -612,7 +540,6 @@
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 (use-package general
   :config
-  ;; (general-evil-setup t)
   (general-create-definer dl/leader-keys
     :keymaps '(normal visual emacs)
     :prefix ","))
@@ -647,15 +574,6 @@ Note the weekly scope of the command's precision.")
   "ee" '(dl/load-buffer-with-emacs-config :which-key "open emacs config")
   "er" '(dl/reload-emacs :which-key "reload emacs"))
 
-(with-eval-after-load 'org
-  (let ((png (cdr (assoc 'dvipng org-preview-latex-process-alist))))
-    (plist-put png :latex-compiler
-	       '("latex -interaction nonstopmode -output-directory %o %F"))
-    (plist-put png :image-converter
-	       '("dvipng -D %D -T tight -o %O %F"))
-    (plist-put png :transparent-image-converter
-	       '("dvipng -D %D -T tight -bg Transparent -o %O %F"))))
-
 (use-package math-preview
   :custom (math-preview-command "/Users/alexeykotomin/.nix-profile/bin/math-preview"))
 
@@ -689,8 +607,8 @@ Note the weekly scope of the command's precision.")
   :config
     ;; Add frame borders and window dividers
     (modify-all-frames-parameters
-    '((right-divider-width . 40)
-    (internal-border-width . 40)))
+    '((right-divider-width . 20)
+    (internal-border-width . 20)))
     (dolist (face '(window-divider
                     window-divider-first-pixel
                     window-divider-last-pixel))
@@ -713,65 +631,6 @@ Note the weekly scope of the command's precision.")
     org-ellipsis "…")
 
     (global-org-modern-mode))
-
-;; (defun dl/evil-hook ()
-;;   (dolist (mode '(eshell-mode
-;;                   git-rebase-mode
-;;                   dashboard-mode
-;;                   term-mode))
-;;   (add-to-list 'evil-emacs-state-modes mode))) ;; no evil mode for these modes
-
-
-;; (use-package evil
-;;   :init
-;;     (setq evil-want-integration t) ;; TODO: resear;; ch what this does
-;;     (setq evil-want-keybinding nil) ;; Required for evil-collection
-;;     (setq evil-want-fine-undo 'fine) ;; undo/redo each motion
-;;     (setq evil-want-Y-yank-to-eol t) ;; Y copies to end of line like vim
-;;     (setq evil-want-C-u-scroll t) ;; vim like scroll up
-;;   :config
-;;     (evil-mode 1)
-;;     (dl/evil-hook)
-;;     ;; Emacs "cancel" == vim "cancel"
-;;     (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state))
-
-;;   ;; Gives me vim bindings elsewhere in emacs
-;;   (use-package evil-collection
-;;     :after evil
-;;     :init
-;;   (setq evil-want-keybinding nil)
-;;     ;; Define the variable before use
-;;     (defvar evil-collection-mode-list nil)
-;;     :config
-;;     (setq evil-collection-mode-list (remove 'magit evil-collection-mode-list))
-;;     (evil-collection-init))
-
-;;   ;; Keybindings in org mode
-;;   (use-package evil-org
-;;   :after evil
-;;   :hook
-;;       (org-mode . evil-org-mode)
-;;   :config
-;;       (require 'evil-org-agenda)
-;;       (evil-org-agenda-set-keys)
-;;       ;; 🔑 включаем все ключевые темы
-;;       (evil-org-set-key-theme '(navigation insert textobjects additional shift todo heading)))
-
-;;   ;; Branching undo system
-;;   (use-package undo-tree
-;;     :after evil
-;;     :diminish
-;;     :config
-;;     (evil-set-undo-system 'undo-tree)
-;;     (global-undo-tree-mode 1))
-
-;;   (use-package evil-commentary
-;;     :after evil
-;;     :config
-;;     (evil-commentary-mode))
-
-  ;; Keep undo files from littering directories
-  (setq undo-tree-history-directory-alist '(("." . "~/.local/state/emacs/undo")))
 
 (use-package nerd-icons-dired)
 
@@ -820,6 +679,8 @@ Note the weekly scope of the command's precision.")
       version-control t      ; Use version numbers on backups
       delete-old-versions t) ; Automatically delete excess backups
 
+(setq undo-tree-history-directory-alist '(("." . "~/.local/state/emacs/undo")))
+
 (setq auto-save-file-name-transforms
       `((".*" "~/.local/state/emacs/" t)))
 (setq lock-file-name-transforms
@@ -859,7 +720,7 @@ Note the weekly scope of the command's precision.")
    denote-markdown-convert-obsidian-links-to-denote-type ))
 (use-package citar
 :custom
-(citar-bibliography '("~/bib/references.bib")))
+(citar-bibliography '("~/Documents/library/references.bib")))
 
 (use-package pdf-tools
 :ensure nil
@@ -868,56 +729,6 @@ Note the weekly scope of the command's precision.")
 (add-hook 'pdf-view-mode-hook
         (lambda ()
           (display-line-numbers-mode -1)))
-
-(use-package ripgrep)
-(use-package projectile
-  :config (projectile-mode)
-  :custom
-    ((projectile-completion-system 'ivy))
-  :bind-keymap
-	    ("C-c p" . projectile-command-map)
-    :init
-    (setq projectile-enable-caching t)
-    (setq projectile-sort-order 'recently-active)
-    (setq projectile-switch-project-action #'projectile-dired))
-
-    ;; Пути к кэшу и списку проектов в ~/.config/emacs/
-    (setq projectile-cache-file
-      (expand-file-name "projectile.cache" ak/config-dir))
-    (setq projectile-known-projects-file
-      (expand-file-name "projectile-bookmarks.eld" ak/config-dir))
-
-(setq projectile-project-root-files-bottom-up '("package.json" ".projectile" ".project" ".git"))
-(setq projectile-ignored-projects '("~/.emacs.d/"))
-(setq projectile-globally-ignored-directories '("dist" "node_modules" ".log" ".git"))
-
-;; Gives me Ivy options in the Projectile menus
-(use-package counsel-projectile 
-  :after projectile
-  :config
-  (counsel-projectile-mode 1))
-
-;; Project-wide search keybindings
-(defun my/swiper-project ()
-  "Search across all files in current project using ripgrep."
-  (interactive)
-  (counsel-rg nil (projectile-project-root)))
-
-;; Search keybindings for projectile
-(dl/leader-keys
-  "/"   '(counsel-projectile-rg :which-key "search project")
-  "?"   '(my/swiper-project :which-key "search project (alt)")
-  "a"   '(:ignore t :which-key "search")
-  "aa"  '(swiper-all :which-key "search buffers") 
-  "ap"  '(counsel-projectile-rg :which-key "search project")
-  "ag"  '(counsel-projectile-grep :which-key "grep project")
-  "af"  '(counsel-projectile-find-file :which-key "find file")
-  "ad"  '(counsel-projectile-find-dir :which-key "find directory"))
-
-;; Alternative global keybindings for quick access
-(global-set-key (kbd "C-c C-s") 'counsel-projectile-rg)
-(global-set-key (kbd "C-c s p") 'my/swiper-project)
-(global-set-key (kbd "C-c s a") 'swiper-all)
 
 ;; Auto scroll the buffer as we compile
 (setq compilation-scroll-output t)
@@ -1009,10 +820,6 @@ Note the weekly scope of the command's precision.")
 (add-hook 'python-mode-hook 'blacken-mode)
 
 (add-to-list 'auto-mode-alist '("\\.env" . shell-script-mode))
-
-(use-package yaml-mode
-  :commands (markdown-mode gfm-mode)
-  :mode (("\\.yml\\'" . yaml-mode)))
 
 ;; Ассоциируем файлы .kbd с lisp-mode
 (add-to-list 'auto-mode-alist '("\\.kbd\\'" . lisp-mode))

@@ -1,6 +1,6 @@
 #+TITLE: Emacs
 #+STARTUP: content
-
+no
 * Configuration :emacs:
 ** Personal Information
 #+NAME: personal-info
@@ -12,24 +12,6 @@
 #+END_SRC
 
 ** Initialization
-*** Booting up
-#+NAME: startup
-#+BEGIN_SRC emacs-lisp
-
-  ;;; Set default frame size and position 
-  (setq inhibit-startup-screen t)
-  (setq initial-scratch-message nil)
-  (setq confirm-kill-emacs #'y-or-n-p)
-  
-    ;; Smooth out garbage collection
-    (use-package gcmh
-      :ensure nil  ; Managed by Nix
-      :demand t
-      :config
-      (gcmh-mode 1))
-
-#+END_SRC
-
 *** Add package sources
 #+NAME: package-sources
 #+BEGIN_SRC emacs-lisp
@@ -112,23 +94,6 @@
     :init (doom-modeline-mode 1))
 #+END_SRC
 
-***** Treemacs
-#+NAME: treemacs
-#+BEGIN_SRC emacs-lisp
-  (use-package treemacs
-    :config
-      (setq treemacs-is-never-other-window 1)
-    :bind
-      ("C-c t" . treemacs-find-file)
-      ("C-c b" . treemacs-bookmark))
-
-  (use-package treemacs-icons-dired)
-  (use-package treemacs-nerd-icons)
-  (use-package treemacs-projectile)
-  (use-package treemacs-magit)
-  ;; (use-package treemacs-evil)
-#+END_SRC
-
 **** Easy window motions with ace-window
 #+NAME: easy-window-motions
 #+BEGIN_SRC emacs-lisp
@@ -144,6 +109,24 @@
   :config
     (ace-window-display-mode 1)
     (advice-add 'ace-select-window :after #'win/auto-resize))
+#+END_SRC
+
+*** Booting up
+#+NAME: startup
+#+BEGIN_SRC emacs-lisp
+
+  ;;; Set default frame size and position 
+  (setq inhibit-startup-screen t)
+  (setq initial-scratch-message nil)
+  (setq confirm-kill-emacs #'y-or-n-p)
+  
+    ;; Smooth out garbage collection
+    (use-package gcmh
+      :ensure nil  ; Managed by Nix
+      :demand t
+      :config
+      (gcmh-mode 1))
+
 #+END_SRC
 
 *** Save Place
@@ -382,10 +365,6 @@ This enables recentf-mode so we can quickly reopen files you visited recently. I
 
     ;; The :init section is always executed.
     :init
-
-    ;; Marginalia must be activated in the :init section of use-package such that
-    ;; the mode gets enabled right away. Note that this forces loading the
-    ;; package.
     (marginalia-mode))
 #+END_SRC
 
@@ -537,25 +516,25 @@ This enables recentf-mode so we can quickly reopen files you visited recently. I
 *** Dashboard
 #+NAME: enlight-settings
 #+BEGIN_SRC emacs-lisp 
-  
-(use-package dashboard
-  :ensure nil  ; Managed by Nix
-  :config
-  (dashboard-setup-startup-hook)
-  (setq dashboard-startup-banner 'ascii
-        dashboard-center-content t
-        dashboard-items '((projects . 5)
-                           (recents  . 5)))
-  (setq dashboard-set-footer nil))
+    
+  (use-package dashboard
+    :ensure nil  ; Managed by Nix
+    :config
+    (dashboard-setup-startup-hook)
+    (setq dashboard-startup-banner 'ascii
+          dashboard-center-content t
+          dashboard-items '((projects . 5)
+                             (recents  . 5)))
+    (setq dashboard-set-footer nil))
 
-  (setq dashboard-banner-logo-title "This is your life")
-  (setq dashboard-set-file-icons t)
-  (setq dashboard-projects-backend 'projectile)
+    (setq dashboard-banner-logo-title "This is your life")
+    (setq dashboard-set-file-icons t)
+    ;; (setq dashboard-projects-backend 'projectile)
 
-  (setq initial-buffer-choice (lambda ()
-                                  (get-buffer-create "*dashboard*")
-                                  (dashboard-refresh-buffer)))
-  (setq dashboard-projects-switch-function 'counsel-projectile-switch-project-by-name)
+    (setq initial-buffer-choice (lambda ()
+                                    (get-buffer-create "*dashboard*")
+                                    (dashboard-refresh-buffer)))
+   
 #+END_SRC
 
 ** Keyboard
@@ -607,67 +586,6 @@ This enables recentf-mode so we can quickly reopen files you visited recently. I
 
 ** Display options
 *** Themes
-
-****Modus-themes
-#+NAME: modus-themes-autothemer
-#+BEGIN_SRC emacs-lisp 
-
-  ;; (     require 'modus-themes) 
-
-  ;; ;; In all of the following, WEIGHT is a symbol such as `semibold',
-  ;; ;; `light', `bold', or anything mentioned in `modus-themes-weights'.
-  ;; (setq modus-themes-italic-constructs t
-  ;;       modus-themes-bold-constructs t 
-  ;;       modus-themes-mixed-fonts t
-  ;;       modus-themes-variable-pitch-ui nil 
-  ;;       modus-themes-custom-auto-reload t
-  ;;       modus-themes-disable-other-themes t
-
-  ;;       ;; Options for `modus-themes-prompts' are either nil (the
-  ;;       ;; default), or a list of properties that may include any of those
-  ;;       ;; symbols: `italic', `WEIGHT'
-  ;;       modus-themes-prompts '(italic medium)
-
-  ;;       ;; The `modus-themes-completions' is an alist that reads two
-  ;;       ;; keys: `matches', `selection'.  Each accepts a nil value (or
-  ;;       ;; empty list) or a list of properties that can include any of
-  ;;       ;; the following (for WEIGHT read further below):
-  ;;       ;;
-  ;;       ;; `matches'   :: `underline', `italic', `WEIGHT'
-  ;;       ;; `selection' :: `underline', `italic', `WEIGHT'
-  ;;       modus-themes-completions
-  ;;       '((matches . (semibold))
-  ;;         (selection . (bold italic text-also)))
-
-  ;;       modus-themes-org-blocks 'tinted-background
-
-  ;;       modus-themes-to-toggle '(modus-vivendi modus-vivendi-tinted)
-
-  ;;       ;; The `modus-themes-headings' is an alist: read the manual's
-  ;;       ;; node about it or its doc string.  Basically, it supports
-  ;;       ;; per-level configurations for the optional use of
-  ;;       ;; `variable-pitch' typography, a height value as a multiple of
-  ;;       ;; the base font size (e.g. 1.5), and a `WEIGHT'.
-  ;;       modus-themes-headings
-  ;;       '((1 . (variable-pitch 1.5))
-  ;;         (2 . (1.3))
-  ;;         (agenda-date . (1.3))
-  ;;         (agenda-structure . (variable-pitch light 1.8))
-  ;;         (t . (1.1))))
-
-  ;; ;; Maybe define some palette overrides, such as by using our presets
-  ;; (setq modus-themes-common-palette-overrides
-  ;;       modus-themes-preset-overrides-intense)
-
-  ;; (mapc #'disable-theme custom-enabled-themes)
-
-  ;; ;; Load the theme of your choice:
-  ;; (load-theme 'modus-vivendi :no-confirm)
-
-  ;; (define-key global-map (kbd "<f5>") #'modus-themes-toggle)
-
-#+END_SRC
-
 **** Ef-themes
 #+NAME: ef-themes-autothemer
 #+BEGIN_SRC emacs-lisp 
@@ -1000,7 +918,7 @@ Use 'golden-ratio-toggle-widescreen' if splits are too wide
      denote-markdown-convert-obsidian-links-to-denote-type ))
   (use-package citar
   :custom
-  (citar-bibliography '("~/bib/references.bib")))
+  (citar-bibliography '("~/Documents/library/references.bib")))
 
   (use-package pdf-tools
   :ensure nil
@@ -1009,61 +927,6 @@ Use 'golden-ratio-toggle-widescreen' if splits are too wide
   (add-hook 'pdf-view-mode-hook
           (lambda ()
             (display-line-numbers-mode -1)))
-#+END_SRC
-
-** Managing projects
-*** Projectile
-#+NAME: projectile
-#+BEGIN_SRC emacs-lisp
-  (use-package ripgrep)
-  (use-package projectile
-    :config (projectile-mode)
-    :custom
-      ((projectile-completion-system 'ivy))
-    :bind-keymap
-	    ("C-c p" . projectile-command-map)
-      :init
-      (setq projectile-enable-caching t)
-      (setq projectile-sort-order 'recently-active)
-      (setq projectile-switch-project-action #'projectile-dired))
-
-      ;; Пути к кэшу и списку проектов в ~/.config/emacs/
-      (setq projectile-cache-file
-        (expand-file-name "projectile.cache" ak/config-dir))
-      (setq projectile-known-projects-file
-        (expand-file-name "projectile-bookmarks.eld" ak/config-dir))
-
-  (setq projectile-project-root-files-bottom-up '("package.json" ".projectile" ".project" ".git"))
-  (setq projectile-ignored-projects '("~/.emacs.d/"))
-  (setq projectile-globally-ignored-directories '("dist" "node_modules" ".log" ".git"))
-
-  ;; Gives me Ivy options in the Projectile menus
-  (use-package counsel-projectile 
-    :after projectile
-    :config
-    (counsel-projectile-mode 1))
-  
-  ;; Project-wide search keybindings
-  (defun my/swiper-project ()
-    "Search across all files in current project using ripgrep."
-    (interactive)
-    (counsel-rg nil (projectile-project-root)))
-  
-  ;; Search keybindings for projectile
-  (dl/leader-keys
-    "/"   '(counsel-projectile-rg :which-key "search project")
-    "?"   '(my/swiper-project :which-key "search project (alt)")
-    "a"   '(:ignore t :which-key "search")
-    "aa"  '(swiper-all :which-key "search buffers") 
-    "ap"  '(counsel-projectile-rg :which-key "search project")
-    "ag"  '(counsel-projectile-grep :which-key "grep project")
-    "af"  '(counsel-projectile-find-file :which-key "find file")
-    "ad"  '(counsel-projectile-find-dir :which-key "find directory"))
-  
-  ;; Alternative global keybindings for quick access
-  (global-set-key (kbd "C-c C-s") 'counsel-projectile-rg)
-  (global-set-key (kbd "C-c s p") 'my/swiper-project)
-  (global-set-key (kbd "C-c s a") 'swiper-all)
 #+END_SRC
 
 ** Coding

@@ -6,9 +6,7 @@ with pkgs; [
   font-awesome
   hack-font
   jetbrains-mono
-  meslo-lgs-nf
   noto-fonts
   noto-fonts-emoji
   geist-font
-  # aporetic
 ]

@@ -8,24 +8,24 @@ let
         obsidian
         gcmh
         general
-        evil
-        evil-collection
-        evil-org
-        evil-commentary
+        # evil
+        # evil-collection
+        # evil-org
+        # evil-commentary
         undo-tree
         quelpa
         quelpa-use-package
         meow
-        meow-tree-sitter
+        # meow-tree-sitter
         denote-markdown
         vterm
         
         # UI and themes
         ef-themes
         doom-modeline
-        all-the-icons
-        all-the-icons-ivy
-        all-the-icons-dired
+        # all-the-icons
+        # all-the-icons-ivy
+        # all-the-icons-dired
         dashboard
         rainbow-delimiters
         ace-window
@@ -53,13 +53,13 @@ let
         math-preview
         
         # Ivy/Counsel framework
-        ivy
-        counsel
-        ivy-rich
-        ivy-prescient
-        prescient
-        counsel-projectile
-        swiper
+        # ivy
+        # counsel
+        # ivy-rich
+        # ivy-prescient
+        # prescient
+        # counsel-projectile
+        # swiper
         
         # File management
         treemacs
