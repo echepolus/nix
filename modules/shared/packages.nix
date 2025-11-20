@@ -3,7 +3,6 @@ let
   myPython = pkgs.python3.withPackages (ps: with ps; [
     slpp
     pip
-    # pan
     rich
     virtualenv
     black
@@ -13,18 +12,12 @@ let
     inflect
     unidecode
     pyaml
-    # pyaml-env
     pypandoc
   ]);
 
   myPHP = pkgs.php82.withExtensions ({ enabled, all }: enabled ++ (with all; [
     xdebug
   ]));
-
-  # myTex = pkgs.texlive.withPackages (ps: with ps; [
-  #     latex
-  #     dvipng
-  # ]);
 
   myFonts = import ./fonts.nix { inherit pkgs; };
 in

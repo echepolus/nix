@@ -1,6 +1,6 @@
 #+TITLE: Emacs
 #+STARTUP: content
-no
+
 * Configuration :emacs:
 ** Personal Information
 #+NAME: personal-info

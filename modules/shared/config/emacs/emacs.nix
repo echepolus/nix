@@ -25,7 +25,7 @@ let
         doom-modeline
         all-the-icons
         # all-the-icons-ivy
-        # all-the-icons-dired
+        all-the-icons-dired
         dashboard
         rainbow-delimiters
         ace-window
