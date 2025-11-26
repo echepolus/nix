@@ -13,7 +13,6 @@ in
      agenix.darwinModules.default
   ];
 
-  # Setup user, packages, programs
   nix = {
     package = pkgs.nix;
 
@@ -33,7 +32,7 @@ in
     gc = {
       automatic = true;
       interval = { Weekday = 0; Hour = 2; Minute = 0; };
-      options = "--delete-older-than 30d";
+      options = "--delete-older-than 7d";
     };
 
     extraOptions = ''
@@ -41,22 +40,17 @@ in
     '';
   };
 
-  # Load configuration that is shared across systems
   environment.systemPackages = with pkgs; [
     myEmacs 
     agenix.packages."${pkgs.system}".default
   ] ++ (import ../../modules/shared/packages.nix { inherit pkgs; })
     ++ (import ../../modules/darwin/packages.nix { inherit pkgs; });
 
-  # Отпечаток пальца вместо пароля везде
   security.pam.services.sudo_local.touchIdAuth = true;
 
-  # Enable kanata keyboard remapping daemon
   services.kanata = {
     enable = true;
     configFile = "/Users/${user}/.config/kanata/config.kbd";
-    # Optional: add extra args like logging level
-    # extraArgs = [ "--log" "info" ];
   };
     
   system = {
