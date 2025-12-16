@@ -8,7 +8,6 @@
    (add-to-list 'package-archives '("nongnu" . "https://elpa.nongnu.org/nongnu/") t))
 
 (defun system-is-mac ()
-  "Return true if system is darwin-based (Mac OS X)"
   (string-equal system-type "darwin"))
 
 (defun system-is-linux ()
@@ -38,7 +37,6 @@
 
 ;; Для более плавной работы с оконным менеджером:
 (setq frame-resize-pixelwise t)  ; Точность в пикселях (может быть полезно)
-;; (setq frame-inhibit-implied-resize t)  ; Не менять размер автоматически
 
 (use-package rainbow-delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
@@ -68,7 +66,6 @@
     (ace-window-display-mode 1)
     (advice-add 'ace-select-window :after #'win/auto-resize))
 
-;;; Set default frame size and position 
 (setq inhibit-startup-screen t)
 (setq initial-scratch-message nil)
 (setq confirm-kill-emacs #'y-or-n-p)
@@ -116,7 +113,6 @@
   :bind (("C-c f" . fontaine-set-preset)
          ("C-c F" . fontaine-toggle-preset))
   :config
-;; Главные семейства для macOS
 (defconst my/mono "Geist Mono")
 (defconst my/var  "SF Pro Text") ; можно сменить на "San Francisco" / "Inter"
 
@@ -131,38 +127,32 @@
          :fixed-pitch-family ,my/mono
          :variable-pitch-family ,my/var)
 
-        ;; по умолчанию
         (regular
          :default-family ,my/mono
          :default-weight regular 
-         :default-height 140
+         :default-height 160
          :fixed-pitch-family ,my/mono
          :variable-pitch-family ,my/var)
 
-        ;; слегка крупнее
         (medium
          :inherit regular
          :default-height 150)
 
-        ;; заметно крупнее — удобно на ретине/диване
         (large
          :inherit regular
-         :default-height 170)
+         :default-height 180)
 
-        ;; для выступлений
         (presentation
          :inherit regular
-         :default-height 190)
+         :default-height 200)
 
-        ;; максимальный
         (jumbo
          :inherit regular
          :default-height 230)
 
-        ;; пресет для кодинга: немного компактнее боксы UI
         (coding
          :inherit regular
-         :default-height 135)
+         :default-height 150)
 
         ;; fallback по умолчанию (используется как база для наследования)
         (t
@@ -263,7 +253,6 @@
   :bind (:map minibuffer-local-map
               ("M-A" . marginalia-cycle))
 
-  ;; The :init section is always executed.
   :init
   (marginalia-mode))
 
@@ -438,63 +427,100 @@
   :config
   (reverse-im-mode t)) ; turn the mode on
 
-(when (require 'meow nil t)             
-(require 'meow-tree-sitter nil t)   
-(when (fboundp 'meow-setup)
-  (meow-setup)
-  (meow-global-mode 1)))
+(setq-default indent-tabs-mode nil
+            js-indent-level 2
+            tab-width 2)
+(setq-default evil-shift-width 2)
 
-(require 'ef-themes)
-(setq ef-themes-to-toggle '(ef-owl ef-maris-dark))
-(setq ef-themes-headings ; read the manual's entry or the doc string
-      '((0 variable-pitch regular 1.9)
-        (1 variable-pitch regular 1.8)
-        (2 variable-pitch light 1.7)
-        (3 variable-pitch light 1.6)
-        (4 variable-pitch light 1.5)
-        (5 variable-pitch light 1.4) ; absence of weight means `bold'
-        (6 variable-pitch light 1.3)
-        (7 variable-pitch light 1.2)
-        (t variable-pitch light 1.1)))
+(defun dl/evil-hook ()
+  (dolist (mode '(eshell-mode
+                  git-rebase-mode
+                  term-mode))
+  (add-to-list 'evil-emacs-state-modes mode))) ;; no evil mode for these modes
 
-(setq ef-themes-mixed-fonts t
-      ef-themes-variable-pitch-ui t)
+(use-package evil
+  :init
+    (setq evil-want-integration t) ;; TODO: research what this does
+    (setq evil-want-keybinding nil) ;; Required for evil-collection
+    (setq evil-want-fine-undo 'fine) ;; undo/redo each motion
+    (setq evil-want-Y-yank-to-eol t) ;; Y copies to end of line like vim
+    (setq evil-want-C-u-scroll t) ;; vim like scroll up
+  :config
+    (evil-mode 1)
+    (dl/evil-hook)
+    ;; Emacs "cancel" == vim "cancel"
+    (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
 
-(mapc #'disable-theme custom-enabled-themes)
+    ;; Ctrl-h deletes in vim insert mode
+    (define-key evil-insert-state-map (kbd "C-h")
+      'evil-delete-backward-char-and-join)
 
-(load-theme 'ef-owl :no-confirm)
+    ;; When we wrap lines, jump visually, not to the "actual" next line
+    (evil-global-set-key 'motion "j" 'evil-next-visual-line)
+    (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
 
-(define-key global-map (kbd "<f5>") #'ef-themes-toggle)
+    (evil-set-initial-state 'message-buffer-mode 'normal)
+    (evil-set-initial-state 'dashboard-mode 'normal))
 
-;;;; Pulsar
-;; Read the pulsar manual: <https://protesilaos.com/emacs/pulsar>.
+  ;; Gives me vim bindings elsewhere in emacs
+  (use-package evil-collection
+    :after evil
+    :config
+    (evil-collection-init))
+
+  ;; Keybindings in org mode
+  (use-package evil-org
+    :after evil
+    :hook
+      (org-mode . (lambda () evil-org-mode))
+    :config
+      (require 'evil-org-agenda)
+      (evil-org-agenda-set-keys))
+
+  ;; Branching undo system
+  (use-package undo-tree
+    :after evil
+    :diminish
+    :config
+    (evil-set-undo-system 'undo-tree)
+    (global-undo-tree-mode 1))
+
+  (use-package evil-commentary
+    :after evil
+    :config
+    (evil-commentary-mode))
+
+  ;; Keep undo files from littering directories
+  (setq undo-tree-history-directory-alist '(("." . "~/.local/state/emacs/undo")))
+
+(use-package doric-themes
+  :ensure nil
+  :demand t
+  :config
+  ;; These are the default values.
+  (setq doric-themes-to-toggle '(doric-light doric-dark))
+  (setq doric-themes-to-rotate doric-themes-collection)
+
+  (doric-themes-select 'doric-light)
+  :bind
+  (("<f5>" . doric-themes-toggle)
+   ("C-<f5>" . doric-themes-select)
+   ("M-<f5>" . doric-themes-rotate)))
+
 (use-package pulsar
   :ensure nil
-  :config
-  (setq pulsar-pulse t
-        pulsar-delay 0.055
-        pulsar-iterations 5
-        pulsar-face 'pulsar-green
-        pulsar-region-face 'pulsar-cyan
-        pulsar-highlight-face 'pulsar-magenta)
-  ;; Pulse after `pulsar-pulse-region-functions'.
-  (setq pulsar-pulse-region-functions pulsar-pulse-region-common-functions)
-  :hook
-  ;; There are convenience functions/commands which pulse the line using
-  ;; a specific colour: `pulsar-pulse-line-red' is one of them.
-  ((next-error . (pulsar-pulse-line-red pulsar-recenter-top pulsar-reveal-entry))
-   (minibuffer-setup . pulsar-pulse-line-red)
-   ;; Pulse right after the use of `pulsar-pulse-functions' and
-   ;; `pulsar-pulse-region-functions'.  The default value of the
-   ;; former user option is comprehensive.
-   (after-init . pulsar-global-mode))
   :bind
-  ;; pulsar does not define any key bindings.  This is just my personal
-  ;; preference.  Remember to read the manual on the matter.  Evaluate:
-  ;;
-  ;; (info "(elisp) Key Binding Conventions")
-  (("C-x l" . pulsar-pulse-line) ; override `count-lines-page'
-   ("C-x L" . pulsar-highlight-dwim))) ; or use `pulsar-highlight-line'
+  ( :map global-map
+    ("C-x l" . pulsar-pulse-line) ; overrides `count-lines-page'
+    ("C-x L" . pulsar-highlight-permanently-dwim)) ; or use `pulsar-highlight-temporarily-dwim'
+  :init
+  (pulsar-global-mode 1)
+  :config
+  (setq pulsar-delay 0.055)
+  (setq pulsar-iterations 5)
+  (setq pulsar-face 'pulsar-green)
+  (setq pulsar-region-face 'pulsar-yellow)
+  (setq pulsar-highlight-face 'pulsar-magenta))
 
 ;; The desired ratio of the focused window's size.
 (setopt auto-resize-ratio 0.7)
@@ -536,10 +562,10 @@
 (global-display-line-numbers-mode t)
 (setq display-line-numbers-type 'relative)
 
-;; ESC will also cancel/quit/etc.
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 (use-package general
   :config
+  (general-evil-setup t)
   (general-create-definer dl/leader-keys
     :keymaps '(normal visual emacs)
     :prefix ","))
@@ -571,8 +597,8 @@ Note the weekly scope of the command's precision.")
 ;; Emacs relates shortcuts
 (dl/leader-keys
   "e"  '(:ignore t :which-key "emacs")
-  "ee" '(dl/load-buffer-with-emacs-config :which-key "open emacs config")
-  "er" '(dl/reload-emacs :which-key "reload emacs"))
+  "gee" '(dl/load-buffer-with-emacs-config :which-key "open emacs config")
+  ;; "er" '(dl/reload-emacs :which-key "reload emacs"))
 
 (use-package math-preview
   :custom (math-preview-command "/Users/alexeykotomin/.nix-profile/bin/math-preview"))
@@ -601,36 +627,6 @@ Note the weekly scope of the command's precision.")
               ("C-c C-p" . obsidian-jump)
               ;; Follow a backlink for the current file
               ("C-c C-b" . obsidian-backlink-jump)))
-
-(use-package org-modern
-  :ensure nil 
-  :config
-    ;; Add frame borders and window dividers
-    (modify-all-frames-parameters
-    '((right-divider-width . 20)
-    (internal-border-width . 20)))
-    (dolist (face '(window-divider
-                    window-divider-first-pixel
-                    window-divider-last-pixel))
-    (face-spec-reset-face face)
-    (set-face-foreground face (face-attribute 'default :background)))
-    (set-face-background 'fringe (face-attribute 'default :background))
-
-    (setq
-    ;; Edit settings
-    org-auto-align-tags nil
-    org-tags-column 0
-    org-catch-invisible-edits 'show-and-error
-    org-special-ctrl-a/e t
-    org-insert-heading-respect-content t
-
-    ;; Org styling, hide markup etc.
-    org-hide-emphasis-markers t
-    org-pretty-entities t
-    org-agenda-tags-column 0
-    org-ellipsis "…")
-
-    (global-org-modern-mode))
 
 (use-package nerd-icons-dired)
 
@@ -673,6 +669,25 @@ Note the weekly scope of the command's precision.")
   (setq insert-directory-program
     (expand-file-name ".nix-profile/bin/ls" (getenv "HOME"))))
 
+;; TRAMP configuration for reliable SSH connections
+(use-package tramp
+  :ensure nil  ; Built-in
+  :config
+  ;; Use a simpler shell prompt detection
+  (setq tramp-shell-prompt-pattern "^[^$>\n]*[#$%>] *\\(\[[0-9;]*[a-zA-Z] *\\)*")
+  
+  ;; Increase timeout for slow connections
+  (setq tramp-connection-timeout 10)
+  
+  ;; Use PATH from remote shell
+  (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
+  
+  ;; Don't check for vc on remote files (speeds things up)
+  (setq vc-ignore-dir-regexp
+        (format "\\(%s\\)\\|\\(%s\\)"
+                vc-ignore-dir-regexp
+                tramp-file-name-regexp)))
+
 (setq backup-directory-alist
       `((".*" . "~/.local/state/emacs/backup"))
       backup-by-copying t    ; Don't delink hardlinks
@@ -686,12 +701,13 @@ Note the weekly scope of the command's precision.")
 (setq lock-file-name-transforms
       `((".*" "~/.local/state/emacs/lock-files/" t)))
 
-;; Remember that the website version of this manual shows the latest
-;; developments, which may not be available in the package you are
-;; using.  Instead of copying from the web site, refer to the version
-;; of the documentation that comes with your package.  Evaluate:
-;;
-;;     (info "(denote) Sample configuration")
+(use-package vterm
+  :commands vterm
+  :config
+  (setq term-prompt-regexp "^[^#$%>\n]*[#$%>] *")  
+  (setq vterm-shell "zsh")                       
+  (setq vterm-max-scrollback 10000))
+
 (use-package denote
   :ensure nil
   :hook (dired-mode . denote-dired-mode)
@@ -730,119 +746,23 @@ Note the weekly scope of the command's precision.")
         (lambda ()
           (display-line-numbers-mode -1)))
 
+(use-package calibredb
+:defer t
+:config
+(setq calibredb-root-dir "~/Documents/calibrary")
+;; for folder driver metadata: it should be .metadata.calibre
+(setq calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir))
+(setq calibredb-library-alist '(("~/Documents/calibrary" (name . "Calibre"))
+
 ;; Auto scroll the buffer as we compile
 (setq compilation-scroll-output t)
 
-;; By default, eshell doesn't support ANSI colors. Enable them for compilation.
+;; By Default, Eshell doesn't support ANSI colors. Enable them for compilation.
 (require 'ansi-color)
 (defun colorize-compilation-buffer ()
   (let ((inhibit-read-only t))
     (ansi-color-apply-on-region (point-min) (point-max))))
 (add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
-
-(use-package lsp-mode
-  :commands lsp lsp-deferred
-  :init
-    (setq lsp-keymap-prefix "C-c l")
-    (setq lsp-restart 'ignore)
-    (setq lsp-headerline-breadcrumb-enable nil)
-    (setq lsp-auto-guess-root t)
-    (setq lsp-enable-which-key-integration t))
-
-(use-package lsp-ui
-  :hook (lsp-mode . lsp-ui-mode)
-  :custom
-    (lsp-ui-doc-position 'bottom))
-
-(use-package lsp-treemacs
-  :after lsp)
-
-(use-package company
-  :after lsp-mode
-  :hook (lsp-mode . company-mode)
-  :bind (:map company-active-map
-        ("<tab>" . company-complete-selection))
-        (:map lsp-mode-map
-        ("<tab>" . company-indent-or-complete-common))
-   :custom
-     (company-minimum-prefix-length 1)
-     (company-idle-delay 0.0))
-
-(use-package company-box
-  :hook (company-mode . company-box-mode))
-
-(add-hook 'lsp-mode-hook #'lsp-headerline-breadcrumb-mode)
-
-(defun dl/lsp-find-references-other-window ()
-  (interactive)
-  (switch-to-buffer-other-window (current-buffer))
-  (lsp-find-references))
-
-(defun dl/lsp-find-implementation-other-window ()
-  (interactive)
-  (switch-to-buffer-other-window (current-buffer))
-  (lsp-find-implementation))
-
-(defun dl/lsp-find-definition-other-window ()
-  (interactive)
-  (switch-to-buffer-other-window (current-buffer))
-  (lsp-find-definition))
-
-(dl/leader-keys
-"l"  '(:ignore t :which-key "lsp")
-"lf" '(dl/lsp-find-references-other-window :which-key "find references")
-"lc" '(dl/lsp-find-implementation-other-window :which-key "find implementation")
-"ls" '(lsp-treemacs-symbols :which-key "list symbols")
-"lt" '(flycheck-list-errors :which-key "list errors")
-"lh" '(lsp-treemacs-call-hierarchy :which-key "call hierarchy")
-"lF" '(lsp-format-buffer :which-key "format buffer")
-"li" '(lsp-organize-imports :which-key "organize imports")
-"ll" '(lsp :which-key "enable lsp mode")
-"lr" '(lsp-rename :which-key "rename")
-"ld" '(dl/lsp-find-definition-other-window :which-key "goto definition"))
-
-(use-package lsp-pyright
-  :ensure nil  ; Managed by Nix
-  :hook (python-mode . (lambda ()
-    (require 'lsp-pyright)
-    (lsp-deferred))))  ; or lsp-deferred
-
-(setq python-indent-offset 2)
-
-(use-package blacken
-  :ensure nil)
-
-(setq blacken-line-length '88)
-(setq blacken-allow-py36 t)
-(setq blacken-executable "black")
-(setq blacken-fast-unsafe t)
-
-(add-hook 'python-mode-hook 'blacken-mode)
-
-(add-to-list 'auto-mode-alist '("\\.env" . shell-script-mode))
-
-;; Ассоциируем файлы .kbd с lisp-mode
-(add-to-list 'auto-mode-alist '("\\.kbd\\'" . lisp-mode))
-
-(use-package nix-mode
-  :mode "\\.nix\\'")
-
-(use-package which-key
-  :ensure nil  ; Managed by Nix
-  :init
-  (setq which-key-idle-delay 0.3
-        which-key-idle-secondary-delay 0.1)
-  :config
-  (which-key-mode))
-
-(use-package helpful
-  :ensure nil  ; Managed by Nix
-  :commands (helpful-callable helpful-variable helpful-key)
-  :bind
-  ([remap describe-function] . helpful-callable)
-  ([remap describe-command]  . helpful-callable)
-  ([remap describe-variable] . helpful-variable)
-  ([remap describe-key]      . helpful-key))
 
 (with-eval-after-load 'org
   (org-babel-do-load-languages

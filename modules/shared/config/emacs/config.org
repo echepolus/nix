@@ -1,3 +1,4 @@
+
 #+TITLE: Emacs
 #+STARTUP: content
 
@@ -5,23 +6,19 @@
 ** Personal Information
 #+NAME: personal-info
 #+BEGIN_SRC emacs-lisp
-
   (setq user-full-name "Alexey Kotomin"
     user-mail-address "a.kotominn@gmail.com")
-
 #+END_SRC
 
 ** Initialization
 *** Add package sources
 #+NAME: package-sources
 #+BEGIN_SRC emacs-lisp
-
   (require 'package)
   (unless (assoc-default "melpa" package-archives)
      (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t))
   (unless (assoc-default "nongnu" package-archives)
      (add-to-list 'package-archives '("nongnu" . "https://elpa.nongnu.org/nongnu/") t))
-  
 #+END_SRC
 
 *** System Definitions
@@ -29,7 +26,6 @@
 #+NAME: conditionals
 #+BEGIN_SRC emacs-lisp
   (defun system-is-mac ()
-    "Return true if system is darwin-based (Mac OS X)"
     (string-equal system-type "darwin"))
 
   (defun system-is-linux ()
@@ -54,7 +50,6 @@
 **** Window minor modes
 #+NAME: windows-ui-settings
 #+BEGIN_SRC emacs-lisp
-
   ;; Turn off UI junk
   (column-number-mode)
   (scroll-bar-mode 0)
@@ -65,8 +60,6 @@
 
   ;; Для более плавной работы с оконным менеджером:
   (setq frame-resize-pixelwise t)  ; Точность в пикселях (может быть полезно)
-  ;; (setq frame-inhibit-implied-resize t)  ; Не менять размер автоматически
-  
 #+END_SRC
 
 **** Colors
@@ -114,8 +107,6 @@
 *** Booting up
 #+NAME: startup
 #+BEGIN_SRC emacs-lisp
-
-  ;;; Set default frame size and position 
   (setq inhibit-startup-screen t)
   (setq initial-scratch-message nil)
   (setq confirm-kill-emacs #'y-or-n-p)
@@ -126,11 +117,9 @@
       :demand t
       :config
       (gcmh-mode 1))
-
 #+END_SRC
 
 *** Save Place
-This enables save-place-mode, so Emacs remembers the cursor position in each file and restores it when reopening that file.
 #+NAME: save-place
 #+BEGIN_SRC emacs-lisp
 (save-place-mode 1)
@@ -138,7 +127,6 @@ This enables save-place-mode, so Emacs remembers the cursor position in each fil
 #+END_SRC
 
 *** Save History
-This enables savehist-mode, which saves minibuffer histories—search strings, commands, kill ring entries, and Org refile/capture history—between Emacs sessions.
 #+NAME: savehist
 #+BEGIN_SRC emacs-lisp
 (savehist-mode 1)
@@ -153,7 +141,6 @@ This enables savehist-mode, which saves minibuffer histories—search strings, c
 #+END_SRC
 
 *** Recent Files
-This enables recentf-mode so we can quickly reopen files you visited recently. It also binds C-x C-r to the recentf-open-files command.
 #+NAME: recentf-mode
 #+BEGIN_SRC emacs-lisp
 (use-package recentf
@@ -172,7 +159,6 @@ This enables recentf-mode so we can quickly reopen files you visited recently. I
 **** Fonts
 #+NAME: fonts
 #+BEGIN_SRC emacs-lisp
-  
   ;;;; Fontaine (font configurations)
   (use-package fontaine
     :ensure nil 
@@ -185,7 +171,6 @@ This enables recentf-mode so we can quickly reopen files you visited recently. I
     :bind (("C-c f" . fontaine-set-preset)
            ("C-c F" . fontaine-toggle-preset))
     :config
-  ;; Главные семейства для macOS
   (defconst my/mono "Geist Mono")
   (defconst my/var  "SF Pro Text") ; можно сменить на "San Francisco" / "Inter"
 
@@ -200,38 +185,32 @@ This enables recentf-mode so we can quickly reopen files you visited recently. I
            :fixed-pitch-family ,my/mono
            :variable-pitch-family ,my/var)
 
-          ;; по умолчанию
           (regular
            :default-family ,my/mono
            :default-weight regular 
-           :default-height 140
+           :default-height 160
            :fixed-pitch-family ,my/mono
            :variable-pitch-family ,my/var)
 
-          ;; слегка крупнее
           (medium
            :inherit regular
            :default-height 150)
 
-          ;; заметно крупнее — удобно на ретине/диване
           (large
            :inherit regular
-           :default-height 170)
+           :default-height 180)
 
-          ;; для выступлений
           (presentation
            :inherit regular
-           :default-height 190)
+           :default-height 200)
 
-          ;; максимальный
           (jumbo
            :inherit regular
            :default-height 230)
 
-          ;; пресет для кодинга: немного компактнее боксы UI
           (coding
            :inherit regular
-           :default-height 135)
+           :default-height 150)
 
           ;; fallback по умолчанию (используется как база для наследования)
           (t
@@ -258,7 +237,6 @@ This enables recentf-mode so we can quickly reopen files you visited recently. I
 
     (with-eval-after-load 'pulsar
       (add-hook 'fontaine-set-preset-hook #'pulsar-pulse-line)))
-
 #+END_SRC
 
 **** Spacious-padding
@@ -294,7 +272,6 @@ This enables recentf-mode so we can quickly reopen files you visited recently. I
 **** General 
 #+NAME: general-minibuffers 
 #+BEGIN_SRC emacs-lisp
-
   (use-package minibuffer
     :ensure nil
     :config
@@ -314,13 +291,11 @@ This enables recentf-mode so we can quickly reopen files you visited recently. I
     :config
     (setq read-minibuffer-restore-windows nil) ; Emacs 28
     (setq enable-recursive-minibuffers t))
-
 #+END_SRC
 
 **** Orderless 
 #+NAME: orderless 
 #+BEGIN_SRC emacs-lisp
-
   (use-package orderless
     :ensure nil 
     :demand t
@@ -334,13 +309,11 @@ This enables recentf-mode so we can quickly reopen files you visited recently. I
     :bind ( :map minibuffer-local-completion-map
             ("SPC" . nil)
             ("?" . nil)))
-
 #+END_SRC
 
 **** Vertico 
 #+NAME: vertico 
 #+BEGIN_SRC emacs-lisp
-
   (use-package vertico
     :ensure nil
     :config
@@ -348,13 +321,11 @@ This enables recentf-mode so we can quickly reopen files you visited recently. I
     (setq vertico-resize nil)
     (vertico-mode 1)
     (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy))
-
 #+END_SRC
 
 **** Marginalia 
 #+NAME: marginalia
 #+BEGIN_SRC emacs-lisp
-
   ;; Enable rich annotations using the Marginalia package
   (use-package marginalia
     ;; Bind `marginalia-cycle' locally in the minibuffer.  To make the binding
@@ -363,7 +334,6 @@ This enables recentf-mode so we can quickly reopen files you visited recently. I
     :bind (:map minibuffer-local-map
                 ("M-A" . marginalia-cycle))
 
-    ;; The :init section is always executed.
     :init
     (marginalia-mode))
 #+END_SRC
@@ -371,7 +341,6 @@ This enables recentf-mode so we can quickly reopen files you visited recently. I
 **** Consult
 #+NAME: consult 
 #+BEGIN_SRC emacs-lisp
-
   ;; Example configuration for Consult
   (use-package consult
     ;; Replace bindings. Lazily loaded by `use-package'.
@@ -574,84 +543,121 @@ This enables recentf-mode so we can quickly reopen files you visited recently. I
     (reverse-im-mode t)) ; turn the mode on
 
 #+END_SRC
-*** Meow
-#+NAME: meow-kbd
+*** Indentation
+#+NAME: indent
 #+BEGIN_SRC emacs-lisp
-  (when (require 'meow nil t)             
-  (require 'meow-tree-sitter nil t)   
-  (when (fboundp 'meow-setup)
-    (meow-setup)
-    (meow-global-mode 1)))
+(setq-default indent-tabs-mode nil
+            js-indent-level 2
+            tab-width 2)
+(setq-default evil-shift-width 2)
 #+END_SRC
 
+*** EVIL
+#+NAME: indent
+#+BEGIN_SRC emacs-lisp
+  (defun dl/evil-hook ()
+  (dolist (mode '(eshell-mode
+                  git-rebase-mode
+                  term-mode))
+  (add-to-list 'evil-emacs-state-modes mode))) ;; no evil mode for these modes
+
+(use-package evil
+  :init
+    (setq evil-want-integration t) ;; TODO: research what this does
+    (setq evil-want-keybinding nil) ;; Required for evil-collection
+    (setq evil-want-fine-undo 'fine) ;; undo/redo each motion
+    (setq evil-want-Y-yank-to-eol t) ;; Y copies to end of line like vim
+    (setq evil-want-C-u-scroll t) ;; vim like scroll up
+  :config
+    (evil-mode 1)
+    (dl/evil-hook)
+    ;; Emacs "cancel" == vim "cancel"
+    (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
+
+    ;; Ctrl-h deletes in vim insert mode
+    (define-key evil-insert-state-map (kbd "C-h")
+      'evil-delete-backward-char-and-join)
+
+    ;; When we wrap lines, jump visually, not to the "actual" next line
+    (evil-global-set-key 'motion "j" 'evil-next-visual-line)
+    (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
+
+    (evil-set-initial-state 'message-buffer-mode 'normal)
+    (evil-set-initial-state 'dashboard-mode 'normal))
+
+  ;; Gives me vim bindings elsewhere in emacs
+  (use-package evil-collection
+    :after evil
+    :config
+    (evil-collection-init))
+
+  ;; Keybindings in org mode
+  (use-package evil-org
+    :after evil
+    :hook
+      (org-mode . (lambda () evil-org-mode))
+    :config
+      (require 'evil-org-agenda)
+      (evil-org-agenda-set-keys))
+
+  ;; Branching undo system
+  (use-package undo-tree
+    :after evil
+    :diminish
+    :config
+    (evil-set-undo-system 'undo-tree)
+    (global-undo-tree-mode 1))
+
+  (use-package evil-commentary
+    :after evil
+    :config
+    (evil-commentary-mode))
+
+  ;; Keep undo files from littering directories
+  (setq undo-tree-history-directory-alist '(("." . "~/.local/state/emacs/undo")))
+#+END_SRC
 ** Display options
 *** Themes
-**** Ef-themes
-#+NAME: ef-themes-autothemer
+**** Doric-themes
+#+NAME: doric-themes-autothemer
 #+BEGIN_SRC emacs-lisp 
+(use-package doric-themes
+  :ensure nil
+  :demand t
+  :config
+  ;; These are the default values.
+  (setq doric-themes-to-toggle '(doric-light doric-dark))
+  (setq doric-themes-to-rotate doric-themes-collection)
 
-  (require 'ef-themes)
-  (setq ef-themes-to-toggle '(ef-owl ef-maris-dark))
-  (setq ef-themes-headings ; read the manual's entry or the doc string
-        '((0 variable-pitch regular 1.9)
-          (1 variable-pitch regular 1.8)
-          (2 variable-pitch light 1.7)
-          (3 variable-pitch light 1.6)
-          (4 variable-pitch light 1.5)
-          (5 variable-pitch light 1.4) ; absence of weight means `bold'
-          (6 variable-pitch light 1.3)
-          (7 variable-pitch light 1.2)
-          (t variable-pitch light 1.1)))
-
-  (setq ef-themes-mixed-fonts t
-        ef-themes-variable-pitch-ui t)
-
-  (mapc #'disable-theme custom-enabled-themes)
-
-  (load-theme 'ef-owl :no-confirm)
-
-  (define-key global-map (kbd "<f5>") #'ef-themes-toggle)
-
+  (doric-themes-select 'doric-light)
+  :bind
+  (("<f5>" . doric-themes-toggle)
+   ("C-<f5>" . doric-themes-select)
+   ("M-<f5>" . doric-themes-rotate)))
 #+END_SRC
 
 *** Pulsar 
 #+NAME: pulsar 
 #+BEGIN_SRC emacs-lisp
-  
-  ;;;; Pulsar
-  ;; Read the pulsar manual: <https://protesilaos.com/emacs/pulsar>.
+    
   (use-package pulsar
     :ensure nil
-    :config
-    (setq pulsar-pulse t
-          pulsar-delay 0.055
-          pulsar-iterations 5
-          pulsar-face 'pulsar-green
-          pulsar-region-face 'pulsar-cyan
-          pulsar-highlight-face 'pulsar-magenta)
-    ;; Pulse after `pulsar-pulse-region-functions'.
-    (setq pulsar-pulse-region-functions pulsar-pulse-region-common-functions)
-    :hook
-    ;; There are convenience functions/commands which pulse the line using
-    ;; a specific colour: `pulsar-pulse-line-red' is one of them.
-    ((next-error . (pulsar-pulse-line-red pulsar-recenter-top pulsar-reveal-entry))
-     (minibuffer-setup . pulsar-pulse-line-red)
-     ;; Pulse right after the use of `pulsar-pulse-functions' and
-     ;; `pulsar-pulse-region-functions'.  The default value of the
-     ;; former user option is comprehensive.
-     (after-init . pulsar-global-mode))
     :bind
-    ;; pulsar does not define any key bindings.  This is just my personal
-    ;; preference.  Remember to read the manual on the matter.  Evaluate:
-    ;;
-    ;; (info "(elisp) Key Binding Conventions")
-    (("C-x l" . pulsar-pulse-line) ; override `count-lines-page'
-     ("C-x L" . pulsar-highlight-dwim))) ; or use `pulsar-highlight-line'
-
+    ( :map global-map
+      ("C-x l" . pulsar-pulse-line) ; overrides `count-lines-page'
+      ("C-x L" . pulsar-highlight-permanently-dwim)) ; or use `pulsar-highlight-temporarily-dwim'
+    :init
+    (pulsar-global-mode 1)
+    :config
+    (setq pulsar-delay 0.055)
+    (setq pulsar-iterations 5)
+    (setq pulsar-face 'pulsar-green)
+    (setq pulsar-region-face 'pulsar-yellow)
+    (setq pulsar-highlight-face 'pulsar-magenta))
+  
 #+END_SRC
 
 *** Golden-ratio 
-Use 'golden-ratio-toggle-widescreen' if splits are too wide
 #+NAME: golden-ratio 
 #+BEGIN_SRC emacs-lisp
 
@@ -710,10 +716,10 @@ Use 'golden-ratio-toggle-widescreen' if splits are too wide
 #+NAME::org-mode-quick-entry
 #+BEGIN_SRC emacs-lisp
 
-  ;; ESC will also cancel/quit/etc.
   (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
   (use-package general
     :config
+    (general-evil-setup t)
     (general-create-definer dl/leader-keys
       :keymaps '(normal visual emacs)
       :prefix ","))
@@ -745,8 +751,8 @@ Use 'golden-ratio-toggle-widescreen' if splits are too wide
   ;; Emacs relates shortcuts
   (dl/leader-keys
     "e"  '(:ignore t :which-key "emacs")
-    "ee" '(dl/load-buffer-with-emacs-config :which-key "open emacs config")
-    "er" '(dl/reload-emacs :which-key "reload emacs"))
+    "gee" '(dl/load-buffer-with-emacs-config :which-key "open emacs config")
+    ;; "er" '(dl/reload-emacs :which-key "reload emacs"))
 
   (use-package math-preview
     :custom (math-preview-command "/Users/alexeykotomin/.nix-profile/bin/math-preview"))
@@ -775,43 +781,6 @@ Use 'golden-ratio-toggle-widescreen' if splits are too wide
                 ("C-c C-p" . obsidian-jump)
                 ;; Follow a backlink for the current file
                 ("C-c C-b" . obsidian-backlink-jump)))
-
-#+END_SRC
-
-*** UI improvements
-**** Org-modern 
-#+NAME::org-mode-visuals
-#+BEGIN_SRC emacs-lisp
-  
-  (use-package org-modern
-    :ensure nil 
-    :config
-      ;; Add frame borders and window dividers
-      (modify-all-frames-parameters
-      '((right-divider-width . 20)
-      (internal-border-width . 20)))
-      (dolist (face '(window-divider
-                      window-divider-first-pixel
-                      window-divider-last-pixel))
-      (face-spec-reset-face face)
-      (set-face-foreground face (face-attribute 'default :background)))
-      (set-face-background 'fringe (face-attribute 'default :background))
-
-      (setq
-      ;; Edit settings
-      org-auto-align-tags nil
-      org-tags-column 0
-      org-catch-invisible-edits 'show-and-error
-      org-special-ctrl-a/e t
-      org-insert-heading-respect-content t
-
-      ;; Org styling, hide markup etc.
-      org-hide-emphasis-markers t
-      org-pretty-entities t
-      org-agenda-tags-column 0
-      org-ellipsis "…")
-
-      (global-org-modern-mode))
 
 #+END_SRC
 
@@ -860,6 +829,29 @@ Use 'golden-ratio-toggle-widescreen' if splits are too wide
         (expand-file-name ".nix-profile/bin/ls" (getenv "HOME"))))
 #+END_SRC
 
+*** TRAMP
+#+NAME: tramp
+#+BEGIN_SRC emacs-lisp
+;; TRAMP configuration for reliable SSH connections
+(use-package tramp
+  :ensure nil  ; Built-in
+  :config
+  ;; Use a simpler shell prompt detection
+  (setq tramp-shell-prompt-pattern "^[^$>\n]*[#$%>] *\\(\[[0-9;]*[a-zA-Z] *\\)*")
+  
+  ;; Increase timeout for slow connections
+  (setq tramp-connection-timeout 10)
+  
+  ;; Use PATH from remote shell
+  (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
+  
+  ;; Don't check for vc on remote files (speeds things up)
+  (setq vc-ignore-dir-regexp
+        (format "\\(%s\\)\\|\\(%s\\)"
+                vc-ignore-dir-regexp
+                tramp-file-name-regexp)))
+#+END_SRC
+
 *** Backups and auto-save
 #+NAME: backup-files
 #+BEGIN_SRC emacs-lisp
@@ -880,16 +872,20 @@ Use 'golden-ratio-toggle-widescreen' if splits are too wide
       `((".*" "~/.local/state/emacs/lock-files/" t)))
 #+END_SRC
 
+*** Terminal
+#+NAME: terminal
+#+BEGIN_SRC emacs-lisp
+  (use-package vterm
+    :commands vterm
+    :config
+    (setq term-prompt-regexp "^[^#$%>\n]*[#$%>] *")  
+    (setq vterm-shell "zsh")                       
+    (setq vterm-max-scrollback 10000))
+#+END_SRC
+
 *** Books & Docs
 #+NAME: pdfs
 #+BEGIN_SRC emacs-lisp
-
-  ;; Remember that the website version of this manual shows the latest
-  ;; developments, which may not be available in the package you are
-  ;; using.  Instead of copying from the web site, refer to the version
-  ;; of the documentation that comes with your package.  Evaluate:
-  ;;
-  ;;     (info "(denote) Sample configuration")
   (use-package denote
     :ensure nil
     :hook (dired-mode . denote-dired-mode)
@@ -927,17 +923,24 @@ Use 'golden-ratio-toggle-widescreen' if splits are too wide
   (add-hook 'pdf-view-mode-hook
           (lambda ()
             (display-line-numbers-mode -1)))
+  
+  (use-package calibredb
+  :defer t
+  :config
+  (setq calibredb-root-dir "~/Documents/calibrary")
+  ;; for folder driver metadata: it should be .metadata.calibre
+  (setq calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir))
+  (setq calibredb-library-alist '(("~/Documents/calibrary" (name . "Calibre"))
 #+END_SRC
 
 ** Coding
 *** Compile buffers
-Everything related to ~M-x compile~.
 #+NAME: compilation-buffer
 #+BEGIN_SRC emacs-lisp
 ;; Auto scroll the buffer as we compile
 (setq compilation-scroll-output t)
 
-;; By default, eshell doesn't support ANSI colors. Enable them for compilation.
+;; By Default, Eshell doesn't support ANSI colors. Enable them for compilation.
 (require 'ansi-color)
 (defun colorize-compilation-buffer ()
   (let ((inhibit-read-only t))
@@ -982,8 +985,6 @@ Everything related to ~M-x compile~.
 #+END_SRC
 
 **** Shortcuts
-Leader keys for ~lsp-mode~.
-
 #+NAME: lsp-leader-keys
 #+BEGIN_SRC emacs-lisp
   (defun dl/lsp-find-references-other-window ()
@@ -1053,8 +1054,6 @@ Leader keys for ~lsp-mode~.
 
 *** Infrastructure
 **** Nix
-Nix is my package manager and operating system of choice; this mode enables me to have a better time writing Nix expressions.
-
 #+NAME: nix-mode
 #+begin_src emacs-lisp
   (use-package nix-mode

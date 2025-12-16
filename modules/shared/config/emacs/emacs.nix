@@ -1,17 +1,16 @@
+
 { pkgs }:
 let
-  emacsPackage = if pkgs.stdenv.isDarwin
-    then pkgs.emacs
-    else pkgs.emacs-unstable-pgtk;
-
+  emacsPackage = pkgs.emacs;
+ 
   emacsWithPackages = (pkgs.emacsPackagesFor emacsPackage).emacsWithPackages (epkgs: with epkgs; [
         obsidian
         gcmh
         general
-        # evil
-        # evil-collection
-        # evil-org
-        # evil-commentary
+        evil
+        evil-collection
+        evil-org
+        evil-commentary
         undo-tree
         quelpa
         quelpa-use-package
@@ -19,9 +18,13 @@ let
         # meow-tree-sitter
         denote-markdown
         vterm
+
+        # C
+        calibredb
+        citar
         
         # UI and themes
-        ef-themes
+        doric-themes
         doom-modeline
         all-the-icons
         # all-the-icons-ivy
@@ -52,25 +55,8 @@ let
         embark-consult
         math-preview
         
-        # Ivy/Counsel framework
-        # ivy
-        # counsel
-        # ivy-rich
-        # ivy-prescient
-        # prescient
-        # counsel-projectile
-        # swiper
-        
-        # File management
-        # treemacs
-        # treemacs-evil
-        # treemacs-projectile
-        # treemacs-icons-dired
-        # treemacs-magit
-        # treemacs-nerd-icons
         dired-ranger
         dired-collapse
-        # perspective
         key-chord
         
         # Project management
@@ -80,14 +66,10 @@ let
         
         # Org mode
         org-super-agenda
-        org-modern
         org-superstar
         org-transclusion
         org-download
         org-roam
-        # emacsql
-        # sqlite3
-        # visual-fill-column
         
         # Writing
         writeroom-mode
@@ -95,7 +77,8 @@ let
         flyspell-correct-ivy
         reverse-im
         denote
-        citar
+        gptel
+
         
         # Version control
         # magit
@@ -103,17 +86,9 @@ let
         # Programming - Language servers
         lsp-mode
         lsp-ui
-        # lsp-treemacs
         
         # Programming - Languages
         nix-mode
-        # yaml-mode
-        # lua-mode
-        # tree-sitter
-        # tree-sitter-langs
-        # tide
-        # prettier-js
-        # emmet-mode
         
         # Python
         lsp-pyright

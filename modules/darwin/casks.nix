@@ -2,13 +2,16 @@
 
 [
   # Development Tools
+  "warp"
+  "v2rayu"
   "wireshark-app"
   "tailscale-app"
   "font-hack-nerd-font"
 
   # Communication Tools
   "zoom"
-  "ayugram"
+  # "ayugram"
+  "forkgram-telegram"
 
   # Utility Tools
   "pearcleaner"
@@ -28,6 +31,7 @@
   # C
   "clash-verge-rev"
   "chatgpt"
+  "calibre"
   
   # G
   "ghostty"
@@ -38,12 +42,9 @@
   # I
   
   # J
-  # "jan"
 
   # Keyboard
-  "leader-key"
-  # "input-source-pro"
-  # "espanso"
+  # "leader-key"
   "kawa-app"
 
   # L
@@ -51,15 +52,14 @@
   # O
 
   # Q
-  # "qmk-toolbox"
 
   # R
 
   # S
-  # "sfm"
-  # "sf-symbols"
   "utm"
 
   # Z
   "zen"
+
+  # X
 ]
