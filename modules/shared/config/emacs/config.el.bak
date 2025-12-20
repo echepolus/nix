@@ -507,13 +507,6 @@
    ("C-<f5>" . doric-themes-select)
    ("M-<f5>" . doric-themes-rotate)))
 
-(use-package nano-theme
-:ensure nil
-:defer t
-:quelpa (nano-theme
-         :fetcher github
-         :repo "rougier/nano-theme"))
-
 (use-package pulsar
   :ensure nil
   :bind
@@ -601,6 +594,11 @@ Note the weekly scope of the command's precision.")
   (interactive)
   (load "~/.emacs.d/init.el"))
 
+;; Emacs relates shortcuts
+(dl/leader-keys
+  "e"  '(:ignore t :which-key "emacs")
+  "gee" '(dl/load-buffer-with-emacs-config :which-key "open emacs config")
+  ;; "er" '(dl/reload-emacs :which-key "reload emacs"))
 
 (use-package math-preview
   :custom (math-preview-command "/Users/alexeykotomin/.nix-profile/bin/math-preview"))
@@ -658,13 +656,13 @@ Note the weekly scope of the command's precision.")
 (require 'key-chord)
 (key-chord-mode 1)
 
-(key-chord-define-global "gd" (lambda() (interactive)
+(key-chord-define-global "dd" (lambda() (interactive)
 (find-file "/Users/alexeykotomin/Downloads/")))
-(key-chord-define-global "ge" (lambda() (interactive)
+(key-chord-define-global "ee" (lambda() (interactive)
 (find-file "/Users/alexeykotomin/.config/nix/modules/shared/config/emacs/")))
-(key-chord-define-global "gb" (lambda() (interactive)
+(key-chord-define-global "bb" (lambda() (interactive)
 (find-file "/Users/alexeykotomin/Documents/library/")))
-(key-chord-define-global "gs" (lambda() (interactive)
+(key-chord-define-global "ss" (lambda() (interactive)
 (find-file "/Users/alexeykotomin/s21_projects/")))
 
 (when (system-is-mac)
@@ -730,38 +728,39 @@ Note the weekly scope of the command's precision.")
   (denote-rename-buffer-mode 1))
 
 (use-package denote-markdown
-  :ensure nil
-  ;; Bind these commands to key bindings of your choice.
-  :commands ( denote-markdown-convert-links-to-file-paths
-              denote-markdown-convert-links-to-denote-type
-              denote-markdown-convert-links-to-obsidian-type
-              denote-markdown-convert-obsidian-links-to-denote-type ))
+ :ensure nil
+ ;; Bind these commands to key bindings of your choice.
+ :commands ( denote-markdown-convert-links-to-file-paths
+   denote-markdown-convert-links-to-denote-type
+   denote-markdown-convert-links-to-obsidian-type
+   denote-markdown-convert-obsidian-links-to-denote-type ))
 (use-package citar
-  :custom
-  (citar-bibliography '("~/Documents/library/references.bib")))
+:custom
+(citar-bibliography '("~/Documents/library/references.bib")))
 
 (use-package pdf-tools
-  :ensure nil
-  :config
-  (pdf-loader-install))
+:ensure nil
+:config
+(pdf-loader-install))
 (add-hook 'pdf-view-mode-hook
-          (lambda ()
-            (display-line-numbers-mode -1)))
-
-(use-package nov
-  :mode ("\\.epub\\'" . nov-mode))
+        (lambda ()
+          (display-line-numbers-mode -1)))
 
 (use-package calibredb
-  :ensure nil  ; Managed by Nix
-  :commands (calibredb)
-  :init
-  (setq calibredb-root-dir "~/Documents/calibrary")
-  (setq calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir))
-  (setq calibredb-library-alist '(("~/Documents/calibrary")))
-  (setq calibredb-open-file-with-default-viewer nil
-        calibredb-view-pdf-with-default-viewer nil
-        calibredb-view-pdf-program "emacs"
-        calibredb-view-epub-program "emacs"))
+:defer t
+:config
+(setq calibredb-root-dir "~/Documents/calibrary")
+;; for folder driver metadata: it should be .metadata.calibre
+(setq calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir))
+(setq calibredb-library-alist '(("~/Documents/calibrary"))))
+
+;; Telega configuration
+(use-package telega
+  :defer t
+  :config
+  (setq telega-app-id "38023252")
+  (setq telega-app-hash "25b30c0339ba45df5458e8e15f2d5840")
+  (setq telega-use-docker nil))
 
 ;; Auto scroll the buffer as we compile
 (setq compilation-scroll-output t)
@@ -887,15 +886,28 @@ Note the weekly scope of the command's precision.")
     (shell . t)))
  )
 
+;; Telega - Telegram client for Emacs
 (use-package telega
   :ensure nil  ; Managed by Nix
   :commands (telega)
   :init
   (setq telega-directory "~/.telega")
   :config
-  ;; Get API ID and Hash from https://my.telegram.org
+  ;; You need to get API ID and Hash from https://my.telegram.org
   ;; Create ~/.telega-api-id.el with:
   ;; (setq telega-api-id "YOUR_API_ID")
   ;; (setq telega-api-hash "YOUR_API_HASH")
   (when (file-exists-p "~/.telega-api-id.el")
     (load "~/.telega-api-id.el")))
+
+;; Calibredb - Calibre database interface
+(use-package calibredb
+  :ensure nil  ; Managed by Nix
+  :commands (calibredb)
+  :init
+  (setq calibredb-root-dir "~/Documents/Calibre")
+  (setq calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir))
+  (setq calibredb-library-alist '(("~/Documents/Calibre"))))
+
+(provide 'config)
+;;; config.el ends here

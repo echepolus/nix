@@ -620,26 +620,19 @@
 **** Doric-themes
 #+NAME: doric-themes-autothemer
 #+BEGIN_SRC emacs-lisp 
-  (use-package doric-themes
-    :ensure nil
-    :demand t
-    :config
-    ;; These are the default values.
-    (setq doric-themes-to-toggle '(doric-light doric-dark))
-    (setq doric-themes-to-rotate doric-themes-collection)
-
-    (doric-themes-select 'doric-light)
-    :bind
-    (("<f5>" . doric-themes-toggle)
-     ("C-<f5>" . doric-themes-select)
-     ("M-<f5>" . doric-themes-rotate)))
-  
-  (use-package nano-theme
+(use-package doric-themes
   :ensure nil
-  :defer t
-  :quelpa (nano-theme
-           :fetcher github
-           :repo "rougier/nano-theme"))
+  :demand t
+  :config
+  ;; These are the default values.
+  (setq doric-themes-to-toggle '(doric-light doric-dark))
+  (setq doric-themes-to-rotate doric-themes-collection)
+
+  (doric-themes-select 'doric-light)
+  :bind
+  (("<f5>" . doric-themes-toggle)
+   ("C-<f5>" . doric-themes-select)
+   ("M-<f5>" . doric-themes-rotate)))
 #+END_SRC
 
 *** Pulsar 
@@ -754,6 +747,10 @@
     (interactive)
     (load "~/.emacs.d/init.el"))
 
+  ;; Emacs relates shortcuts
+  (dl/leader-keys
+    "e"  '(:ignore t :which-key "emacs")
+    "gee" '(dl/load-buffer-with-emacs-config :which-key "open emacs config"))
 
   (use-package math-preview
     :custom (math-preview-command "/Users/alexeykotomin/.nix-profile/bin/math-preview"))
@@ -816,13 +813,13 @@
     (require 'key-chord)
     (key-chord-mode 1)
 
-    (key-chord-define-global "gd" (lambda() (interactive)
+    (key-chord-define-global "dd" (lambda() (interactive)
     (find-file "/Users/alexeykotomin/Downloads/")))
-    (key-chord-define-global "ge" (lambda() (interactive)
+    (key-chord-define-global "ee" (lambda() (interactive)
     (find-file "/Users/alexeykotomin/.config/nix/modules/shared/config/emacs/")))
-    (key-chord-define-global "gb" (lambda() (interactive)
+    (key-chord-define-global "bb" (lambda() (interactive)
     (find-file "/Users/alexeykotomin/Documents/library/")))
-    (key-chord-define-global "gs" (lambda() (interactive)
+    (key-chord-define-global "ss" (lambda() (interactive)
     (find-file "/Users/alexeykotomin/s21_projects/")))
 
     (when (system-is-mac)
@@ -887,59 +884,60 @@
 *** Books & Docs
 #+NAME: pdfs
 #+BEGIN_SRC emacs-lisp
-  (use-package denote
-    :ensure nil
-    :hook (dired-mode . denote-dired-mode)
-    :bind
-    (("C-c n n" . denote)
-     ("C-c n r" . denote-rename-file)
-     ("C-c n l" . denote-link)
-     ("C-c n b" . denote-backlinks)
-     ("C-c n d" . denote-dired)
-     ("C-c n g" . denote-grep))
-    :config
-    (setq denote-directory (expand-file-name "~/Documents/notes/"))
+    (use-package denote
+      :ensure nil
+      :hook (dired-mode . denote-dired-mode)
+      :bind
+      (("C-c n n" . denote)
+       ("C-c n r" . denote-rename-file)
+       ("C-c n l" . denote-link)
+       ("C-c n b" . denote-backlinks)
+       ("C-c n d" . denote-dired)
+       ("C-c n g" . denote-grep))
+      :config
+      (setq denote-directory (expand-file-name "~/Documents/notes/"))
 
-    ;; Automatically rename Denote buffers when opening them so that
-    ;; instead of their long file name they have, for example, a literal
-    ;; "[D]" followed by the file's title.  Read the doc string of
-    ;; `denote-rename-buffer-format' for how to modify this.
-    (denote-rename-buffer-mode 1))
+      ;; Automatically rename Denote buffers when opening them so that
+      ;; instead of their long file name they have, for example, a literal
+      ;; "[D]" followed by the file's title.  Read the doc string of
+      ;; `denote-rename-buffer-format' for how to modify this.
+      (denote-rename-buffer-mode 1))
 
-  (use-package denote-markdown
-    :ensure nil
-    ;; Bind these commands to key bindings of your choice.
-    :commands ( denote-markdown-convert-links-to-file-paths
-                denote-markdown-convert-links-to-denote-type
-                denote-markdown-convert-links-to-obsidian-type
-                denote-markdown-convert-obsidian-links-to-denote-type ))
-  (use-package citar
+    (use-package denote-markdown
+     :ensure nil
+     ;; Bind these commands to key bindings of your choice.
+     :commands ( denote-markdown-convert-links-to-file-paths
+       denote-markdown-convert-links-to-denote-type
+       denote-markdown-convert-links-to-obsidian-type
+       denote-markdown-convert-obsidian-links-to-denote-type ))
+    (use-package citar
     :custom
     (citar-bibliography '("~/Documents/library/references.bib")))
 
-  (use-package pdf-tools
+    (use-package pdf-tools
     :ensure nil
     :config
     (pdf-loader-install))
-  (add-hook 'pdf-view-mode-hook
+    (add-hook 'pdf-view-mode-hook
             (lambda ()
               (display-line-numbers-mode -1)))
+    
 
-  (use-package nov
-    :mode ("\\.epub\\'" . nov-mode))
-  
-  (use-package calibredb
-    :ensure nil  ; Managed by Nix
-    :commands (calibredb)
-    :init
-    (setq calibredb-root-dir "~/Documents/calibrary")
-    (setq calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir))
-    (setq calibredb-library-alist '(("~/Documents/calibrary")))
-    (setq calibredb-open-file-with-default-viewer nil
-          calibredb-view-pdf-with-default-viewer nil
-          calibredb-view-pdf-program "emacs"
-          calibredb-view-epub-program "emacs"))
+  (require 'calibredb)
+  (setq calibredb-root-dir "~/Documents/calibrary")
+  ;; for folder driver metadata: it should be .metadata.calibre
+  (setq calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir))
+  (setq calibredb-library-alist '(("~/Documents/calibrary")))
+  (setq calibredb-program "/Applications/calibre.app/Contents/MacOS/calibredb")
 
+
+    ;; Telega configuration
+    (use-package telega
+      :ensure nil
+      :config
+      (setq telega-api-id 38023252)
+      (setq telega-api-hash "25b30c0339ba45df5458e8e15f2d5840"))
+      ;; (setq telega-use-docker nil))
 #+END_SRC
 
 ** Coding
@@ -1104,6 +1102,7 @@
    )
 #+END_SRC
 
+
 **** Telega - Telegram client
 #+BEGIN_SRC emacs-lisp
 (use-package telega
@@ -1120,13 +1119,13 @@
     (load "~/.telega-api-id.el")))
 #+END_SRC
 
-# **** Calibredb - Calibre library manager
-# #+BEGIN_SRC emacs-lisp
-# (use-package calibredb
-#   :ensure nil  ; Managed by Nix
-#   :commands (calibredb)
-#   :init
-#   (setq calibredb-root-dir "~/Documents/calibrary")
-#   (setq calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir))
-#   (setq calibredb-library-alist '(("~/Documents/calibrary"))))
-# #+END_SRC
+**** Calibredb - Calibre library manager
+#+BEGIN_SRC emacs-lisp
+(use-package calibredb
+  :ensure nil  ; Managed by Nix
+  :commands (calibredb)
+  :init
+  (setq calibredb-root-dir "~/Documents/calibrary")
+  (setq calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir))
+  (setq calibredb-library-alist '(("~/Documents/calibrary"))))
+#+END_SRC

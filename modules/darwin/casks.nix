@@ -58,8 +58,12 @@
   # S
   "utm"
 
+  # V
+  "tigervnc-viewer"
+
   # Z
   "zen"
 
   # X
+  "xquartz"
 ]

@@ -70,6 +70,9 @@ let
         org-transclusion
         org-download
         org-roam
+        emacsql
+        sqlite3
+        visual-fill-column
         
         # Writing
         writeroom-mode
@@ -103,6 +106,15 @@ let
         exec-path-from-shell
         pdf-tools   
         tablist # required by pdf-tools
+
+        # N
+        nov
+        nano-theme
+        nano-modeline
+        nano-agenda
+
+        # T
+        telega
   ]);
 in 
 emacsWithPackages

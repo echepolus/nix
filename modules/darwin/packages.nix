@@ -13,4 +13,8 @@ shared-packages ++ [
   libclang
   xray
   zip
+  gperf
+  cmakeMinimal
+  pkg-configUpstream
+  tdlib
 ]

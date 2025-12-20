@@ -32,7 +32,7 @@ in
       "gitlab-runner"
       "rbenv"
       "bear"
-      # "llvm"
+      "tdlib"
     ];
     masApps = {
       #"1password" = 1333542190;
