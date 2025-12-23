@@ -33,6 +33,7 @@ in
       "rbenv"
       "bear"
       "tdlib"
+      "zlib"
     ];
     masApps = {
       #"1password" = 1333542190;

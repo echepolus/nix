@@ -414,7 +414,7 @@
   :demand t ; always load it
   :after char-fold ; but only after `char-fold' is loaded
   :bind
-  ("M-T" . reverse-im-translate-word) ; to fix a word written in the wrong layout
+  ("M-Τ" . reverse-im-translate-word) ; to fix a word written in the wrong layout
   :custom
   ;; cache generated keymaps
   (reverse-im-cache-file (locate-user-emacs-file "reverse-im-cache.el"))
@@ -432,87 +432,80 @@
             tab-width 2)
 (setq-default evil-shift-width 2)
 
-(defun dl/evil-hook ()
-  (dolist (mode '(eshell-mode
-                  git-rebase-mode
-                  term-mode))
-  (add-to-list 'evil-emacs-state-modes mode))) ;; no evil mode for these modes
+;;   (defun dl/evil-hook ()
+;;   (dolist (mode '(eshell-mode
+;;                   git-rebase-mode
+;;                   term-mode))
+;;   (add-to-list 'evil-emacs-state-modes mode))) ;; no evil mode for these modes
 
-(use-package evil
-  :init
-    (setq evil-want-integration t) ;; TODO: research what this does
-    (setq evil-want-keybinding nil) ;; Required for evil-collection
-    (setq evil-want-fine-undo 'fine) ;; undo/redo each motion
-    (setq evil-want-Y-yank-to-eol t) ;; Y copies to end of line like vim
-    (setq evil-want-C-u-scroll t) ;; vim like scroll up
-  :config
-    (evil-mode 1)
-    (dl/evil-hook)
-    ;; Emacs "cancel" == vim "cancel"
-    (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
+;; (use-package evil
+;;   :init
+;;     (setq evil-want-integration t) ;; TODO: research what this does
+;;     (setq evil-want-keybinding nil) ;; Required for evil-collection
+;;     (setq evil-want-fine-undo 'fine) ;; undo/redo each motion
+;;     (setq evil-want-Y-yank-to-eol t) ;; Y copies to end of line like vim
+;;     (setq evil-want-C-u-scroll t) ;; vim like scroll up
+;;   :config
+;;     (evil-mode 1)
+;;     (dl/evil-hook)
+;;     ;; Emacs "cancel" == vim "cancel"
+;;     (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
 
-    ;; Ctrl-h deletes in vim insert mode
-    (define-key evil-insert-state-map (kbd "C-h")
-      'evil-delete-backward-char-and-join)
+;;     ;; Ctrl-h deletes in vim insert mode
+;;     (define-key evil-insert-state-map (kbd "C-h")
+;;       'evil-delete-backward-char-and-join)
 
-    ;; When we wrap lines, jump visually, not to the "actual" next line
-    (evil-global-set-key 'motion "j" 'evil-next-visual-line)
-    (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
+;;     ;; When we wrap lines, jump visually, not to the "actual" next line
+;;     (evil-global-set-key 'motion "j" 'evil-next-visual-line)
+;;     (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
 
-    (evil-set-initial-state 'message-buffer-mode 'normal)
-    (evil-set-initial-state 'dashboard-mode 'normal))
+;;     (evil-set-initial-state 'message-buffer-mode 'normal)
+;;     (evil-set-initial-state 'dashboard-mode 'normal))
 
-  ;; Gives me vim bindings elsewhere in emacs
-  (use-package evil-collection
-    :after evil
-    :config
-    (evil-collection-init))
+;;   ;; Gives me vim bindings elsewhere in emacs
+;;   (use-package evil-collection
+;;     :after evil
+;;     :config
+;;     (evil-collection-init))
 
-  ;; Keybindings in org mode
-  (use-package evil-org
-    :after evil
-    :hook
-      (org-mode . (lambda () evil-org-mode))
-    :config
-      (require 'evil-org-agenda)
-      (evil-org-agenda-set-keys))
+;;   ;; Keybindings in org mode
+;;   (use-package evil-org
+;;     :after evil
+;;     :hook
+;;       (org-mode . (lambda () evil-org-mode))
+;;     :config
+;;       (require 'evil-org-agenda)
+;;       (evil-org-agenda-set-keys))
 
-  ;; Branching undo system
-  (use-package undo-tree
-    :after evil
-    :diminish
-    :config
-    (evil-set-undo-system 'undo-tree)
-    (global-undo-tree-mode 1))
+;;   ;; Branching undo system
+;;   (use-package undo-tree
+;;     :after evil
+;;     :diminish
+;;     :config
+;;     (evil-set-undo-system 'undo-tree)
+;;     (global-undo-tree-mode 1))
 
-  (use-package evil-commentary
-    :after evil
-    :config
-    (evil-commentary-mode))
+;;   (use-package evil-commentary
+;;     :after evil
+;;     :config
+;;     (evil-commentary-mode))
 
-  ;; Keep undo files from littering directories
-  (setq undo-tree-history-directory-alist '(("." . "~/.local/state/emacs/undo")))
+;;   ;; Keep undo files from littering directories
+;;   (setq undo-tree-history-directory-alist '(("." . "~/.local/state/emacs/undo")))
 
 (use-package doric-themes
   :ensure nil
   :demand t
   :config
-  ;; These are the default values.
-  (setq doric-themes-to-toggle '(doric-light doric-dark))
+  (setq doric-themes-to-toggle '(doric-dark doric-light))
   (setq doric-themes-to-rotate doric-themes-collection)
 
-  (doric-themes-select 'doric-light)
+  (doric-themes-select 'doric-dark)
+  (doric-themes-load-random 'dark)
   :bind
   (("<f5>" . doric-themes-toggle)
    ("C-<f5>" . doric-themes-select)
    ("M-<f5>" . doric-themes-rotate)))
-
-(use-package nano-theme
-:ensure nil
-:defer t
-:quelpa (nano-theme
-         :fetcher github
-         :repo "rougier/nano-theme"))
 
 (use-package pulsar
   :ensure nil
@@ -548,7 +541,6 @@
 
 (advice-add 'other-window :after (lambda (&rest args)
                                    (win/auto-resize)))
-
 (advice-add 'windmove-up    :after 'win/auto-resize)
 (advice-add 'windmove-down  :after 'win/auto-resize)
 (advice-add 'windmove-right :after 'win/auto-resize)
@@ -761,7 +753,22 @@ Note the weekly scope of the command's precision.")
   (setq calibredb-open-file-with-default-viewer nil
         calibredb-view-pdf-with-default-viewer nil
         calibredb-view-pdf-program "emacs"
-        calibredb-view-epub-program "emacs"))
+        calibredb-view-epub-program "emacs"
+        calibredb-view-djvu-program "emacs"
+        calibredb-search-page-max-rows 100
+        calibredb-virtual-library-alist '(("1. Программирование" . "work pdf")
+                                          ("2. Математика" . "Readit epub")
+                                          ("3. Христианство" . "rust")
+                                          ("4. Древнегреческий" . "rust")
+                                          ("5. Художественная литература" . "rust"))
+        calibredb-id-width 0
+  ))
+
+(use-package quick-sdcv
+  :ensure t
+  :custom
+  (quick-sdcv-dictionary-prefix-symbol "►")
+  (quick-sdcv-ellipsis " ▼"))
 
 ;; Auto scroll the buffer as we compile
 (setq compilation-scroll-output t)
@@ -888,14 +895,7 @@ Note the weekly scope of the command's precision.")
  )
 
 (use-package telega
-  :ensure nil  ; Managed by Nix
+  :load-path  "~/telega.el"
   :commands (telega)
-  :init
-  (setq telega-directory "~/.telega")
-  :config
-  ;; Get API ID and Hash from https://my.telegram.org
-  ;; Create ~/.telega-api-id.el with:
-  ;; (setq telega-api-id "YOUR_API_ID")
-  ;; (setq telega-api-hash "YOUR_API_HASH")
-  (when (file-exists-p "~/.telega-api-id.el")
-    (load "~/.telega-api-id.el")))
+  :defer t)
+(setq telega-server-libs-prefix "/opt/homebrew/Cellar/tdlib/1.8.0")

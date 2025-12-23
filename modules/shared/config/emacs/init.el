@@ -1,11 +1,11 @@
 ;; -------------------------
 ;; Evil early setup (must be before evil or evil-collection is loaded!)
 ;; -------------------------
-(setq evil-want-integration t)      ;; default = t
-(setq evil-want-keybinding nil)     ;; disable default bindings so evil-collection can set them
-(setq evil-want-fine-undo 'fine)    ;; granular undo
-(setq evil-want-Y-yank-to-eol t)    ;; Y yanks to end of line
-(setq evil-want-C-u-scroll t)       ;; C-u scrolls like in Vim
+;; (setq evil-want-integration t)      ;; default = t
+;; (setq evil-want-keybinding nil)     ;; disable default bindings so evil-collection can set them
+;; (setq evil-want-fine-undo 'fine)    ;; granular undo
+;; (setq evil-want-Y-yank-to-eol t)    ;; Y yanks to end of line
+;; (setq evil-want-C-u-scroll t)       ;; C-u scrolls like in Vim
 
 ;; -------------------------
 ;; Variable Declarations

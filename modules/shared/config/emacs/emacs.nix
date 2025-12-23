@@ -14,8 +14,6 @@ let
         undo-tree
         quelpa
         quelpa-use-package
-        meow
-        # meow-tree-sitter
         denote-markdown
         vterm
 
@@ -80,7 +78,6 @@ let
         flyspell-correct-ivy
         reverse-im
         denote
-        gptel
 
         
         # Version control
@@ -109,9 +106,9 @@ let
 
         # N
         nov
-        nano-theme
-        nano-modeline
-        nano-agenda
+
+        # S
+        quick-sdcv
 
         # T
         telega

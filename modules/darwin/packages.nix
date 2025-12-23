@@ -16,5 +16,5 @@ shared-packages ++ [
   gperf
   cmakeMinimal
   pkg-configUpstream
-  tdlib
+  # tdlib
 ]

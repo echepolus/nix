@@ -103,6 +103,7 @@ with pkgs; [
   # S
   sqlite # SQL database engine
   symlinks
+  sdcv
 
   # T
   tree # Directory tree viewer

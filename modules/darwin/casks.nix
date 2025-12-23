@@ -2,11 +2,10 @@
 
 [
   # Development Tools
-  "warp"
   "v2rayu"
   "wireshark-app"
   "tailscale-app"
-  "font-hack-nerd-font"
+  # "font-hack-nerd-font"
 
   # Communication Tools
   "zoom"
@@ -29,7 +28,6 @@
   # B
 
   # C
-  "clash-verge-rev"
   "chatgpt"
   "calibre"
   
@@ -58,6 +56,8 @@
   # S
   "utm"
 
+  # T
+
   # V
   "tigervnc-viewer"
 
@@ -65,5 +65,5 @@
   "zen"
 
   # X
-  "xquartz"
+  # "xquartz"
 ]
