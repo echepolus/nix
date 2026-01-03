@@ -49,6 +49,8 @@ with pkgs; [
   # F
   fd # Fast find alternative
   fzf # Fuzzy finder
+  ffmpeg
+  
  
   # G
   gh # GitHub CLI
@@ -121,6 +123,7 @@ with pkgs; [
   # X
 
   # Y
+  yt-dlp
 
   # Z
   zip # ZIP archive creator

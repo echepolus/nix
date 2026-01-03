@@ -180,6 +180,44 @@
   (with-eval-after-load 'pulsar
     (add-hook 'fontaine-set-preset-hook #'pulsar-pulse-line)))
 
+(require 'beframe)
+
+;; This is the default value.  Write here the names of buffers that
+;; should not be beframed.
+(setq beframe-global-buffers '("*scratch*" "*Messages*" "*Backtrace*"))
+
+(beframe-mode 1)
+
+;; Bind Beframe commands to a prefix key, such as C-c b:
+;; (define-key global-map (kbd "C-c b") #'beframe-prefix-map)
+;; OR use the transient instead of the prefix map:
+(define-key global-map (kbd "C-c b") #'beframe-transient)
+
+(defvar consult-buffer-sources)
+(declare-function consult--buffer-state "consult")
+
+(with-eval-after-load 'consult
+  (defface beframe-buffer
+    '((t :inherit font-lock-string-face))
+    "Face for `consult' framed buffers.")
+
+  (defun my-beframe-buffer-names-sorted (&optional frame)
+    "Return the list of buffers from `beframe-buffer-names' sorted by visibility.
+With optional argument FRAME, return the list of buffers of FRAME."
+    (beframe-buffer-names frame :sort #'beframe-buffer-sort-visibility))
+
+  (defvar beframe-consult-source
+    `( :name     "Frame-specific buffers (current frame)"
+       :narrow   ?F
+       :category buffer
+       :face     beframe-buffer
+       :history  beframe-history
+       :items    ,#'my-beframe-buffer-names-sorted
+       :action   ,#'switch-to-buffer
+       :state    ,#'consult--buffer-state))
+
+  (add-to-list 'consult-buffer-sources 'beframe-consult-source))
+
 (require 'spacious-padding)
 
 ;; These are the default values, but I keep them here for visibility.
@@ -377,7 +415,7 @@
 ;;
 ;; Further reading: https://protesilaos.com/emacs/dotemacs#h:9a3581df-ab18-4266-815e-2edd7f7e4852
 (use-package wgrep
-  :ensure t
+  :ensure nil
   :bind ( :map grep-mode-map
           ("e" . wgrep-change-to-wgrep-mode)
           ("C-x C-q" . wgrep-change-to-wgrep-mode)
@@ -422,7 +460,6 @@
   (reverse-im-char-fold t)
   ;; advice read-char to fix commands that use their own shortcut mechanism
   (reverse-im-read-char-advice-function #'reverse-im-read-char-include)
-  ;; translate these methods
   (reverse-im-input-methods '("russian-computer" "greek"))
   :config
   (reverse-im-mode t)) ; turn the mode on
@@ -430,68 +467,7 @@
 (setq-default indent-tabs-mode nil
             js-indent-level 2
             tab-width 2)
-(setq-default evil-shift-width 2)
-
-;;   (defun dl/evil-hook ()
-;;   (dolist (mode '(eshell-mode
-;;                   git-rebase-mode
-;;                   term-mode))
-;;   (add-to-list 'evil-emacs-state-modes mode))) ;; no evil mode for these modes
-
-;; (use-package evil
-;;   :init
-;;     (setq evil-want-integration t) ;; TODO: research what this does
-;;     (setq evil-want-keybinding nil) ;; Required for evil-collection
-;;     (setq evil-want-fine-undo 'fine) ;; undo/redo each motion
-;;     (setq evil-want-Y-yank-to-eol t) ;; Y copies to end of line like vim
-;;     (setq evil-want-C-u-scroll t) ;; vim like scroll up
-;;   :config
-;;     (evil-mode 1)
-;;     (dl/evil-hook)
-;;     ;; Emacs "cancel" == vim "cancel"
-;;     (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
-
-;;     ;; Ctrl-h deletes in vim insert mode
-;;     (define-key evil-insert-state-map (kbd "C-h")
-;;       'evil-delete-backward-char-and-join)
-
-;;     ;; When we wrap lines, jump visually, not to the "actual" next line
-;;     (evil-global-set-key 'motion "j" 'evil-next-visual-line)
-;;     (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
-
-;;     (evil-set-initial-state 'message-buffer-mode 'normal)
-;;     (evil-set-initial-state 'dashboard-mode 'normal))
-
-;;   ;; Gives me vim bindings elsewhere in emacs
-;;   (use-package evil-collection
-;;     :after evil
-;;     :config
-;;     (evil-collection-init))
-
-;;   ;; Keybindings in org mode
-;;   (use-package evil-org
-;;     :after evil
-;;     :hook
-;;       (org-mode . (lambda () evil-org-mode))
-;;     :config
-;;       (require 'evil-org-agenda)
-;;       (evil-org-agenda-set-keys))
-
-;;   ;; Branching undo system
-;;   (use-package undo-tree
-;;     :after evil
-;;     :diminish
-;;     :config
-;;     (evil-set-undo-system 'undo-tree)
-;;     (global-undo-tree-mode 1))
-
-;;   (use-package evil-commentary
-;;     :after evil
-;;     :config
-;;     (evil-commentary-mode))
-
-;;   ;; Keep undo files from littering directories
-;;   (setq undo-tree-history-directory-alist '(("." . "~/.local/state/emacs/undo")))
+;; (setq-default evil-shift-width 2)
 
 (use-package doric-themes
   :ensure nil
@@ -500,7 +476,6 @@
   (setq doric-themes-to-toggle '(doric-dark doric-light))
   (setq doric-themes-to-rotate doric-themes-collection)
 
-  (doric-themes-select 'doric-dark)
   (doric-themes-load-random 'dark)
   :bind
   (("<f5>" . doric-themes-toggle)
@@ -550,22 +525,20 @@
 (global-visual-line-mode t) ;; Wraps lines everywhere
 (global-auto-revert-mode t) ;; Auto refresh buffers from disk
 
-;; Настройка подсветки скобок
 (show-paren-mode t)  ;; Включить режим
 (setq show-paren-style 'mixed) ;; Лучшая видимость (выделение всей пары или одной)
 (setq show-paren-delay 0)      ;; Мгновенная подсветка 
 
 (setq warning-minimum-level :error)
 
-;; Нумерация
 (global-display-line-numbers-mode t)
 (setq display-line-numbers-type 'relative)
 
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 (use-package general
   :config
-  (general-evil-setup t)
-  (general-create-definer dl/leader-keys
+  ;; (general-evil-setup t)
+  (general-create-definer eux/leader-keys
     :keymaps '(normal visual emacs)
     :prefix ","))
 
@@ -573,26 +546,22 @@
   "Format of date to insert with `insert-current-time' func.
 Note the weekly scope of the command's precision.")
 
-(defun dl/find-file (path)
+(defun eux/find-file (path)
   "Helper function to open a file in a buffer"
   (interactive)
   (find-file path))
 
-(defun dl/load-buffer-with-emacs-config ()
-  "Open the emacs configuration"
+(defun eux/load-buffer-with-emacs-config ()
   (interactive)
-  (dl/find-file "~/.local/share/src/nixos-config/modules/shared/config/emacs/config.org"))
+  (eux/find-file "~/.config/nix/modules/shared/config/emacs/config.org"))
 
-(defun dl/load-buffer-with-nix-config ()
-  "Open the emacs configuration"
+(defun eux/load-buffer-with-nix-config ()
   (interactive)
-  (dl/find-file "~/.local/share/src/nixos-config/modules/shared/home-manager.nix"))
+  (eux/find-file "~/.config/nix/modules/shared/home-manager.nix"))
 
-(defun dl/reload-emacs ()
-  "Reload the emacs configuration"
+(defun eux/reload-emacs ()
   (interactive)
   (load "~/.emacs.d/init.el"))
-
 
 (use-package math-preview
   :custom (math-preview-command "/Users/alexeykotomin/.nix-profile/bin/math-preview"))
@@ -609,7 +578,6 @@ Note the weekly scope of the command's precision.")
   ;; Useful if you're going to be using wiki links
   (markdown-enable-wiki-links t)
 
-  ;; These bindings are only suggestions; it's okay to use other bindings
   :bind (:map obsidian-mode-map
               ;; Create note
               ("C-c C-n" . obsidian-capture)
@@ -629,20 +597,20 @@ Note the weekly scope of the command's precision.")
   :defer 1
   :commands (dired dired-jump)
   :config
-    (setq dired-listing-switches "-agho --group-directories-first")
-    (setq dired-hide-details-hide-symlink-targets nil)
-    (put 'dired-find-alternate-file 'disabled nil)
-    (setq delete-by-moving-to-trash t)
-    (add-hook 'dired-load-hook
-          (lambda ()
-            (interactive)
-            (dired-collapse)))
-    (add-hook 'dired-mode-hook
-          (lambda ()
-            (interactive)
-            (nerd-icons-dired-mode 1)
-            (hl-line-mode 1))))
-    (add-hook 'dired-mode-hook 'dired-hide-details-mode)t
+  (setq dired-listing-switches "-agho --group-directories-first")
+  (setq dired-hide-details-hide-symlink-targets nil)
+  (put 'dired-find-alternate-file 'disabled nil)
+  (setq delete-by-moving-to-trash t)
+  (add-hook 'dired-load-hook
+            (lambda ()
+              (interactive)
+              (dired-collapse)))
+  (add-hook 'dired-mode-hook
+            (lambda ()
+              (interactive)
+              (nerd-icons-dired-mode 1)
+              (hl-line-mode 1))))
+(add-hook 'dired-mode-hook 'dired-hide-details-mode)t
 
 (use-package dired-ranger)
 (use-package dired-collapse)
@@ -651,17 +619,38 @@ Note the weekly scope of the command's precision.")
 (key-chord-mode 1)
 
 (key-chord-define-global "gd" (lambda() (interactive)
-(find-file "/Users/alexeykotomin/Downloads/")))
+                                (find-file "/Users/alexeykotomin/Downloads/")))
 (key-chord-define-global "ge" (lambda() (interactive)
-(find-file "/Users/alexeykotomin/.config/nix/modules/shared/config/emacs/")))
+                                (find-file "/Users/alexeykotomin/.config/nix/modules/shared/config/emacs/")))
 (key-chord-define-global "gb" (lambda() (interactive)
-(find-file "/Users/alexeykotomin/Documents/library/")))
+                                (find-file "/Users/alexeykotomin/Documents/library/")))
 (key-chord-define-global "gs" (lambda() (interactive)
-(find-file "/Users/alexeykotomin/s21_projects/")))
+                                (find-file "/Users/alexeykotomin/s21_projects/")))
 
 (when (system-is-mac)
   (setq insert-directory-program
-    (expand-file-name ".nix-profile/bin/ls" (getenv "HOME"))))
+        (expand-file-name ".nix-profile/bin/ls" (getenv "HOME"))))
+
+(require 'dired-preview)
+
+;; Default values for demo purposes
+(setq dired-preview-delay 0.1)
+(setq dired-preview-max-size (expt 2 20))
+(setq dired-preview-ignored-extensions-regexp
+      (concat "\\."
+              "\\(gz\\|"
+              "zst\\|"
+              "tar\\|"
+              "xz\\|"
+              "rar\\|"
+              "zip\\|"
+              "iso\\|"
+              "epub"
+              "\\)"))
+
+;; Enable `dired-preview-mode' in a given Dired buffer or do it
+;; globally:
+(dired-preview-global-mode 1)
 
 ;; TRAMP configuration for reliable SSH connections
 (use-package tramp
@@ -728,47 +717,136 @@ Note the weekly scope of the command's precision.")
               denote-markdown-convert-links-to-denote-type
               denote-markdown-convert-links-to-obsidian-type
               denote-markdown-convert-obsidian-links-to-denote-type ))
+
+(use-package consult-denote
+  :ensure nil
+  :bind
+  (("C-c n f" . consult-denote-find)
+   ("C-c n g" . consult-denote-grep))
+  :config
+  (consult-denote-mode 1))
+
+(use-package denote-org
+  :ensure nil
+  :commands
+  ;; I list the commands here so that you can discover them more
+  ;; easily.  You might want to bind the most frequently used ones to
+  ;; the `org-mode-map'.
+  ( denote-org-link-to-heading
+    denote-org-backlinks-for-heading
+
+    denote-org-extract-org-subtree
+
+    denote-org-convert-links-to-file-type
+    denote-org-convert-links-to-denote-type
+
+    denote-org-dblock-insert-files
+    denote-org-dblock-insert-links
+    denote-org-dblock-insert-backlinks
+    denote-org-dblock-insert-missing-links
+    denote-org-dblock-insert-files-as-headings))
+
+(use-package denote-journal
+  :ensure nil
+  ;; Bind those to some key for your convenience.
+  :commands ( denote-journal-new-entry
+              denote-journal-new-or-existing-entry
+              denote-journal-link-or-create-entry )
+  :hook (calendar-mode . denote-journal-calendar-mode)
+  :config
+  ;; Use the "journal" subdirectory of the `denote-directory'.  Set this
+  ;; to nil to use the `denote-directory' instead.
+  (setq denote-journal-directory
+        (expand-file-name "journal" denote-directory))
+  ;; Default keyword for new journal entries. It can also be a list of
+  ;; strings.
+  (setq denote-journal-keyword "journal")
+  ;; Read the doc string of `denote-journal-title-format'.
+  (setq denote-journal-title-format 'day-date-month-year))
+
+(use-package denote-sequence
+  :ensure t
+  :bind
+  ( :map global-map
+    ;; Here we make "C-c n s" a prefix for all "[n]otes with [s]equence".
+    ;; This is just for demonstration purposes: use the key bindings
+    ;; that work for you.  Also check the commands:
+    ;;
+    ;; - `denote-sequence-new-parent'
+    ;; - `denote-sequence-new-sibling'
+    ;; - `denote-sequence-new-child'
+    ;; - `denote-sequence-new-child-of-current'
+    ;; - `denote-sequence-new-sibling-of-current'
+    ("C-c n s s" . denote-sequence)
+    ("C-c n s f" . denote-sequence-find)
+    ("C-c n s l" . denote-sequence-link)
+    ("C-c n s d" . denote-sequence-dired)
+    ("C-c n s r" . denote-sequence-reparent)
+    ("C-c n s c" . denote-sequence-convert))
+  :config
+  ;; The default sequence scheme is `numeric'.
+  (setq denote-sequence-scheme 'alphanumeric))
+
+
 (use-package citar
   :custom
   (citar-bibliography '("~/Documents/library/references.bib")))
 
-(use-package pdf-tools
-  :ensure nil
-  :config
-  (pdf-loader-install))
-(add-hook 'pdf-view-mode-hook
-          (lambda ()
-            (display-line-numbers-mode -1)))
 
 (use-package nov
   :mode ("\\.epub\\'" . nov-mode))
 
 (use-package calibredb
-  :ensure nil  ; Managed by Nix
+  :ensure nil
   :commands (calibredb)
   :init
   (setq calibredb-root-dir "~/Documents/calibrary")
   (setq calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir))
   (setq calibredb-library-alist '(("~/Documents/calibrary")))
-  (setq calibredb-open-file-with-default-viewer nil
-        calibredb-view-pdf-with-default-viewer nil
-        calibredb-view-pdf-program "emacs"
-        calibredb-view-epub-program "emacs"
-        calibredb-view-djvu-program "emacs"
-        calibredb-search-page-max-rows 100
-        calibredb-virtual-library-alist '(("1. Программирование" . "work pdf")
-                                          ("2. Математика" . "Readit epub")
-                                          ("3. Христианство" . "rust")
-                                          ("4. Древнегреческий" . "rust")
-                                          ("5. Художественная литература" . "rust"))
-        calibredb-id-width 0
-  ))
+  (setq calibredb-search-page-max-rows 100)
+  (setq calibredb-id-width 0)
+  (setq calibredb-comment-width 0)
+  (setq calibredb-program "/Applications/calibre.app/Contents/MacOS/calibredb"))
 
-(use-package quick-sdcv
-  :ensure t
-  :custom
-  (quick-sdcv-dictionary-prefix-symbol "►")
-  (quick-sdcv-ellipsis " ▼"))
+;; (use-package quick-sdcv
+;;   :ensure nil
+;;   :custom
+;;   (quick-sdcv-dictionary-prefix-symbol "►")
+;;   (quick-sdcv-ellipsis " ▼"))
+
+;; Указать, что PDF/EPUB всегда открываются в специальном окне
+(defvar eux/protected-buffer nil
+  "Защищенный буфер с PDF/EPUB.")
+
+(defun eux/display-pdf-epub (buffer alist)
+  "Отображать PDF/EPUB в постоянном окне."
+  (let ((window (display-buffer-in-side-window
+                 buffer '((side . left) (slot . 0) (window-width . 0.7)))))
+    (setq eux/protected-buffer buffer)
+    window))
+
+;; Для pdf-tools
+(add-to-list 'display-buffer-alist
+             `((derived-mode . pdf-view-mode)
+               (display-buffer-in-side-window)
+               (side . left)
+               (slot . 0)
+               (window-width . 0.7)))
+
+;; Для nov-mode (EPUB)
+(add-to-list 'display-buffer-alist
+             `((derived-mode . nov-mode)
+               (display-buffer-in-side-window)
+               (side . left)
+               (slot . 1)
+               (window-width . 0.7)))
+;; Для doc-view 
+(add-to-list 'display-buffer-alist
+           `((derived-mode . doc-view-mode)
+             (display-buffer-in-side-window)
+             (side . left)
+             (slot . 0)
+             (window-width . 0.7)))
 
 ;; Auto scroll the buffer as we compile
 (setq compilation-scroll-output t)
@@ -813,25 +891,25 @@ Note the weekly scope of the command's precision.")
 
 (add-hook 'lsp-mode-hook #'lsp-headerline-breadcrumb-mode)
 
-(defun dl/lsp-find-references-other-window ()
+(defun eux/lsp-find-references-other-window ()
   (interactive)
   (switch-to-buffer-other-window (current-buffer))
   (lsp-find-references))
 
-(defun dl/lsp-find-implementation-other-window ()
+(defun eux/lsp-find-implementation-other-window ()
   (interactive)
   (switch-to-buffer-other-window (current-buffer))
   (lsp-find-implementation))
 
-(defun dl/lsp-find-definition-other-window ()
+(defun eux/lsp-find-definition-other-window ()
   (interactive)
   (switch-to-buffer-other-window (current-buffer))
   (lsp-find-definition))
 
-(dl/leader-keys
+(eux/leader-keys
 "l"  '(:ignore t :which-key "lsp")
-"lf" '(dl/lsp-find-references-other-window :which-key "find references")
-"lc" '(dl/lsp-find-implementation-other-window :which-key "find implementation")
+"lf" '(eux/lsp-find-references-other-window :which-key "find references")
+"lc" '(eux/lsp-find-implementation-other-window :which-key "find implementation")
 "ls" '(lsp-treemacs-symbols :which-key "list symbols")
 "lt" '(flycheck-list-errors :which-key "list errors")
 "lh" '(lsp-treemacs-call-hierarchy :which-key "call hierarchy")
@@ -839,7 +917,7 @@ Note the weekly scope of the command's precision.")
 "li" '(lsp-organize-imports :which-key "organize imports")
 "ll" '(lsp :which-key "enable lsp mode")
 "lr" '(lsp-rename :which-key "rename")
-"ld" '(dl/lsp-find-definition-other-window :which-key "goto definition"))
+"ld" '(eux/lsp-find-definition-other-window :which-key "goto definition"))
 
 (use-package lsp-pyright
   :ensure nil  ; Managed by Nix
@@ -894,8 +972,38 @@ Note the weekly scope of the command's precision.")
     (shell . t)))
  )
 
-(use-package telega
-  :load-path  "~/telega.el"
-  :commands (telega)
-  :defer t)
-(setq telega-server-libs-prefix "/opt/homebrew/Cellar/tdlib/1.8.0")
+(use-package pdf-tools
+    :defer t
+    :commands (pdf-loader-install)
+    :mode "\\.pdf\\'"
+    :bind (:map pdf-view-mode-map
+                ("i" . pdf-view-next-line-or-next-page)
+                ("n" . pdf-view-previous-line-or-previous-page)
+                ("C-=" . pdf-view-enlarge)
+                ("C--" . pdf-view-shrink))
+    :init (pdf-loader-install)
+    :config (add-to-list 'revert-without-query ".pdf"))
+  (setq pdf-history-enabled t)
+  (setq pdf-view-auto-restore 'position)
+(require 'bookmark)
+(require 'saveplace-pdf-view)
+(save-place-mode 1)
+
+  (add-hook 'pdf-view-mode-hook #'(lambda () (interactive) (display-line-numbers-mode -1)))
+
+;; (require 'god-mode)
+;; (god-mode)
+;; (setq god-exempt-major-modes nil)
+;; (setq god-exempt-predicates nil)
+;; (defun my-god-mode-update-cursor-type ()
+;;   (setq cursor-type (if (or god-local-mode buffer-read-only) 'box 'bar)))
+;; (add-hook 'post-command-hook #'my-god-mode-update-cursor-type)
+;; (define-key god-local-mode-map (kbd "i") #'god-local-mode)
+;; (global-set-key (kbd "<escape>") #'(lambda () (interactive) (god-local-mode 1)))
+;; (global-set-key (kbd "C-x C-1") #'delete-other-windows)
+;; (global-set-key (kbd "C-x C-2") #'split-window-below)
+;; (global-set-key (kbd "C-x C-3") #'split-window-right)
+;; (global-set-key (kbd "C-x C-0") #'delete-window)
+
+;; (define-key god-local-mode-map (kbd "[") #'backward-paragraph)
+;; (define-key god-local-mode-map (kbd "]") #'forward-paragraph)

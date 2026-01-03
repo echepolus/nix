@@ -75,7 +75,7 @@
 (defun system-is-mac () (string-equal system-type "darwin"))
 (defun system-is-linux () (string-equal system-type "gnu/linux"))
 
-(defun dl/window-setup ()
+(defun eux/window-setup ()
   (condition-case nil
       (progn
         (column-number-mode)
@@ -91,10 +91,10 @@
         (setq frame-title-format nil)
         (message "Window and UI setup completed successfully."))
     (error (message "Error occurred in Window and UI setup."))))
-(dl/window-setup)
+(eux/window-setup)
 
 ;; Function to set transparency and styling
-(defun dl/setup-transparency-and-styling ()
+(defun eux/setup-transparency-and-styling ()
     (when (system-is-mac)
 	;; Values: 0-100 (0 = fully transparent, 100 = opaque)
 	(set-frame-parameter nil 'alpha-background 100) ; For Emacs 29+
@@ -124,7 +124,7 @@
 ;; -------------------------
 ;; Org Mode Setup
 ;; -------------------------
-(defun dl/org-mode-setup ()
+(defun eux/org-mode-setup ()
   (condition-case nil
       (progn
         (org-indent-mode)
@@ -138,7 +138,7 @@
 (use-package org
   :ensure nil
   :defer t
-  :hook (org-mode . dl/org-mode-setup)
+  :hook (org-mode . eux/org-mode-setup)
   :config
   (setq org-edit-src-content-indentation 2
 	org-ellipsis " ▾"
@@ -149,7 +149,7 @@
 ;; -------------------------
 ;; Default Config Download
 ;; -------------------------
-(defun dl/download-default-config ()
+(defun eux/download-default-config ()
   (condition-case nil
       (progn
         (unless (file-exists-p default-config-file)
@@ -167,7 +167,7 @@
 (condition-case err
     (progn
       (unless (file-exists-p org-config-file)
-        (dl/download-default-config))
+        (eux/download-default-config))
       (if (file-exists-p org-config-file)
           (org-babel-load-file org-config-file)
         (org-babel-load-file default-config-file))
@@ -175,10 +175,10 @@
   (error 
    (message "Error occurred while loading the configuration: %s" (error-message-string err))
    ;; fallback for evil-mode and leader-keys
-   (when (fboundp 'evil-mode)
-      (evil-mode 1))
+   ; (when (fboundp 'evil-mode)
+   ;    (evil-mode 1))
    (when (fboundp 'general-create-definer)
-     (general-create-definer dl/leader-keys
+     (general-create-definer eux/leader-keys
        :keymaps '(normal visual emacs)
        :prefix ","))))
 

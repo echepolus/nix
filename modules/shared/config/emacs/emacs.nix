@@ -15,8 +15,12 @@ let
         quelpa
         quelpa-use-package
         denote-markdown
+        denote-sequence
         vterm
 
+        # B
+        beframe
+        
         # C
         calibredb
         citar
@@ -52,10 +56,11 @@ let
         embark
         embark-consult
         math-preview
-        
         dired-ranger
         dired-collapse
+        dired-preview
         key-chord
+        
         
         # Project management
         projectile
@@ -78,7 +83,9 @@ let
         flyspell-correct-ivy
         reverse-im
         denote
-
+        consult-denote
+        denote-org
+        denote-journal
         
         # Version control
         # magit
@@ -103,15 +110,25 @@ let
         exec-path-from-shell
         pdf-tools   
         tablist # required by pdf-tools
+        saveplace-pdf-view
+
+        # G
+        # god-mode
 
         # N
         nov
 
+        # O
+        org-modern
+        
         # S
-        quick-sdcv
+        # quick-sdcv
 
         # T
-        telega
+        # telega
+
+        # W
+        wgrep
   ]);
 in 
 emacsWithPackages

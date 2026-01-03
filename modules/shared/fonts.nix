@@ -9,5 +9,4 @@ with pkgs; [
   noto-fonts
   noto-fonts-emoji
   geist-font
-  nerd-fonts.roboto-mono
 ]

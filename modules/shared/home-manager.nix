@@ -104,7 +104,7 @@ in
           nix-shell '<nixpkgs>' -A "$1"
       }
       alias nrb='nix run .#build'
-      alias nr='nix run .#build-switch'
+      alias nr='cd /Users/alexeykotomin/.config/nix && nix run .#build-switch'
 
       # pnpm is a javascript package manager
       alias pn=pnpm
