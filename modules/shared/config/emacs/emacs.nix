@@ -4,13 +4,8 @@ let
   emacsPackage = pkgs.emacs;
  
   emacsWithPackages = (pkgs.emacsPackagesFor emacsPackage).emacsWithPackages (epkgs: with epkgs; [
-        obsidian
         gcmh
         general
-        evil
-        evil-collection
-        evil-org
-        evil-commentary
         undo-tree
         quelpa
         quelpa-use-package
@@ -50,6 +45,7 @@ let
 
         # Minibuffers framework
         vertico
+        vertico-posframe
         marginalia
         consult
         orderless
@@ -60,7 +56,6 @@ let
         dired-collapse
         dired-preview
         key-chord
-        
         
         # Project management
         projectile
@@ -113,7 +108,7 @@ let
         saveplace-pdf-view
 
         # G
-        # god-mode
+
 
         # N
         nov

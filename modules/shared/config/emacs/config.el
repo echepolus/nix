@@ -1,4 +1,4 @@
-(setq user-full-name "Alexey Kotomin"
+(setq user-full-name "echepolus"
   user-mail-address "a.kotominn@gmail.com")
 
 (require 'package)
@@ -101,7 +101,6 @@
 
 (global-set-key (kbd "C-x C-r") 'recentf-open-files)
 
-;;;; Fontaine (font configurations)
 (use-package fontaine
   :ensure nil 
   :hook
@@ -180,48 +179,9 @@
   (with-eval-after-load 'pulsar
     (add-hook 'fontaine-set-preset-hook #'pulsar-pulse-line)))
 
-(require 'beframe)
-
-;; This is the default value.  Write here the names of buffers that
-;; should not be beframed.
-(setq beframe-global-buffers '("*scratch*" "*Messages*" "*Backtrace*"))
-
-(beframe-mode 1)
-
-;; Bind Beframe commands to a prefix key, such as C-c b:
-;; (define-key global-map (kbd "C-c b") #'beframe-prefix-map)
-;; OR use the transient instead of the prefix map:
-(define-key global-map (kbd "C-c b") #'beframe-transient)
-
-(defvar consult-buffer-sources)
-(declare-function consult--buffer-state "consult")
-
-(with-eval-after-load 'consult
-  (defface beframe-buffer
-    '((t :inherit font-lock-string-face))
-    "Face for `consult' framed buffers.")
-
-  (defun my-beframe-buffer-names-sorted (&optional frame)
-    "Return the list of buffers from `beframe-buffer-names' sorted by visibility.
-With optional argument FRAME, return the list of buffers of FRAME."
-    (beframe-buffer-names frame :sort #'beframe-buffer-sort-visibility))
-
-  (defvar beframe-consult-source
-    `( :name     "Frame-specific buffers (current frame)"
-       :narrow   ?F
-       :category buffer
-       :face     beframe-buffer
-       :history  beframe-history
-       :items    ,#'my-beframe-buffer-names-sorted
-       :action   ,#'switch-to-buffer
-       :state    ,#'consult--buffer-state))
-
-  (add-to-list 'consult-buffer-sources 'beframe-consult-source))
-
 (require 'spacious-padding)
 
-;; These are the default values, but I keep them here for visibility.
-(setq spacious-padding-widths
+ (setq spacious-padding-widths
       '( :internal-border-width 15
          :header-line-width 4
          :mode-line-width 6
@@ -278,25 +238,28 @@ With optional argument FRAME, return the list of buffers of FRAME."
 (use-package vertico
   :ensure nil
   :config
-  (setq vertico-cycle t)
-  (setq vertico-resize nil)
+  (setq vertico-cycle t
+  	    vertico-count 10
+  	    vertico-resize t)
   (vertico-mode 1)
   (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy))
 
-;; Enable rich annotations using the Marginalia package
+(use-package vertico-posframe
+  :after vertico
+  :config
+  (vertico-posframe-mode 1)
+  (setq vertico-posframe-parameters
+        '((left-fringe . 5)
+          (right-fringe . 5)))
+  (setq vertico-posframe-poshandler #'posframe-poshandler-frame-center))
+
 (use-package marginalia
-  ;; Bind `marginalia-cycle' locally in the minibuffer.  To make the binding
-  ;; available in the *Completions* buffer, add it to the
-  ;; `completion-list-mode-map'.
   :bind (:map minibuffer-local-map
               ("M-A" . marginalia-cycle))
-
   :init
   (marginalia-mode))
 
-;; Example configuration for Consult
 (use-package consult
-  ;; Replace bindings. Lazily loaded by `use-package'.
   :bind (;; C-c bindings in `mode-specific-map'
          ("C-c M-x" . consult-mode-command)
          ("C-c h" . consult-history)
@@ -379,14 +342,6 @@ With optional argument FRAME, return the list of buffers of FRAME."
   ;; (setq consult-preview-key '("S-<down>" "S-<up>"))
   ;; For some commands and buffer sources it is useful to configure the
   ;; :preview-key on a per-command basis using the `consult-customize' macro.
-  (consult-customize
-   consult-theme :preview-key '(:debounce 0.2 any)
-   consult-ripgrep consult-git-grep consult-grep consult-man
-   consult-bookmark consult-recent-file consult-xref
-   consult--source-bookmark consult--source-file-register
-   consult--source-recent-file consult--source-project-recent-file
-   ;; :preview-key "M-."
-   :preview-key '(:debounce 0.4 any))
 
   (setq consult-narrow-key "<") ;; "C-+"
 
@@ -395,25 +350,15 @@ With optional argument FRAME, return the list of buffers of FRAME."
   ;; (keymap-set consult-narrow-map (concat consult-narrow-key " ?") #'consult-narrow-help)
 )
 
-;;; Extended minibuffer actions and more (embark.el)
 (use-package embark
   :ensure nil
   :bind (("C-." . embark-act)
          :map minibuffer-local-map
          ("C-c C-c" . embark-collect)
          ("C-c C-e" . embark-export)))
-
-;; Needed for correct exporting while using Embark with Consult
-;; commands.
 (use-package embark-consult
   :ensure nil)
 
-;; The `wgrep' packages lets us edit the results of a grep search
-;; while inside a `grep-mode' buffer.  All we need is to toggle the
-;; editable mode, make the changes, and then type C-c C-c to confirm
-;; or C-c C-k to abort.
-;;
-;; Further reading: https://protesilaos.com/emacs/dotemacs#h:9a3581df-ab18-4266-815e-2edd7f7e4852
 (use-package wgrep
   :ensure nil
   :bind ( :map grep-mode-map
@@ -422,7 +367,7 @@ With optional argument FRAME, return the list of buffers of FRAME."
           ("C-c C-c" . wgrep-finish-edit)))
 
 (use-package dashboard
-  :ensure nil  ; Managed by Nix
+  :ensure nil
   :config
   (dashboard-setup-startup-hook)
   (setq dashboard-startup-banner 'ascii
@@ -434,12 +379,13 @@ With optional argument FRAME, return the list of buffers of FRAME."
   (setq dashboard-banner-logo-title "This is your life")
   (setq dashboard-set-file-icons t)
   ;; (setq dashboard-projects-backend 'projectile)
-
   (setq initial-buffer-choice (lambda ()
                                   (get-buffer-create "*dashboard*")
                                   (dashboard-refresh-buffer)))
 
 (global-set-key (kbd "<C-tab>") 'next-buffer)
+(global-set-key (kbd "<s-}>") 'next-buffer)
+(global-set-key (kbd "<s-{>") 'previous-buffer)
 
 ;; Needed for `:after char-fold' to work
 (use-package char-fold
@@ -449,8 +395,8 @@ With optional argument FRAME, return the list of buffers of FRAME."
 
 (use-package reverse-im
   :ensure nil 
-  :demand t ; always load it
-  :after char-fold ; but only after `char-fold' is loaded
+  :demand t 
+  :after char-fold 
   :bind
   ("M-Τ" . reverse-im-translate-word) ; to fix a word written in the wrong layout
   :custom
@@ -522,17 +468,20 @@ With optional argument FRAME, return the list of buffers of FRAME."
 (advice-add 'windmove-left  :after 'win/auto-resize)
 
 (setq use-short-answers t)
-(global-visual-line-mode t) ;; Wraps lines everywhere
-(global-auto-revert-mode t) ;; Auto refresh buffers from disk
-
-(show-paren-mode t)  ;; Включить режим
-(setq show-paren-style 'mixed) ;; Лучшая видимость (выделение всей пары или одной)
-(setq show-paren-delay 0)      ;; Мгновенная подсветка 
-
+(global-visual-line-mode t) 
+(global-auto-revert-mode t) 
+(show-paren-mode t)  
+(setq show-paren-style 'mixed) 
+(setq show-paren-delay 0)      
 (setq warning-minimum-level :error)
-
 (global-display-line-numbers-mode t)
 (setq display-line-numbers-type 'relative)
+(dolist (mode '(org-mode-hook
+              text-mode-hook
+              prog-mode-hook
+              dired-mode-hook                
+              conf-mode-hook))
+(add-hook mode (lambda () (display-line-numbers-mode 0))))
 
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 (use-package general
@@ -565,30 +514,6 @@ Note the weekly scope of the command's precision.")
 
 (use-package math-preview
   :custom (math-preview-command "/Users/alexeykotomin/.nix-profile/bin/math-preview"))
-
-(use-package obsidian
-  :config
-  (global-obsidian-mode t)
-  (obsidian-backlinks-mode t)
-  :custom
-  ;; location of obsidian vault
-  (obsidian-directory "~/Documents/notes/obsidian")
-  ;; Default location for new notes from `obsidian-capture'
-  (obsidian-inbox-directory "Inbox")
-  ;; Useful if you're going to be using wiki links
-  (markdown-enable-wiki-links t)
-
-  :bind (:map obsidian-mode-map
-              ;; Create note
-              ("C-c C-n" . obsidian-capture)
-              ;; If you prefer you can use `obsidian-insert-wikilink'
-              ("C-c C-l" . obsidian-insert-link)
-              ;; Open file pointed to by link at point
-              ("C-c C-o" . obsidian-follow-link-at-point)
-              ;; Open a different note from vault
-              ("C-c C-p" . obsidian-jump)
-              ;; Follow a backlink for the current file
-              ("C-c C-b" . obsidian-backlink-jump)))
 
 (use-package nerd-icons-dired)
 
@@ -631,41 +556,12 @@ Note the weekly scope of the command's precision.")
   (setq insert-directory-program
         (expand-file-name ".nix-profile/bin/ls" (getenv "HOME"))))
 
-(require 'dired-preview)
-
-;; Default values for demo purposes
-(setq dired-preview-delay 0.1)
-(setq dired-preview-max-size (expt 2 20))
-(setq dired-preview-ignored-extensions-regexp
-      (concat "\\."
-              "\\(gz\\|"
-              "zst\\|"
-              "tar\\|"
-              "xz\\|"
-              "rar\\|"
-              "zip\\|"
-              "iso\\|"
-              "epub"
-              "\\)"))
-
-;; Enable `dired-preview-mode' in a given Dired buffer or do it
-;; globally:
-(dired-preview-global-mode 1)
-
-;; TRAMP configuration for reliable SSH connections
 (use-package tramp
-  :ensure nil  ; Built-in
+  :ensure nil
   :config
-  ;; Use a simpler shell prompt detection
   (setq tramp-shell-prompt-pattern "^[^$>\n]*[#$%>] *\\(\[[0-9;]*[a-zA-Z] *\\)*")
-  
-  ;; Increase timeout for slow connections
   (setq tramp-connection-timeout 10)
-  
-  ;; Use PATH from remote shell
   (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
-  
-  ;; Don't check for vc on remote files (speeds things up)
   (setq vc-ignore-dir-regexp
         (format "\\(%s\\)\\|\\(%s\\)"
                 vc-ignore-dir-regexp
@@ -673,10 +569,9 @@ Note the weekly scope of the command's precision.")
 
 (setq backup-directory-alist
       `((".*" . "~/.local/state/emacs/backup"))
-      backup-by-copying t    ; Don't delink hardlinks
-      version-control t      ; Use version numbers on backups
-      delete-old-versions t) ; Automatically delete excess backups
-
+      backup-by-copying t    
+      version-control t      
+      delete-old-versions t)
 (setq undo-tree-history-directory-alist '(("." . "~/.local/state/emacs/undo")))
 
 (setq auto-save-file-name-transforms
@@ -703,11 +598,6 @@ Note the weekly scope of the command's precision.")
    ("C-c n g" . denote-grep))
   :config
   (setq denote-directory (expand-file-name "~/Documents/notes/"))
-
-  ;; Automatically rename Denote buffers when opening them so that
-  ;; instead of their long file name they have, for example, a literal
-  ;; "[D]" followed by the file's title.  Read the doc string of
-  ;; `denote-rename-buffer-format' for how to modify this.
   (denote-rename-buffer-mode 1))
 
 (use-package denote-markdown
@@ -787,11 +677,9 @@ Note the weekly scope of the command's precision.")
   ;; The default sequence scheme is `numeric'.
   (setq denote-sequence-scheme 'alphanumeric))
 
-
 (use-package citar
   :custom
   (citar-bibliography '("~/Documents/library/references.bib")))
-
 
 (use-package nov
   :mode ("\\.epub\\'" . nov-mode))
@@ -807,12 +695,6 @@ Note the weekly scope of the command's precision.")
   (setq calibredb-id-width 0)
   (setq calibredb-comment-width 0)
   (setq calibredb-program "/Applications/calibre.app/Contents/MacOS/calibredb"))
-
-;; (use-package quick-sdcv
-;;   :ensure nil
-;;   :custom
-;;   (quick-sdcv-dictionary-prefix-symbol "►")
-;;   (quick-sdcv-ellipsis " ▼"))
 
 ;; Указать, что PDF/EPUB всегда открываются в специальном окне
 (defvar eux/protected-buffer nil
@@ -848,10 +730,7 @@ Note the weekly scope of the command's precision.")
              (slot . 0)
              (window-width . 0.7)))
 
-;; Auto scroll the buffer as we compile
 (setq compilation-scroll-output t)
-
-;; By Default, Eshell doesn't support ANSI colors. Enable them for compilation.
 (require 'ansi-color)
 (defun colorize-compilation-buffer ()
   (let ((inhibit-read-only t))
@@ -969,8 +848,7 @@ Note the weekly scope of the command's precision.")
     (emacs-lisp . t)
     (python . t)
     (sql . t)
-    (shell . t)))
- )
+    (shell . t))))
 
 (use-package pdf-tools
     :defer t
@@ -990,20 +868,3 @@ Note the weekly scope of the command's precision.")
 (save-place-mode 1)
 
   (add-hook 'pdf-view-mode-hook #'(lambda () (interactive) (display-line-numbers-mode -1)))
-
-;; (require 'god-mode)
-;; (god-mode)
-;; (setq god-exempt-major-modes nil)
-;; (setq god-exempt-predicates nil)
-;; (defun my-god-mode-update-cursor-type ()
-;;   (setq cursor-type (if (or god-local-mode buffer-read-only) 'box 'bar)))
-;; (add-hook 'post-command-hook #'my-god-mode-update-cursor-type)
-;; (define-key god-local-mode-map (kbd "i") #'god-local-mode)
-;; (global-set-key (kbd "<escape>") #'(lambda () (interactive) (god-local-mode 1)))
-;; (global-set-key (kbd "C-x C-1") #'delete-other-windows)
-;; (global-set-key (kbd "C-x C-2") #'split-window-below)
-;; (global-set-key (kbd "C-x C-3") #'split-window-right)
-;; (global-set-key (kbd "C-x C-0") #'delete-window)
-
-;; (define-key god-local-mode-map (kbd "[") #'backward-paragraph)
-;; (define-key god-local-mode-map (kbd "]") #'forward-paragraph)
