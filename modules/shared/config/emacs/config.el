@@ -43,15 +43,141 @@
 
 (use-package nerd-icons)
 
-;; f.el - modern file API
-(use-package f
-  :ensure nil  ; Managed by Nix
-  :demand t)
+    (use-package f
+      :ensure nil  ; Managed by Nix
+      :demand t)
+;; Загружаем тему
+(use-package nano-theme
+  :config
+  (setq nano-fonts-use t)
+  (nano-light)
+  (nano-mode))
 
-(use-package doom-modeline
-  :ensure nil  ; Managed by Nix
-  :after f
-  :init (doom-modeline-mode 1))
+;; Определяем функцию для тонкого modeline заранее
+(defun my/thin-modeline ()
+  "Transform the modeline in a thin faded line"
+  (when (fboundp 'nano-modeline-face-clear)
+    (nano-modeline-face-clear 'mode-line)
+    (nano-modeline-face-clear 'mode-line-inactive))
+  (setq mode-line-format (list ""))
+  (setq-default mode-line-format (list ""))
+  (set-face-attribute 'mode-line nil
+                      :box nil
+                      :inherit nil
+                      :foreground (face-background 'nano-subtle)
+                      :background (face-background 'nano-subtle)
+                      :height 0.1)
+  (set-face-attribute 'mode-line-inactive nil
+                      :box nil
+                      :inherit nil
+                      :foreground (face-background 'nano-subtle)
+                      :background (face-background 'nano-subtle)
+                      :height 0.1))
+
+;; Обеспечиваем загрузку nano-modeline после nano-theme
+(use-package nano-modeline
+  :after nano-theme
+  :hook (nano-modeline-mode . my/thin-modeline)
+  :init
+  ;; Настройки modeline
+  (setq nano-modeline-prefix 'status)
+  (setq nano-modeline-prefix-padding 1)
+  :config
+  ;; Сначала сбрасываем header-line
+  (set-face-attribute 'header-line nil)
+
+  ;; Основные настройки modeline (проверяем доступность лиц)
+  (when (facep 'nano-subtle-i)
+    (set-face-attribute 'mode-line nil
+                        :foreground (face-foreground 'nano-subtle-i)
+                        :background (face-foreground 'nano-subtle-i)
+                        :inherit nil
+                        :box nil)
+    (set-face-attribute 'mode-line-inactive nil
+                        :foreground (face-foreground 'nano-subtle-i)
+                        :background (face-foreground 'nano-subtle-i)
+                        :inherit nil
+                        :box nil))
+
+  ;; Настройка nano-modeline-active
+  (when (facep 'nano-default-i)
+    (set-face-attribute 'nano-modeline-active nil
+                        :underline (face-foreground 'nano-default-i)
+                        :background (face-background 'nano-subtle)
+                        :inherit '(nano-default)
+                        :box nil))
+
+  ;; Настройка nano-modeline-inactive
+  (when (facep 'nano-default-i)
+    (set-face-attribute 'nano-modeline-inactive nil
+                        :foreground 'unspecified
+                        :underline (face-foreground 'nano-default-i)
+                        :background (face-background 'nano-subtle)
+                        :box nil))
+
+  ;; Включаем modeline
+  (require 'nano-modeline)
+  (nano-modeline-mode 1)
+  
+  ;; Функция для настройки дополнительных лиц ПОСЛЕ включения mode
+  (defun my/setup-nano-modeline-faces ()
+    "Setup nano modeline faces after nano-modeline-mode is enabled"
+    ;; Создаем лица если они не существуют
+    (dolist (face '(nano-modeline-active-name
+                    nano-modeline-active-primary
+                    nano-modeline-active-secondary
+                    nano-modeline-active-status-RW
+                    nano-modeline-active-status-**
+                    nano-modeline-active-status-RO
+                    nano-modeline-inactive-name
+                    nano-modeline-inactive-primary
+                    nano-modeline-inactive-secondary
+                    nano-modeline-inactive-status-RW
+                    nano-modeline-inactive-status-**
+                    nano-modeline-inactive-status-RO))
+      (unless (facep face)
+        (make-face face)))
+    
+    ;; Теперь настраиваем лица
+    (set-face-attribute 'nano-modeline-active-name nil
+                        :foreground (face-foreground 'default)
+                        :inherit '(nano-modeline-active nano-strong))
+    
+    (set-face-attribute 'nano-modeline-active-primary nil
+                        :inherit '(nano-modeline-active))
+    
+    (set-face-attribute 'nano-modeline-active-secondary nil
+                        :inherit '(nano-faded nano-modeline-active))
+    
+    (set-face-attribute 'nano-modeline-active-status-RW nil
+                        :inherit '(nano-faded-i nano-strong nano-modeline-active))
+    
+    (set-face-attribute 'nano-modeline-active-status-** nil
+                        :inherit '(nano-popout-i nano-strong nano-modeline-active))
+    
+    (set-face-attribute 'nano-modeline-active-status-RO nil
+                        :inherit '(nano-default-i nano-strong nano-modeline-active))
+    
+    (set-face-attribute 'nano-modeline-inactive-name nil
+                        :inherit '(nano-faded nano-strong nano-modeline-inactive))
+    
+    (set-face-attribute 'nano-modeline-inactive-primary nil
+                        :inherit '(nano-faded nano-modeline-inactive))
+    
+    (set-face-attribute 'nano-modeline-inactive-secondary nil
+                        :inherit '(nano-faded nano-modeline-inactive))
+    
+    (set-face-attribute 'nano-modeline-inactive-status-RW nil
+                        :inherit '(nano-modeline-inactive-secondary))
+    
+    (set-face-attribute 'nano-modeline-inactive-status-** nil
+                        :inherit '(nano-modeline-inactive-secondary))
+    
+    (set-face-attribute 'nano-modeline-inactive-status-RO nil
+                        :inherit '(nano-modeline-inactive-secondary)))
+  
+  ;; Вызываем настройку лиц после небольшой задержки
+  (run-with-idle-timer 0.1 nil #'my/setup-nano-modeline-faces))
 
 ;; Remove binding for facemap-menu, use for ace-window instead
 (global-unset-key (kbd "M-o"))
@@ -101,83 +227,83 @@
 
 (global-set-key (kbd "C-x C-r") 'recentf-open-files)
 
-(use-package fontaine
-  :ensure nil 
-  :hook
-  ;; Persist the latest font preset when closing/starting Emacs.
-  ((after-init . fontaine-mode)
-   (after-init . (lambda ()
-                   ;; Set last preset or fall back to desired style from `fontaine-presets'.
-                   (fontaine-set-preset (or (fontaine-restore-latest-preset) 'regular)))))
-  :bind (("C-c f" . fontaine-set-preset)
-         ("C-c F" . fontaine-toggle-preset))
-  :config
-(defconst my/mono "Geist Mono")
-(defconst my/var  "SF Pro Text") ; можно сменить на "San Francisco" / "Inter"
+;; (use-package fontaine
+;;   :ensure nil 
+;;   :hook
+;;   ;; Persist the latest font preset when closing/starting Emacs.
+;;   ((after-init . fontaine-mode)
+;;    (after-init . (lambda ()
+;;                    ;; Set last preset or fall back to desired style from `fontaine-presets'.
+;;                    (fontaine-set-preset (or (fontaine-restore-latest-preset) 'regular)))))
+;;   :bind (("C-c f" . fontaine-set-preset)
+;;          ("C-c F" . fontaine-toggle-preset))
+;;   :config
+;; (defconst my/mono "Geist Mono")
+;; (defconst my/var  "SF Pro Text") ; можно сменить на "San Francisco" / "Inter"
 
-;; Набор пресетов. Высоты — в “сотых” по классике Emacs: 140 ≈ 14pt.
-(setq fontaine-presets
-      `(
-        ;; компактный
-        (small
-         :default-family ,my/mono
-         :default-weight light 
-         :default-height 110
-         :fixed-pitch-family ,my/mono
-         :variable-pitch-family ,my/var)
+;; ;; Набор пресетов. Высоты — в “сотых” по классике Emacs: 140 ≈ 14pt.
+;; (setq fontaine-presets
+;;       `(
+;;         ;; компактный
+;;         (small
+;;          :default-family ,my/mono
+;;          :default-weight light 
+;;          :default-height 110
+;;          :fixed-pitch-family ,my/mono
+;;          :variable-pitch-family ,my/var)
 
-        (regular
-         :default-family ,my/mono
-         :default-weight regular 
-         :default-height 160
-         :fixed-pitch-family ,my/mono
-         :variable-pitch-family ,my/var)
+;;         (regular
+;;          :default-family ,my/mono
+;;          :default-weight regular 
+;;          :default-height 160
+;;          :fixed-pitch-family ,my/mono
+;;          :variable-pitch-family ,my/var)
 
-        (medium
-         :inherit regular
-         :default-height 150)
+;;         (medium
+;;          :inherit regular
+;;          :default-height 150)
 
-        (large
-         :inherit regular
-         :default-height 180)
+;;         (large
+;;          :inherit regular
+;;          :default-height 180)
 
-        (presentation
-         :inherit regular
-         :default-height 200)
+;;         (presentation
+;;          :inherit regular
+;;          :default-height 200)
 
-        (jumbo
-         :inherit regular
-         :default-height 230)
+;;         (jumbo
+;;          :inherit regular
+;;          :default-height 230)
 
-        (coding
-         :inherit regular
-         :default-height 150)
+;;         (coding
+;;          :inherit regular
+;;          :default-height 150)
 
-        ;; fallback по умолчанию (используется как база для наследования)
-        (t
-         :default-family ,my/mono
-         :default-weight regular
-         :default-slant normal
-         :default-width normal
-         :default-height 140
+;;         ;; fallback по умолчанию (используется как база для наследования)
+;;         (t
+;;          :default-family ,my/mono
+;;          :default-weight regular
+;;          :default-slant normal
+;;          :default-width normal
+;;          :default-height 140
 
-         :fixed-pitch-family ,my/mono
-         :fixed-pitch-height 1.0
+;;          :fixed-pitch-family ,my/mono
+;;          :fixed-pitch-height 1.0
 
-         :variable-pitch-family ,my/var
-         :variable-pitch-height 1.0
+;;          :variable-pitch-family ,my/var
+;;          :variable-pitch-height 1.0
 
-         :mode-line-active-height 1.0
-         :mode-line-inactive-height 1.0
-         :header-line-height 1.0
-         :line-number-height 1.0
-         :tab-bar-height 1.0
-         :tab-line-height 1.0
-         :bold-weight bold
-         :italic-slant italic)))
+;;          :mode-line-active-height 1.0
+;;          :mode-line-inactive-height 1.0
+;;          :header-line-height 1.0
+;;          :line-number-height 1.0
+;;          :tab-bar-height 1.0
+;;          :tab-line-height 1.0
+;;          :bold-weight bold
+;;          :italic-slant italic)))
 
-  (with-eval-after-load 'pulsar
-    (add-hook 'fontaine-set-preset-hook #'pulsar-pulse-line)))
+;;   (with-eval-after-load 'pulsar
+;;     (add-hook 'fontaine-set-preset-hook #'pulsar-pulse-line)))
 
 (require 'spacious-padding)
 
@@ -256,6 +382,9 @@
 (use-package marginalia
   :bind (:map minibuffer-local-map
               ("M-A" . marginalia-cycle))
+  :config   (setq-default marginalia--ellipsis "…"    ; Nicer ellipsis
+                          marginalia-align 'right     ; right alignment
+                          marginalia-align-offset -1) ; one space on the right
   :init
   (marginalia-mode))
 
@@ -410,23 +539,38 @@
   :config
   (reverse-im-mode t)) ; turn the mode on
 
-(setq-default indent-tabs-mode nil
-            js-indent-level 2
-            tab-width 2)
-;; (setq-default evil-shift-width 2)
+(delete-selection-mode 1) ; Replace region when inserting text
 
-(use-package doric-themes
-  :ensure nil
-  :demand t
-  :config
-  (setq doric-themes-to-toggle '(doric-dark doric-light))
-  (setq doric-themes-to-rotate doric-themes-collection)
+(setq-default select-enable-clipboard t) ; Merge system's and Emacs' clipboard
 
-  (doric-themes-load-random 'dark)
-  :bind
-  (("<f5>" . doric-themes-toggle)
-   ("C-<f5>" . doric-themes-select)
-   ("M-<f5>" . doric-themes-rotate)))
+(setq-default indent-tabs-mode nil        ; Stop using tabs to indent
+              tab-always-indent 'complete ; Indent first then try completions
+              tab-width 4)                ; Smaller width for tab characters
+
+;; Let Emacs guess Python indent silently
+(setq python-indent-guess-indent-offset t
+      python-indent-guess-indent-offset-verbose nil)
+
+;; Highlighting of the current line (native mode)
+(require 'hl-line)
+(global-hl-line-mode)
+
+(setq-default scroll-conservatively 101       ; Avoid recentering when scrolling far
+              scroll-margin 2                 ; Add a margin when scrolling vertically
+              recenter-positions '(5 bottom)) ; Set re-centering positions
+
+;; (use-package doric-themes
+;;   :ensure nil
+;;   :demand t
+;;   :config
+;;   (setq doric-themes-to-toggle '(doric-dark doric-light))
+;;   (setq doric-themes-to-rotate doric-themes-collection)
+
+;;   (doric-themes-load-random 'dark)
+;;   :bind
+;;   (("<f5>" . doric-themes-toggle)
+;;    ("C-<f5>" . doric-themes-select)
+;;    ("M-<f5>" . doric-themes-rotate)))
 
 (use-package pulsar
   :ensure nil
@@ -467,6 +611,13 @@
 (advice-add 'windmove-right :after 'win/auto-resize)
 (advice-add 'windmove-left  :after 'win/auto-resize)
 
+(setq-default cursor-in-non-selected-windows nil ; Hide the cursor in inactive windows
+              cursor-type '(hbar . 2)            ; Underline-shaped cursor
+              cursor-intangible-mode t           ; Enforce cursor intangibility
+              x-stretch-cursor nil)              ; Don't stretch cursor to the glyph width
+
+(blink-cursor-mode 0)                            ; Still cursor
+
 (setq use-short-answers t)
 (global-visual-line-mode t) 
 (global-auto-revert-mode t) 
@@ -479,8 +630,12 @@
 (dolist (mode '(org-mode-hook
               text-mode-hook
               prog-mode-hook
-              dired-mode-hook                
-              conf-mode-hook))
+              dired-mode-hook
+              vterm-mode-hook
+              eshell-mode-hook
+              shell-mode-hook                
+              conf-mode-hook
+              Info-mode-hook))
 (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
@@ -493,7 +648,7 @@
 
 (defvar current-time-format "%H:%M:%S"
   "Format of date to insert with `insert-current-time' func.
-Note the weekly scope of the command's precision.")
+  Note the weekly scope of the command's precision.")
 
 (defun eux/find-file (path)
   "Helper function to open a file in a buffer"
@@ -514,6 +669,11 @@ Note the weekly scope of the command's precision.")
 
 (use-package math-preview
   :custom (math-preview-command "/Users/alexeykotomin/.nix-profile/bin/math-preview"))
+
+(setq org-agenda-files "~/.emacs.d/agenda.txt" )
+
+(global-set-key (kbd "C-c c") 'org-capture)
+(global-set-key (kbd "C-c t") 'my-org-todo-prefix)
 
 (use-package nerd-icons-dired)
 
@@ -636,46 +796,6 @@ Note the weekly scope of the command's precision.")
     denote-org-dblock-insert-missing-links
     denote-org-dblock-insert-files-as-headings))
 
-(use-package denote-journal
-  :ensure nil
-  ;; Bind those to some key for your convenience.
-  :commands ( denote-journal-new-entry
-              denote-journal-new-or-existing-entry
-              denote-journal-link-or-create-entry )
-  :hook (calendar-mode . denote-journal-calendar-mode)
-  :config
-  ;; Use the "journal" subdirectory of the `denote-directory'.  Set this
-  ;; to nil to use the `denote-directory' instead.
-  (setq denote-journal-directory
-        (expand-file-name "journal" denote-directory))
-  ;; Default keyword for new journal entries. It can also be a list of
-  ;; strings.
-  (setq denote-journal-keyword "journal")
-  ;; Read the doc string of `denote-journal-title-format'.
-  (setq denote-journal-title-format 'day-date-month-year))
-
-(use-package denote-sequence
-  :ensure t
-  :bind
-  ( :map global-map
-    ;; Here we make "C-c n s" a prefix for all "[n]otes with [s]equence".
-    ;; This is just for demonstration purposes: use the key bindings
-    ;; that work for you.  Also check the commands:
-    ;;
-    ;; - `denote-sequence-new-parent'
-    ;; - `denote-sequence-new-sibling'
-    ;; - `denote-sequence-new-child'
-    ;; - `denote-sequence-new-child-of-current'
-    ;; - `denote-sequence-new-sibling-of-current'
-    ("C-c n s s" . denote-sequence)
-    ("C-c n s f" . denote-sequence-find)
-    ("C-c n s l" . denote-sequence-link)
-    ("C-c n s d" . denote-sequence-dired)
-    ("C-c n s r" . denote-sequence-reparent)
-    ("C-c n s c" . denote-sequence-convert))
-  :config
-  ;; The default sequence scheme is `numeric'.
-  (setq denote-sequence-scheme 'alphanumeric))
 
 (use-package citar
   :custom
@@ -850,21 +970,26 @@ Note the weekly scope of the command's precision.")
     (sql . t)
     (shell . t))))
 
+(add-hook 'doc-view-mode-hook 'pdf-tools-install)
+
+(setq-default pdf-view-use-scaling t
+              pdf-view-use-imagemagick nil)
+
 (use-package pdf-tools
-    :defer t
-    :commands (pdf-loader-install)
-    :mode "\\.pdf\\'"
-    :bind (:map pdf-view-mode-map
-                ("i" . pdf-view-next-line-or-next-page)
-                ("n" . pdf-view-previous-line-or-previous-page)
-                ("C-=" . pdf-view-enlarge)
-                ("C--" . pdf-view-shrink))
-    :init (pdf-loader-install)
-    :config (add-to-list 'revert-without-query ".pdf"))
-  (setq pdf-history-enabled t)
-  (setq pdf-view-auto-restore 'position)
+  :defer t
+  :commands (pdf-loader-install)
+  :mode "\\.pdf\\'"
+  :bind (:map pdf-view-mode-map
+              ("i" . pdf-view-next-line-or-next-page)
+              ("n" . pdf-view-previous-line-or-previous-page)
+              ("C-=" . pdf-view-enlarge)
+              ("C--" . pdf-view-shrink))
+  :init (pdf-loader-install)
+  :config (add-to-list 'revert-without-query ".pdf"))
+(setq pdf-history-enabled t)
+(setq pdf-view-auto-restore 'position)
 (require 'bookmark)
 (require 'saveplace-pdf-view)
 (save-place-mode 1)
 
-  (add-hook 'pdf-view-mode-hook #'(lambda () (interactive) (display-line-numbers-mode -1)))
+(add-hook 'pdf-view-mode-hook #'(lambda () (interactive) (display-line-numbers-mode -1)))

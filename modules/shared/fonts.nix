@@ -9,4 +9,8 @@ with pkgs; [
   noto-fonts
   noto-fonts-emoji
   geist-font
+  roboto-mono
+  victor-mono
+  inconsolata
+  nerd-fonts.roboto-mono
 ]

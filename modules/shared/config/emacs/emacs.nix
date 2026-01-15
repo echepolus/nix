@@ -10,11 +10,9 @@ let
         quelpa
         quelpa-use-package
         denote-markdown
-        denote-sequence
         vterm
 
         # B
-        beframe
         
         # C
         calibredb
@@ -108,10 +106,15 @@ let
         saveplace-pdf-view
 
         # G
-
+        
+        # I
+        imenu-list
 
         # N
         nov
+        nano-theme
+        nano-modeline
+        nano-agenda
 
         # O
         org-modern

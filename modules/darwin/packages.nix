@@ -10,10 +10,9 @@ shared-packages ++ [
   gnupg # GNU Privacy Guard
   gcc
   libclang
-  xray
   zip
   gperf
   cmakeMinimal
   pkg-configUpstream
-  # tdlib
+  
 ]

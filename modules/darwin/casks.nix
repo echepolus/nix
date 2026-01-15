@@ -5,11 +5,9 @@
   "v2rayu"
   "wireshark-app"
   "tailscale-app"
-  # "font-hack-nerd-font"
 
   # Communication Tools
   "zoom"
-  # "ayugram"
   "forkgram-telegram"
 
   # Utility Tools
@@ -42,7 +40,6 @@
   # J
 
   # Keyboard
-  # "leader-key"
   "kawa-app"
 
   # L
@@ -60,10 +57,12 @@
 
   # V
   "tigervnc-viewer"
-
+  
+  # W
+  "warp"
+  
   # Z
   "zen"
 
   # X
-  # "xquartz"
 ]

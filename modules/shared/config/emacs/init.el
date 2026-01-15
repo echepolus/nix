@@ -84,10 +84,10 @@
         (tool-bar-mode -1)
         (winner-mode 1)
         (when (system-is-mac)
-          (add-to-list 'default-frame-alist '(ns-transparent-titlebar . nil))
-          ;; (add-to-list 'default-frame-alist '(ns-appearance . dark))
           (add-to-list 'default-frame-alist '(undecorated . t))
-          (setq ns-use-proxy-icon t))
+          (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
+          ;; (add-to-list 'default-frame-alist '(ns-appearance . dark))
+          (setq ns-use-proxy-icon nil))
         (setq frame-title-format nil)
         (message "Window and UI setup completed successfully."))
     (error (message "Error occurred in Window and UI setup."))))
@@ -107,6 +107,8 @@
 	    ;; Only apply rounded corners if not in aerospace startup to avoid conflicts
 	(set-frame-parameter nil 'undecorated-round t)
 	(add-to-list 'default-frame-alist '(undecorated-round . t)))))
+
+(eux/setup-transparency-and-styling)
 
 ;; -------------------------
 ;; Copy to Clipboard in TTY 
