@@ -25,28 +25,23 @@
                                  "/nix/var/nix/profiles/default/bin"
                                  "/usr/local/bin"
                                  "/usr/bin")
-                           exec-path))))
+                            exec-path))))
 
-;; Turn off UI junk
 (column-number-mode)
 (scroll-bar-mode 0)
 (menu-bar-mode -1)
 (tool-bar-mode 0)
-(winner-mode 1) ;; ctrl-c left, ctrl-c right for window undo/redo
+(winner-mode 1)
 (blink-cursor-mode -1)
-
-;; Для более плавной работы с оконным менеджером:
-(setq frame-resize-pixelwise t)  ; Точность в пикселях (может быть полезно)
-
 (use-package rainbow-delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
 
 (use-package nerd-icons)
 
-    (use-package f
-      :ensure nil  ; Managed by Nix
-      :demand t)
-;; Загружаем тему
+(use-package f
+  :ensure nil
+  :demand t)
+
 (use-package nano-theme
   :config
   (setq nano-fonts-use t)
@@ -207,14 +202,43 @@
 (setq save-place-file "~/.local/state/emacs/saveplace")
 
 (savehist-mode 1)
+
+(defun unpropertize-kill-ring ()
+  (setq kill-ring (mapcar 'substring-no-properties kill-ring)))
+
+(add-hook 'kill-emacs-hook 'unpropertize-kill-ring)
+
+(setq kill-ring-max 50
+      history-length 50)
+
 (setq savehist-additional-variables
-  '(search-ring
-    regexp-search-ring
-    kill-ring
-    register-alist
-    org-refile-history
-    org-capture-history))
+      '(kill-ring
+        command-history
+        set-variable-value-history
+        custom-variable-history   
+        query-replace-history     
+        read-expression-history   
+        minibuffer-history        
+        read-char-history         
+        face-name-history         
+        bookmark-history
+        file-name-history))
+
+(put 'minibuffer-history         'history-length 50)
+(put 'file-name-history          'history-length 50)
+(put 'set-variable-value-history 'history-length 25)
+(put 'custom-variable-history    'history-length 25)
+(put 'query-replace-history      'history-length 25)
+(put 'read-expression-history    'history-length 25)
+(put 'read-char-history          'history-length 25)
+(put 'face-name-history          'history-length 25)
+(put 'bookmark-history           'history-length 25)
+
+(setq history-delete-duplicates t)
 (setq savehist-file "~/.local/state/emacs/savehist")
+
+(let (message-log-max)
+  (savehist-mode))
 
 (use-package recentf
   :ensure nil
