@@ -43,12 +43,13 @@ with pkgs; [
   direnv # Environment variable management per directory
   difftastic # Structural diff tool
   djvulibre
-
+  
   # E
 
   # F
   fd # Fast find alternative
   fzf # Fuzzy finder
+  ffmpeg
  
   # G
   gh # GitHub CLI
@@ -64,7 +65,7 @@ with pkgs; [
 
   # I
   iftop # Network bandwidth monitor
-
+  
   # J
 
   # K
@@ -73,7 +74,6 @@ with pkgs; [
   # L
   lnav # Log file navigator
   libpng
-  lazygit
 
   # M
   myPHP # Custom PHP with extensions
@@ -103,9 +103,10 @@ with pkgs; [
   # S
   sqlite # SQL database engine
   symlinks
+  sdcv
 
   # T
-  tree # Directory tree viewer
+  tree # Directory tree viewe
 
   # U
   unrar # RAR archive extractor
@@ -120,7 +121,8 @@ with pkgs; [
   # X
 
   # Y
-
+  
+  
   # Z
   zip # ZIP archive creator
   zsh-powerlevel10k # Zsh theme

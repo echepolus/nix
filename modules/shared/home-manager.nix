@@ -12,11 +12,10 @@ in
     nix-direnv.enable = true;
   };
 
-  # Shared shell configuration
   zsh = {
     enable = true;
     autocd = false;
-    cdpath = [ "~/.local/share/src" ]; # переменная, которая задаёт список директорий, в которых будет искать cd, если не указан полный путь
+    cdpath = [ "~/.local/share/src" ];
     plugins = [
       {
           name = "powerlevel10k";
@@ -63,7 +62,6 @@ in
         fi
       fi
 
-      # Define variables for directories
       export PATH=$HOME/.pnpm-packages/bin:$HOME/.pnpm-packages:$PATH
       export PATH=$HOME/.npm-packages/bin:$HOME/bin:$PATH
       export PATH=$HOME/.composer/vendor/bin:$PATH
@@ -79,45 +77,32 @@ in
       # Ripgrep alias
       alias search='rg -p --glob "!node_modules/*" --glob "!vendor/*" "$@"'
 
-      # Emacs is my editor
       export ALTERNATE_EDITOR=""
-      # export EDITOR="emacsclient -t"
-      # export VISUAL="emacsclient -c -a emacs"
-      export EDITOR="/Users/alexeykotomin/.nix-profile/bin/nvim"
-      export VISUAL="/Users/alexeykotomin/.nix-profile/bin/nvim"
+      export EDITOR="emacsclient -t"
+      export VISUAL="emacsclient -c -a emacs"
+      # export EDITOR="/Users/alexeykotomin/.nix-profile/bin/nvim"
+      # export VISUAL="/Users/alexeykotomin/.nix-profile/bin/nvim"
       e() {
           emacsclient -t "$@"
       }
       export NVIM="/Users/alexeykotomin/.nix-profile/bin/nvim"  
 
-      # fzf: интерактивный поиск по history, файлам, git, etc
       [ -f ${pkgs.fzf}/share/fzf/key-bindings.zsh ] && source ${pkgs.fzf}/share/fzf/key-bindings.zsh
       [ -f ${pkgs.fzf}/share/fzf/completion.zsh ] && source ${pkgs.fzf}/share/fzf/completion.zsh
 
-      # ALT-C → fzf cd
       bindkey '^[c' fzf-cd-widget
       bindkey '^R' fzf-history-widget
       bindkey '^T' fzf-file-widget  
 
-      # nix shortcuts
       shell() {
           nix-shell '<nixpkgs>' -A "$1"
       }
-      alias nrb='nix run .#build'
-      alias nr='nix run .#build-switch'
+      alias nr='cd /Users/alexeykotomin/.config/nix && nix run .#build-switch'
 
-      # pnpm is a javascript package manager
-      alias pn=pnpm
-      alias px=pnpx
-
-      # Use difftastic, syntax-aware diffing
       alias diff=difft
 
-      # Always color ls and group directories
-      alias ls='ls --color=auto'
+      alias ls='ls -la --color=auto'
 
-      # yazi — терминальный файловый менеджер
-      # alias y="yazi"
       function y() {
         local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
         yazi "$@" --cwd-file="$tmp"
@@ -127,13 +112,11 @@ in
         rm -f -- "$tmp"
       }
 
-      # zoxide (умный cd)
       eval "$(zoxide init zsh)"
       alias cd="z"
 
       export TERM=xterm-ghostty
 
-      # git aliases
       alias ga='git add .' 
       alias gs='git status'
       alias gd='git diff'
@@ -142,7 +125,6 @@ in
         git commit -m "$*"
       }
 
-      # Подгружаем и инициализируем автодополнение
       autoload -Uz compinit
       compinit
       source ${pkgs.zsh-autosuggestions}/share/zsh-autosuggestions/zsh-autosuggestions.zsh
@@ -190,118 +172,9 @@ in
         rebase.autoStash = true;
       };
     };
-
     ignores = [ "*.swp" ];
     lfs.enable = true;
-
   };
-
-  vim = {
-    enable = true;
-    plugins = with pkgs.vimPlugins; [ vim-airline vim-airline-themes vim-startify vim-tmux-navigator ];
-    settings = { ignorecase = true; };
-    extraConfig = ''
-      "" General
-      set number
-      set history=1000
-      set nocompatible
-      set modelines=0
-      set encoding=utf-8
-      set scrolloff=3
-      set showmode
-      set showcmd
-      set hidden
-      set wildmenu
-      set wildmode=list:longest
-      set cursorline
-      set ttyfast
-      set nowrap
-      set ruler
-      set backspace=indent,eol,start
-      set laststatus=2
-
-      " Dir stuff
-      set nobackup
-      set nowritebackup
-      set noswapfile
-      set backupdir=~/.config/vim/backups
-      set directory=~/.config/vim/swap
-
-      " Relative line numbers for easy movement
-      set relativenumber
-      set rnu
-
-      "" Whitespace rules
-      set tabstop=8
-      set shiftwidth=2
-      set softtabstop=2
-      set expandtab
-
-      "" Searching
-      set incsearch
-      set gdefault
-
-      "" Statusbar
-      set nocompatible " Disable vi-compatibility
-      set laststatus=2 " Always show the statusline
-      let g:airline_theme='bubblegum'
-      let g:airline_powerline_fonts = 1
-
-      "" Local keys and such
-      let mapleader=","
-      let maplocalleader=" "
-
-      "" Change cursor on mode
-      :autocmd InsertEnter * set cul
-      :autocmd InsertLeave * set nocul
-
-      "" File-type highlighting and configuration
-      syntax on
-      filetype on
-      filetype plugin on
-      filetype indent on
-
-      "" macOS clipboard integration
-      vnoremap <Leader>. :w !pbcopy<CR><CR>
-      nnoremap <Leader>, :r !pbpaste<CR>
-
-      "" Move cursor by display lines when wrapping
-      nnoremap j gj
-      nnoremap k gk
-
-      "" Map leader-q to quit out of window
-      nnoremap <leader>q :q<cr>
-
-      "" Move around split
-      nnoremap <C-h> <C-w>h
-      nnoremap <C-j> <C-w>j
-      nnoremap <C-k> <C-w>k
-      nnoremap <C-l> <C-w>l
-
-      "" Easier to yank entire line
-      nnoremap Y y$
-
-      "" Move buffers
-      nnoremap <tab> :bnext<cr>
-      nnoremap <S-tab> :bprev<cr>
-
-      "" Like a boss, sudo AFTER opening the file to write
-      cmap w!! w !sudo tee % >/dev/null
-
-      let g:startify_lists = [
-        \ { 'type': 'dir',       'header': ['   Current Directory '. getcwd()] },
-        \ { 'type': 'sessions',  'header': ['   Sessions']       },
-        \ { 'type': 'bookmarks', 'header': ['   Bookmarks']      }
-        \ ]
-
-      let g:startify_bookmarks = [
-        \ '~/.local/share/src',
-        \ ]
-
-      let g:airline_theme='bubblegum'
-      let g:airline_powerline_fonts = 1
-      '';
-     };
 
   ssh = {
     enable = true;
@@ -316,34 +189,9 @@ in
     ];
   };
 
-  neovim = {
-    enable = true;
-    viAlias = true;
-    vimAlias = true;
-    withNodeJs = true;
-    withPython3 = true;
-  };
-
   yazi = {
     enable = true;
     enableBashIntegration = true;
     enableZshIntegration = true;
-    plugins = {
-      git          = pkgs.yaziPlugins.git;
-      sudo         = pkgs.yaziPlugins.sudo;
-      starship     = pkgs.yaziPlugins.starship;
-      smart-paste  = pkgs.yaziPlugins.smart-paste;
-      rsync        = pkgs.yaziPlugins.rsync;
-      restore      = pkgs.yaziPlugins.restore;
-      recycle-bin  = pkgs.yaziPlugins.recycle-bin;
-      projects     = pkgs.yaziPlugins.projects;
-      piper        = pkgs.yaziPlugins.piper;
-      ouch         = pkgs.yaziPlugins.ouch;
-      vcs-files    = pkgs.yaziPlugins.vcs-files;
-      smart-enter  = pkgs.yaziPlugins.smart-enter;
-      full-border  = pkgs.yaziPlugins.full-border;
-      mactag       = pkgs.yaziPlugins.mactag;
-      chmod        = pkgs.yaziPlugins.chmod;
-    };
   };
 }

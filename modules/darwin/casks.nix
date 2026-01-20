@@ -6,12 +6,10 @@
   "v2rayu"
   "wireshark-app"
   "tailscale-app"
-  "font-hack-nerd-font"
 
   # Communication Tools
   "zoom"
-  # "ayugram"
-  "forkgram-telegram"
+  "ayugram"
 
   # Utility Tools
   "pearcleaner"
@@ -19,17 +17,12 @@
   # Entertainment Tools
   "vlc"
   
-  # Productivity Tools
-  
-  # Window Managemen
-
   # A
   "anki"
  
   # B
 
   # C
-  "clash-verge-rev"
   "chatgpt"
   "calibre"
   
@@ -44,7 +37,6 @@
   # J
 
   # Keyboard
-  # "leader-key"
   "kawa-app"
 
   # L

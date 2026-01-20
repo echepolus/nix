@@ -4,21 +4,18 @@ let
   emacsPackage = pkgs.emacs;
  
   emacsWithPackages = (pkgs.emacsPackagesFor emacsPackage).emacsWithPackages (epkgs: with epkgs; [
-        obsidian
         gcmh
         general
-        evil
-        evil-collection
-        evil-org
-        evil-commentary
         undo-tree
         quelpa
         quelpa-use-package
-        meow
-        # meow-tree-sitter
         denote-markdown
+        denote-sequence
         vterm
 
+        # B
+        beframe
+        
         # C
         calibredb
         citar
@@ -48,15 +45,16 @@ let
 
         # Minibuffers framework
         vertico
+        vertico-posframe
         marginalia
         consult
         orderless
         embark
         embark-consult
         math-preview
-        
         dired-ranger
         dired-collapse
+        dired-preview
         key-chord
         
         # Project management
@@ -70,6 +68,9 @@ let
         org-transclusion
         org-download
         org-roam
+        emacsql
+        sqlite3
+        visual-fill-column
         
         # Writing
         writeroom-mode
@@ -77,8 +78,9 @@ let
         flyspell-correct-ivy
         reverse-im
         denote
-        gptel
-
+        consult-denote
+        denote-org
+        denote-journal
         
         # Version control
         # magit
@@ -103,6 +105,29 @@ let
         exec-path-from-shell
         pdf-tools   
         tablist # required by pdf-tools
+        saveplace-pdf-view
+
+        # I
+        indent-bars
+        
+        # G
+
+
+        # N
+        nov
+
+        # O
+        org-modern
+        
+        # S
+        sdcv
+        quick-sdcv
+
+        # T
+        # telega
+
+        # W
+        wgrep
   ]);
 in 
 emacsWithPackages
