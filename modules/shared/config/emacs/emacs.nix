@@ -1,4 +1,3 @@
-
 { pkgs }:
 let
   emacsPackage = pkgs.emacs;
@@ -14,17 +13,21 @@ let
         vterm
 
         # B
-        beframe
         
         # C
         calibredb
         citar
+        counsel
+
+        # E
+        evil
+        evil-collection
         
         # UI and themes
         doric-themes
         doom-modeline
         all-the-icons
-        # all-the-icons-ivy
+        all-the-icons-ivy
         all-the-icons-dired
         dashboard
         rainbow-delimiters
@@ -41,7 +44,6 @@ let
         fontaine
         pulsar
         spacious-padding
-        golden-ratio
 
         # Minibuffers framework
         vertico
@@ -54,7 +56,6 @@ let
         math-preview
         dired-ranger
         dired-collapse
-        dired-preview
         key-chord
         
         # Project management
@@ -82,9 +83,6 @@ let
         denote-org
         denote-journal
         
-        # Version control
-        # magit
-        
         # Programming - Language servers
         lsp-mode
         lsp-ui
@@ -109,10 +107,13 @@ let
 
         # I
         indent-bars
+        ivy-rich
         
         # G
 
-
+        # L
+        lsp-ivy
+        
         # N
         nov
 
@@ -124,7 +125,6 @@ let
         quick-sdcv
 
         # T
-        # telega
 
         # W
         wgrep

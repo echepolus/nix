@@ -131,6 +131,7 @@
         (variable-pitch-mode 1)
         (auto-fill-mode 0)
         (visual-line-mode 1)
+        (org-superstar-mode 1)
         ;; (setq evil-auto-indent nil)
         (message "Org mode setup completed successfully."))
     (error (message "Error occurred in Org mode setup."))))
@@ -181,4 +182,16 @@
      (general-create-definer dl/leader-keys
        :keymaps '(normal visual emacs)
        :prefix ","))))
+
+;; -------------------------
+;; Automatically load Org Config when we save it
+;; -------------------------
+
+(defun efs/org-babel-tangle-config ()
+  (when (string-equal (buffer-file-name)
+                      (expand-file-name "~/.config/nix/modules/shared/config/emacs/config.org"))
+    (let ((org-confirm-babel-evaluate nil))
+      (org-babel-tangle))))
+
+(add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'efs/org-babel-tangle-config)))
 

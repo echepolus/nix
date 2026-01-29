@@ -25,27 +25,39 @@
                                  "/usr/bin")
                            exec-path))))
 
-;; Turn off UI junk
 (column-number-mode)
 (scroll-bar-mode 0)
 (menu-bar-mode -1)
 (tool-bar-mode 0)
-(winner-mode 1) ;; ctrl-c left, ctrl-c right for window undo/redo
+(winner-mode 1)
 (blink-cursor-mode -1)
-(setq frame-resize-pixelwise t)  ; Точность в пикселях (может быть полезно)
-
 (use-package rainbow-delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
+(setq inhibit-startup-screen t)
+(setq initial-scratch-message nil)
+(setq confirm-kill-emacs #'y-or-n-p)
+(use-package gcmh
+  :ensure nil
+  :demand t
+  :config (gcmh-mode 1))
+(setq use-short-answers t)
+(global-visual-line-mode t)
+(global-auto-revert-mode t)
+(show-paren-mode t)
+(setq show-paren-style 'mixed)
+(setq show-paren-delay 0)
+(setq warning-minimum-level :error)
+(dolist (mode '(prog-mode-hook))
+  (add-hook mode #'display-line-numbers-mode 0))
+(setq frame-resize-pixelwise t)
 
-(use-package nerd-icons)
+(use-package all-the-icons)
 
-;; f.el - modern file API
 (use-package f
-  :ensure nil  ; Managed by Nix
+  :ensure nil
   :demand t)
 
 (use-package doom-modeline
-  :ensure nil  ; Managed by Nix
   :after f
   :init (doom-modeline-mode 1))
 
@@ -59,66 +71,50 @@
     (aw-minibuffer-flag t)
   :config
     (ace-window-display-mode 1)
-    (advice-add 'ace-select-window :after #'win/auto-resize))
+    (advice-add 'ace-select-window :after #'eu/auto-resize))
 
-(setq inhibit-startup-screen t)
-(setq initial-scratch-message nil)
-(setq confirm-kill-emacs #'y-or-n-p)
-(use-package gcmh
-  :ensure nil
-  :demand t
-  :config
-  (gcmh-mode 1))
+(setopt auto-resize-ratio 0.7)
 
-(save-place-mode 1)
-(setq save-place-file "~/.local/state/emacs/saveplace")
-(savehist-mode 1)
-(setq savehist-additional-variables
-      '(search-ring
-        regexp-search-ring
-        kill-ring
-        register-alist
-        org-refile-history
-        org-capture-history))
-(setq savehist-file "~/.local/state/emacs/savehist")
+(defun eu/auto-resize ()
+  (let* ((height (floor (* auto-resize-ratio (frame-height))))
+         (width (floor (* auto-resize-ratio (frame-width))))
+         (h-diff (max 0 (- height (window-height))))
+         (w-diff (max 0 (- width (window-width)))))
+    (enlarge-window h-diff)
+    (enlarge-window w-diff t)))
+(setopt window-min-height 10)
+(setopt window-min-width 10)
 
-(use-package recentf
-  :ensure nil
-  :init
-  (setq recentf-max-saved-items 100
-    recentf-max-menu-items 50
-    recentf-save-file "~/.local/state/emacs/recentf")
-  :config
-    (recentf-mode 1))
-
-(global-set-key (kbd "C-x C-r") 'recentf-open-files)
+(advice-add 'other-window :after (lambda (&rest args) (eu/auto-resize)))
+(advice-add 'windmove-up    :after 'eu/auto-resize)
+(advice-add 'windmove-down  :after 'eu/auto-resize)
+(advice-add 'windmove-right :after 'eu/auto-resize)
+(advice-add 'windmove-left  :after 'eu/auto-resize)
 
 (use-package fontaine
   :ensure nil
   :hook
   ((after-init . fontaine-mode)
    (after-init . (lambda ()
-                   ;; Set last preset or fall back to desired style from `fontaine-presets'.
                    (fontaine-set-preset (or (fontaine-restore-latest-preset) 'regular)))))
   :bind (("C-c f" . fontaine-set-preset)
          ("C-c F" . fontaine-toggle-preset))
   :config
 (defconst my/mono "Geist Mono")
-(defconst my/var  "SF Pro Text") ; можно сменить на "San Francisco" / "Inter"
-
-;; Набор пресетов. Высоты — в “сотых” по классике Emacs: 140 ≈ 14pt.
-(setq fontaine-presets
+(defconst my/var  "SF Pro Text")
+  (setq fontaine-presets
       `(
+        ;; компактный
         (small
          :default-family ,my/mono
-         :default-weight light
+         :default-weight light 
          :default-height 110
          :fixed-pitch-family ,my/mono
          :variable-pitch-family ,my/var)
 
         (regular
          :default-family ,my/mono
-         :default-weight regular
+         :default-weight regular 
          :default-height 160
          :fixed-pitch-family ,my/mono
          :variable-pitch-family ,my/var)
@@ -166,14 +162,14 @@
          :bold-weight bold
          :italic-slant italic)))
 
-  (with-eval-after-load 'pulsar
-    (add-hook 'fontaine-set-preset-hook #'pulsar-pulse-line)))
+(with-eval-after-load 'pulsar
+  (add-hook 'fontaine-set-preset-hook #'pulsar-pulse-line)))
 
 (require 'spacious-padding)
 (setq spacious-padding-widths
       '( :internal-border-width 15
          :header-line-width 4
-         :mode-line-width 6
+         :mode-line-width 5
          :tab-width 4
          :right-divider-width 30
          :scroll-bar-width 8
@@ -189,10 +185,9 @@
   (setq completion-styles '(basic substring initials flex orderless)) ; also see `completion-category-overrides'
   (setq completion-pcm-leading-wildcard t)) ; Emacs 31: make `partial-completion' behave like `substring'
 
-;; settings to ignore letter casing
 (setq completion-ignore-case t)
 (setq read-buffer-completion-ignore-case t)
-(setq-default case-fold-search t)   ; For general regexp
+(setq-default case-fold-search t)
 (setq read-file-name-completion-ignore-case t)
 (file-name-shadow-mode 1)
 
@@ -200,7 +195,7 @@
   :ensure nil
   :hook (after-init . minibuffer-depth-indicate-mode)
   :config
-  (setq read-minibuffer-restore-windows nil) ; Emacs 28
+  (setq read-minibuffer-restore-windows nil)
   (setq enable-recursive-minibuffers t))
 
 (use-package orderless
@@ -210,9 +205,6 @@
   :config
   (setq orderless-matching-styles '(orderless-prefixes orderless-regexp))
   (setq orderless-smart-case nil)
-
-  ;; SPC should never complete: use it for `orderless' groups.
-  ;; The `?' is a regexp construct.
   :bind ( :map minibuffer-local-completion-map
           ("SPC" . nil)
           ("?" . nil)))
@@ -238,8 +230,7 @@
 (use-package marginalia
   :bind (:map minibuffer-local-map
               ("M-A" . marginalia-cycle))
-  :init
-  (marginalia-mode))
+  :init (marginalia-mode 1))
 
 (use-package consult
   :bind (;; C-c bindings in `mode-specific-map'
@@ -348,6 +339,28 @@
           ("C-x C-q" . wgrep-change-to-wgrep-mode)
           ("C-c C-c" . wgrep-finish-edit)))
 
+;; (use-package ivy
+;;    :diminish
+;;    :bind (("C-s" . swiper)
+;;           :map ivy-minibuffer-map
+;;           ("TAB" . ivy-alt-done)
+;;           ("C-l" . ivy-alt-done)
+;;           ("C-j" . ivy-next-line)
+;;           ("C-k" . ivy-previous-line)
+;;           :map ivy-switch-buffer-map
+;;           ("C-k" . ivy-previous-line)
+;;           ("C-l" . ivy-done)
+;;           ("C-d" . ivy-switch-buffer-kill)
+;;           :map ivy-reverse-i-search-map
+;;           ("C-k" . ivy-previous-line)
+;;           ("C-d" . ivy-reverse-i-search-kill))
+;;    :config
+;;    (ivy-mode 1))
+
+;;  (use-package ivy-rich
+;;    :init
+;;    (ivy-rich-mode 1))
+
 (use-package dashboard
   :ensure nil
   :config
@@ -363,76 +376,22 @@
                                   (get-buffer-create "*dashboard*")
                                   (dashboard-refresh-buffer)))
 
-;; Access my Dot Emacs
-(defun config-visit ()
-  (interactive)
-  (find-file "/Users/alexeykotomin/.config/nix/modules/shared/config/emacs/config.org"))
-(global-set-key (kbd "C-c d") 'config-visit)
-;; Scroll up and down
-(global-set-key (kbd "s-<down>") (kbd "C-u 1 C-v"))
-(global-set-key (kbd "s-<up>") (kbd "C-u 1 M-v"))
-;; Kill this buffer
-(global-set-key (kbd "C-1") 'kill-this-buffer)
-;; Clean whitespace
-(global-set-key (kbd "C-c w") 'whitespace-cleanup)
-;; Hippie expand
-(global-set-key (kbd "M-/") 'hippie-expand)
-;; Remember-mode
-(global-set-key (kbd "C-c r") 'remember)
-;; Quickly access my fav folder in dired
-(global-set-key (kbd "<f5>") (lambda() (interactive)(find-file "~/")))
-
-(global-set-key (kbd "<C-tab>") 'next-buffer)
-(global-set-key (kbd "<C-S-tab>") 'previous-buffer)
-
-;; Needed for `:after char-fold' to work
-(use-package char-fold
-  :custom
-  (char-fold-symmetric t)
-  (search-default-mode #'char-fold-to-regexp))
-
-(use-package reverse-im
-  :ensure nil
-  :demand t
-  :after char-fold
-  :bind
-  ("M-Τ" . reverse-im-translate-word) ; to fix a word written in the wrong layout
-  :custom
-  ;; cache generated keymaps
-  (reverse-im-cache-file (locate-user-emacs-file "reverse-im-cache.el"))
-  ;; use lax matching
-  (reverse-im-char-fold t)
-  ;; advice read-char to fix commands that use their own shortcut mechanism
-  (reverse-im-read-char-advice-function #'reverse-im-read-char-include)
-  (reverse-im-input-methods '("russian-computer" "greek"))
-  :config
-  (reverse-im-mode t)) ; turn the mode on
-
-(setq-default indent-tabs-mode nil
-            js-indent-level 2
-            tab-width 2)
-;; (setq-default evil-shift-width 2)
-
 (use-package doric-themes
   :ensure nil
   :demand t
   :config
   (setq doric-themes-to-toggle '(doric-dark doric-light))
   (setq doric-themes-to-rotate doric-themes-collection)
-
   (doric-themes-load-random 'dark)
-  :bind
-  (("C-<f5>" . doric-themes-select)
-   ("M-<f5>" . doric-themes-rotate)))
+  :bind ("M-<f5>" . doric-themes-rotate))
 
 (use-package pulsar
   :ensure nil
   :bind
-  ( :map global-map
-    ("C-x l" . pulsar-pulse-line) ; overrides `count-lines-page'
-    ("C-x L" . pulsar-highlight-permanently-dwim)) ; or use `pulsar-highlight-temporarily-dwim'
-  :init
-  (pulsar-global-mode 1)
+  (:map global-map
+    ("C-x l" . pulsar-pulse-line)
+    ("C-x L" . pulsar-highlight-permanently-dwim))
+  :init (pulsar-global-mode 1)
   :config
   (setq pulsar-delay 0.055)
   (setq pulsar-iterations 5)
@@ -440,63 +399,39 @@
   (setq pulsar-region-face 'pulsar-yellow)
   (setq pulsar-highlight-face 'pulsar-magenta))
 
-(setopt auto-resize-ratio 0.7)
+(save-place-mode 1)
+(setq save-place-file "~/.local/state/emacs/saveplace")
+(savehist-mode 1)
+(setq savehist-additional-variables
+      '(search-ring
+        regexp-search-ring
+        kill-ring
+        register-alist
+        org-refile-history
+        org-capture-history))
+(setq savehist-file "~/.local/state/emacs/savehist")
+(setq backup-directory-alist
+      `((".*" . "~/.local/state/emacs/backup"))
+      backup-by-copying t
+      version-control t
+      delete-old-versions t)
+(setq undo-tree-history-directory-alist '(("." . "~/.local/state/emacs/undo")))
 
-(defun win/auto-resize ()
-  (let* (
-         (height (floor (* auto-resize-ratio (frame-height))))
-         (width (floor (* auto-resize-ratio (frame-width))))
-         ;; INFO We need to calculate by how much we should enlarge
-         ;; focused window because Emacs does not allow setting the
-         ;; window dimensions directly.
-         (h-diff (max 0 (- height (window-height))))
-         (w-diff (max 0 (- width (window-width)))))
-    (enlarge-window h-diff)
-    (enlarge-window w-diff t)))
-(setopt window-min-height 10)
-(setopt window-min-width 10)
+(setq auto-save-file-name-transforms
+      `((".*" "~/.local/state/emacs/" t)))
+(setq lock-file-name-transforms
+      `((".*" "~/.local/state/emacs/lock-files/" t)))
 
-(advice-add 'other-window :after (lambda (&rest args)
-                                   (win/auto-resize)))
-(advice-add 'windmove-up    :after 'win/auto-resize)
-(advice-add 'windmove-down  :after 'win/auto-resize)
-(advice-add 'windmove-right :after 'win/auto-resize)
-(advice-add 'windmove-left  :after 'win/auto-resize)
+(use-package recentf
+  :ensure nil
+  :init
+  (setq recentf-max-saved-items 100
+        recentf-max-menu-items 50
+        recentf-save-file "~/.local/state/emacs/recentf")
+  :config
+  (recentf-mode 1))
 
-(setq use-short-answers t)
-(global-visual-line-mode t)
-(global-auto-revert-mode t)
-(show-paren-mode t)
-(setq show-paren-style 'mixed)
-(setq show-paren-delay 0)
-(setq warning-minimum-level :error)
-(dolist (mode '(prog-mode-hook))
-(add-hook mode #'display-line-numbers-mode 0))
-
-(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
-(use-package math-preview
-  :custom (math-preview-command "/Users/alexeykotomin/.nix-profile/bin/math-preview"))
-
-(setq org-directory "~/org")
-
-(setq org-agenda-files '("~/org"))
-
-(setq org-todo-keywords
-      '((sequence "TODO" "NEXT" "|" "DONE")))
-
-(setq org-log-done 'time)
-
-(setq org-archive-location "~/org/archive.org::")
-
-(setq org-capture-templates
-      '(("i" "Inbox" entry
-         (file "~/org/inbox.org")
-         "* TODO %?\n  %U")))
-
-(setq org-agenda-custom-commands
-      '(("d" "Daily"
-         ((agenda "" ((org-agenda-span 1)))
-          (todo "NEXT")))))
+(global-set-key (kbd "C-x C-r") 'recentf-open-files)
 
 (use-package nerd-icons-dired)
 
@@ -537,25 +472,6 @@
         (format "\\(%s\\)\\|\\(%s\\)"
                 vc-ignore-dir-regexp
                 tramp-file-name-regexp)))
-
-(setq backup-directory-alist
-      `((".*" . "~/.local/state/emacs/backup"))
-      backup-by-copying t
-      version-control t
-      delete-old-versions t)
-(setq undo-tree-history-directory-alist '(("." . "~/.local/state/emacs/undo")))
-
-(setq auto-save-file-name-transforms
-      `((".*" "~/.local/state/emacs/" t)))
-(setq lock-file-name-transforms
-      `((".*" "~/.local/state/emacs/lock-files/" t)))
-
-(use-package vterm
-  :commands vterm
-  :config
-  (setq term-prompt-regexp "^[^#$%>\n]*[#$%>] *")
-  (setq vterm-shell "zsh")
-  (setq vterm-max-scrollback 10000))
 
 (use-package denote
   :ensure nil
@@ -667,88 +583,6 @@
   (setq calibredb-comment-width 0)
   (setq calibredb-program "/Applications/calibre.app/Contents/MacOS/calibredb"))
 
-(setq compilation-scroll-output t)
-(require 'ansi-color)
-(defun colorize-compilation-buffer ()
-  (let ((inhibit-read-only t))
-    (ansi-color-apply-on-region (point-min) (point-max))))
-(add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
-
-(use-package lsp-mode
-  :commands lsp lsp-deferred
-  :init
-    (setq lsp-keymap-prefix "C-c l")
-    (setq lsp-restart 'ignore)
-    (setq lsp-headerline-breadcrumb-enable nil)
-    (setq lsp-auto-guess-root t)
-    (setq lsp-enable-which-key-integration t))
-
-(use-package lsp-ui
-  :hook (lsp-mode . lsp-ui-mode)
-  :custom
-    (lsp-ui-doc-position 'bottom))
-
-(use-package lsp-treemacs
-  :after lsp)
-
-(use-package company
-  :after lsp-mode
-  :hook (lsp-mode . company-mode)
-  :bind (:map company-active-map
-        ("<tab>" . company-complete-selection))
-        (:map lsp-mode-map
-        ("<tab>" . company-indent-or-complete-common))
-   :custom
-     (company-minimum-prefix-length 1)
-     (company-idle-delay 0.0))
-
-(use-package company-box
-  :hook (company-mode . company-box-mode))
-
-(add-hook 'lsp-mode-hook #'lsp-headerline-breadcrumb-mode)
-
-(use-package indent-bars
-  :ensure nil
-  :custom
-  (indent-bars-treesit-support t)
-  (indent-bars-treesit-wrap '((c argument_list parameter_list init_declarator parenthesized_expression))))
-                                        ; alternative to wrap:
-  ; (indent-bars-no-descend-lists '(?\[ ?\()) ; prevent {} from being treated like lists!
-
-(add-to-list 'auto-mode-alist '("\\.env" . shell-script-mode))
-
-;; Ассоциируем файлы .kbd с lisp-mode
-(add-to-list 'auto-mode-alist '("\\.kbd\\'" . lisp-mode))
-
-(use-package nix-mode
-  :mode "\\.nix\\'")
-
-(use-package which-key
-  :ensure nil  ; Managed by Nix
-  :init
-  (setq which-key-idle-delay 0.3
-        which-key-idle-secondary-delay 0.1)
-  :config
-  (which-key-mode))
-
-(use-package helpful
-  :ensure nil  ; Managed by Nix
-  :commands (helpful-callable helpful-variable helpful-key)
-  :bind
-  ([remap describe-function] . helpful-callable)
-  ([remap describe-command]  . helpful-callable)
-  ([remap describe-variable] . helpful-variable)
-  ([remap describe-key]      . helpful-key))
-
-(with-eval-after-load 'org
-  (org-babel-do-load-languages
-  'org-babel-load-languages
-  '(
-    (emacs-lisp . t)
-    (python . t)
-    (sql . t)
-    (shell . t))))
-
 (use-package pdf-tools
   :defer t
   :commands (pdf-loader-install)
@@ -766,17 +600,190 @@
 
  (add-hook 'pdf-view-mode-hook #'(lambda () (interactive) (display-line-numbers-mode -1))))
 
-;;; Input Methods Configuration
+(use-package vterm
+  :commands vterm
+  :config
+  (setq term-prompt-regexp "^[^#$%>\n]*[#$%>] *")
+  (setq vterm-shell "zsh")
+  (setq vterm-max-scrollback 10000))
+
+(defun config-visit ()
+  (interactive)
+  (find-file "/Users/alexeykotomin/.config/nix/modules/shared/config/emacs/config.org"))
+(defun my-projects-visit ()
+  (interactive)
+  (find-file "/Users/alexeykotomin/org/20260105T151859--действующие-проекты-и-книги__задачи_книги_проекты.org"))
+(global-set-key (kbd "C-c d") 'config-visit)
+(global-set-key (kbd "C-c p") 'my-projects-visit)
+;; Scroll up and down
+(global-set-key (kbd "s-<down>") (kbd "C-u 1 C-v"))
+(global-set-key (kbd "s-<up>") (kbd "C-u 1 M-v"))
+;; Kill this buffer
+(global-set-key (kbd "C-1") 'kill-this-buffer)
+;; Clean whitespace
+(global-set-key (kbd "C-c w") 'whitespace-cleanup)
+;; Hippie expand
+(global-set-key (kbd "M-/") 'hippie-expand)
+;; Remember-mode
+(global-set-key (kbd "C-c r") 'remember)
+;; Quickly access my fav folder in dired
+(global-set-key (kbd "<f5>") (lambda() (interactive)(find-file "~/")))
+(setq-default indent-tabs-mode nil
+            js-indent-level 2
+            tab-width 2)
+(global-set-key (kbd "<C-tab>") 'next-buffer)
+(global-set-key (kbd "<C-S-tab>") 'previous-buffer) 
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+
+;; Needed for `:after char-fold' to work
+(use-package char-fold
+  :custom
+  (char-fold-symmetric t)
+  (search-default-mode #'char-fold-to-regexp))
+
+(use-package reverse-im
+  :ensure nil
+  :demand t
+  :after char-fold
+  :bind
+  ("M-Τ" . reverse-im-translate-word) ; to fix a word written in the wrong layout
+  :custom
+  ;; cache generated keymaps
+  (reverse-im-cache-file (locate-user-emacs-file "reverse-im-cache.el"))
+  ;; use lax matching
+  (reverse-im-char-fold t)
+  ;; advice read-char to fix commands that use their own shortcut mechanism
+  (reverse-im-read-char-advice-function #'reverse-im-read-char-include)
+  (reverse-im-input-methods '("russian-computer" "greek"))
+  :config
+  (reverse-im-mode t)) ; turn the mode on
+
+;; (use-package evil
+;;   :init
+;;   (setq evil-want-integration t)
+;;   (setq evil-want-keybinding nil)
+;;   (setq evil-want-C-u-scroll t)
+;;   (setq evil-want-C-i-jump nil)
+;;   :config
+;;   (evil-mode 1)
+;;   (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
+;;   (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
+
+;;   ;; Use visual line motions even outside of visual-line-mode buffers
+;;   (evil-global-set-key 'motion "j" 'evil-next-visual-line)
+;;   (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
+
+;;   (evil-set-initial-state 'messages-buffer-mode 'normal)
+;;   (evil-set-initial-state 'dashboard-mode 'normal))
+
+;; (use-package evil-collection
+;;   :after evil
+;;   :config
+;;   (evil-collection-init))
+
+;; (use-package company
+;;   :after lsp-mode
+;;   :hook (lsp-mode . company-mode)
+;;   :bind (:map company-active-map
+;;          ("<tab>" . company-complete-selection))
+;;         (:map lsp-mode-map
+;;          ("<tab>" . company-indent-or-complete-common))
+;;   :custom
+;;   (company-minimum-prefix-length 1)
+;;   (company-idle-delay 0.0))
+
+;; (use-package company-box
+;;   :hook (company-mode . company-box-mode))
+
+(use-package math-preview
+  :custom (math-preview-command "/Users/alexeykotomin/.nix-profile/bin/math-preview"))
+
+(setq org-directory "~/org")
+(setq org-agenda-files '("~/org"))
+(setq org-todo-keywords
+      '((sequence "TODO" "DONE")))
+(setq org-log-done 'time)
+(setq org-archive-location "~/org/archive.org::")
+(setq org-capture-templates
+      '(("i" "Inbox" entry
+         (file "~/org/inbox.org")
+         "* TODO %?\n  %U")))
+
+(setq org-agenda-custom-commands
+      '(("d" "Daily"
+         ((agenda "" ((org-agenda-span 1)))
+          (todo "NEXT")))))
+
+(defun efs/lsp-mode-setup ()
+  (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
+  (lsp-headerline-breadcrumb-mode))
+
+(use-package lsp-mode
+  :commands (lsp lsp-deferred)
+  :init (setq lsp-keymap-prefix "C-c l")
+  :config (lsp-enable-which-key-integration t))
+
+(use-package lsp-ui
+  :hook (lsp-mode . lsp-ui-mode)
+  :custom
+  (lsp-ui-doc-position 'bottom))
+
+(use-package lsp-ivy)
+
+(use-package lsp-treemacs
+  :after lsp)
+
+(use-package indent-bars
+  :ensure nil
+  :custom
+  (indent-bars-treesit-support t)
+  (indent-bars-treesit-wrap '((c argument_list parameter_list init_declarator parenthesized_expression))))
+                                        ; alternative to wrap:
+  ; (indent-bars-no-descend-lists '(?\[ ?\()) ; prevent {} from being treated like lists!
+
+(add-to-list 'auto-mode-alist '("\\.env" . shell-script-mode))
+
+(add-to-list 'auto-mode-alist '("\\.kbd\\'" . lisp-mode))
+
+(use-package nix-mode
+  :mode "\\.nix\\'")
+
+(setq ede-project-directories-file
+    (expand-file-name "ede-projects.el" user-emacs-directory))
+(load ede-project-directories-file 'noerror)
+
+(with-eval-after-load 'org
+  (org-babel-do-load-languages
+  'org-babel-load-languages
+  '(
+    (emacs-lisp . t)
+    (python . t)
+    (sql . t)
+    (shell . t))))
+
+(use-package which-key
+  :ensure nil
+  :init
+  (setq which-key-idle-delay 0.3
+        which-key-idle-secondary-delay 0.1)
+  :config
+  (which-key-mode))
+
+(use-package helpful
+  :ensure nil
+  :commands (helpful-callable helpful-variable helpful-key)
+  :bind
+  ([remap describe-function] . helpful-callable)
+  ([remap describe-command]  . helpful-callable)
+  ([remap describe-variable] . helpful-variable)
+  ([remap describe-key]      . helpful-key))
 
 ;; Key bindings:
 ;; - Toggle Hebrew (biblical-sil): C-\
 ;; - Toggle Greek (babel): C-|
-;; - Insert hard break (Hebrew to English): C-x 8 f
 
 ;; Type hard break for Hebrew to English
 (define-key 'iso-transl-ctl-x-8-map "f" [?‎])
-
-;; Input method and key binding configuration
 (setq alternative-input-methods
       '(("greek-babel" . [?\C-|])))
 
@@ -832,8 +839,6 @@ Checks characters within 5 positions before and after point."
 
 (add-hook 'post-command-hook #'my-adjust-cursor-for-language)
 
-;;; Text Cleaning Utilities
-
 (defun strip-numbers-and-brackets (beg end)
   "Remove numbers and brackets from selected region between BEG and END.
 Also removes leading/trailing spaces and collapses multiple spaces between words.
@@ -859,8 +864,6 @@ Useful for cleaning up Greek/Hebrew text with verse numbers."
         (replace-match "")))))
 
 (defalias 'grk 'strip-numbers-and-brackets)
-
-;;; Flyspell Configuration
 
 (defun greek-hebrew-flyspell-verify ()
   "Return nil if word at point contains Greek or Hebrew characters.
@@ -903,16 +906,7 @@ This tells flyspell to skip checking this word."
             (setq-local flyspell-generic-check-word-predicate
                         #'greek-hebrew-flyspell-verify)))
 
-;;; Font Configuration
-
-;; Use Liberation Mono for Greek and Hebrew
-;; Alternative option - SBL BibLit (download from: https://www.sbl-site.org/resources/fonts/):
 (set-fontset-font "fontset-default" 'greek (font-spec :family "SBL BibLit" :size 22))
 (set-fontset-font "fontset-default" 'hebrew (font-spec :family "SBL BibLit" :size 20))
 
-;; (set-fontset-font "fontset-default" 'greek (font-spec :family "Liberation Mono" :size 22))
-;; (set-fontset-font "fontset-default" 'hebrew (font-spec :family "Liberation Mono" :size 22))
-
 (provide 'my-ancient-greek-tweaks)
-
-;;; greek-hebrew.el ends here
