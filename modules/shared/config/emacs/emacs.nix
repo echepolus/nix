@@ -113,7 +113,9 @@ let
 
         # L
         lsp-ivy
-        
+
+        # M
+        mood-line
         # N
         nov
 
