@@ -2,7 +2,6 @@
 
 [
   # Development Tools
-  "warp"
   "v2rayu"
   "wireshark-app"
   "tailscale-app"
@@ -36,7 +35,7 @@
   
   # J
 
-  # Keyboard
+  # K
   "kawa-app"
 
   # L

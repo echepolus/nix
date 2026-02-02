@@ -81,11 +81,12 @@ with pkgs; [
   math-preview
 
   # N
-  ncurses # Terminal control library with terminfo database
+  ncurses
   nodejs
   nodePackages.live-server # Development server with live reload
   nodePackages.nodemon # Node.js file watcher
   (hiPrio nodePackages.prettier) # Code formatter
+  ncdu
 
   # O
   openssh # SSH client and server
