@@ -32,6 +32,7 @@ in
       "tesseract"
       "tesseract-lang"
       "imagemagick"
+      "tdlib"
     ];
   };
 
