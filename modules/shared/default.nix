@@ -1,4 +1,4 @@
-{ config, pkgs, callPackage, ... }:
+{ config, pkgs, ... }:
 
 let
   emacsOverlaySha256 = "0mrrddafds7s003ylnz0nahs1p947l3y5qm56g6lsjxlan8bn7fa";
@@ -14,16 +14,18 @@ in
     };
 
     overlays =
-      # First apply the official emacs-overlay
-      [(import (builtins.fetchTarball {
-               url = "https://github.com/nix-community/emacs-overlay/archive/master.tar.gz";
-               sha256 = emacsOverlaySha256;
-           }))]
-      # Then apply local overlays (including custom emacs patches)
-      ++ (let path = ../../overlays; in with builtins;
-          map (n: import (path + ("/" + n)))
-              (filter (n: match ".*\\.nix" n != null ||
-                          pathExists (path + ("/" + n + "/default.nix")))
-                      (attrNames (readDir path))));
+      let
+        path = ../../overlays;
+      in with builtins;
+        map (n: import (path + ("/" + n)))
+          (filter (n:
+            (match ".*\\.nix" n != null ||
+             pathExists (path + ("/" + n + "/default.nix"))))
+              (attrNames (readDir path)))
+
+      ++ [(import (builtins.fetchTarball {
+        url = "https://github.com/nix-community/emacs-overlay/archive/master.tar.gz";
+        sha256 = emacsOverlaySha256;
+      }))];
   };
 }

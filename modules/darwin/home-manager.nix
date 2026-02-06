@@ -8,12 +8,12 @@ let
     emacsclient -c -n &
   '';
   sharedFiles = import ../shared/files.nix { inherit config pkgs; };
-  additionalFiles = import ./files.nix { inherit user config pkgs lib; };
+  additionalFiles = import ./files.nix { inherit user config pkgs; };
 in
 {
-  imports = [
-    ./dock
-  ];
+  # imports = [
+  #   ./dock
+  # ];
 
   users.users.${user} = {
     name = "${user}";
@@ -33,13 +33,8 @@ in
       "tesseract-lang"
       "imagemagick"
     ];
-    masApps = {
-      #"1password" = 1333542190;
-      #"wireguard" = 1451685025;
-    };
   };
 
-  # Enable home-manager
   home-manager = {
     useGlobalPkgs = true;
     users.${user} = { pkgs, config, lib, ... }:{
@@ -50,41 +45,11 @@ in
             sharedFiles
             additionalFiles
             { "emacs-launcher.command".source = myEmacsLauncher; }
-            { ".terminfo".source = "${pkgs.ghostty-bin}/Applications/Ghostty.app/Contents/Resources/terminfo"; }
+            # { ".terminfo".source = "${pkgs.ghostty-bin}/Applications/Ghostty.app/Contents/Resources/terminfo"; }
         ];
-
         stateVersion = "25.11";
       };
-
       programs = {} // import ../shared/home-manager.nix { inherit config pkgs lib; };
-      
-    };
-  };
-
-  # Fully declarative dock using the latest from Nix Store
-  local = {
-    dock = {
-      enable = true;
-      username = user;
-      entries = [
-
-        # { path = "${pkgs.ghostty-bin}/Applications/Ghostty.app"; }
-        # { path = "/Applications/iPhone Mirroring.app/"; }
-        # {
-        #   path = toString myEmacsLauncher;
-        #   section = "others";
-        # }
-        # {
-        #   path = "${config.users.users.${user}.home}/.local/share/";
-        #   section = "others";
-        #   options = "--sort name --view grid --display folder";
-        # }
-        # {
-        #   path = "${config.users.users.${user}.home}/.local/share/downloads";
-        #   section = "others";
-        #   options = "--sort name --view grid --display stack";
-        # }
-      ];
     };
   };
 }

@@ -4,15 +4,22 @@ let
     slpp
     pip
     rich
+    mysql-connector
     virtualenv
     black
+    requests
+    faker
+    textual
+    pyqt5
     epc
     sexpdata
     six
     inflect
     unidecode
     pyaml
-    pypandoc
+    # pypandoc
+    feedparser
+    python-dateutil
   ]);
 
   myPHP = pkgs.php82.withExtensions ({ enabled, all }: enabled ++ (with all; [
@@ -83,11 +90,8 @@ with pkgs; [
 
   # N
   ncurses
-  nodejs
-  nodePackages.live-server # Development server with live reload
-  nodePackages.nodemon # Node.js file watcher
-  (hiPrio nodePackages.prettier) # Code formatter
   ncdu
+  nodejs_20
 
   # O
   openssh # SSH client and server
@@ -96,8 +100,15 @@ with pkgs; [
   pass # Stores, retrieves, generates, synchronizes passwords
   pandoc # Document converter
   poppler # PDF to plain text tool
+  php82Packages.composer # PHP dependency manager
+  deployer # PHP deployment tool
+  php82Packages.php-cs-fixer # PHP code style fixer
+  php82Packages.phpstan # PHP static analysis tool
+  phpactor # PHP language server with better refactoring support
+  phpunit # PHP testing framework
 
   # Q
+  qt5.qtbase
 
   # R
   ripgrep # Fast text search tool
@@ -128,11 +139,6 @@ with pkgs; [
   # Z
   zip # ZIP archive creator
   zsh-powerlevel10k # Zsh theme
-  zsh-autosuggestions
-  zsh-syntax-highlighting
-  zsh-completions
   zoxide
   zlib
-  zsh-fzf-tab
-
 ] ++ myFonts

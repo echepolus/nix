@@ -1,4 +1,4 @@
-{ user, config, pkgs, lib, ... }:
+{ user, config, pkgs, ... }:
 
 let
   xdg_configHome = "${config.users.users.${user}.home}/.config";
@@ -23,10 +23,10 @@ in
 
       if [[ $1 = "-t" ]]; then
         # Terminal mode
-        ${pkgs.emacs-unstable}/bin/emacsclient -t $@
+        ${pkgs.emacs}/bin/emacsclient -t $@
       else
         # GUI mode
-        ${pkgs.emacs-unstable}/bin/emacsclient -c -n -a "" $@
+        ${pkgs.emacs}/bin/emacsclient -c -n $@
       fi
     '';
   };

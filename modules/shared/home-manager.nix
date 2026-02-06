@@ -27,18 +27,6 @@ in
           src = lib.cleanSource ./config;
           file = "p10k.zsh";
       }
-      {
-          name = "zsh-autosuggestions";
-          src = pkgs.zsh-autosuggestions;
-      }
-      {
-          name = "zsh-syntax-highlighting";
-          src = pkgs.zsh-syntax-highlighting;
-      }
-      {
-          name = "zsh-completions";
-          src = pkgs.zsh-completions;
-      }
     ];
     initContent = lib.mkBefore ''
       if [[ -f /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]]; then

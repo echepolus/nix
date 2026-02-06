@@ -1,4 +1,4 @@
-{ ... }:
+_:
 
 [
   # Development Tools
@@ -17,7 +17,6 @@
   
   # A
   "anki"
-  "ayugram"
  
   # B
 

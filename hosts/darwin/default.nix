@@ -14,19 +14,12 @@ in
   ];
 
   nix = {
+    enable = true;
     package = pkgs.nix;
-
     settings = {
       trusted-users = [ "@admin" "${user}" ];
-      trusted-substituters= [ "@admin" "${user}" ];
-      substituters = [
-        "https://nix-community.cachix.org"
-        "https://cache.nixos.org" 
-      ];
-      trusted-public-keys = [
-        "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
-        "nix-community.cachix.org-1:Jj8RWB6Rs6qJ2rFDe3P4B6LB73Dpc8s53CAw4G7xqFY="
-      ];
+      substituters = [ "https://nix-community.cachix.org" "https://cache.nixos.org" ];
+      trusted-public-keys = [ "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=" ];
     };
 
     gc = {

@@ -1,7 +1,5 @@
 {
   description = "General Purpose Configuration with secrets for MacOS and NixOS";
-
-  # Перечень внешних источников, откуда подтягиваем внешние флейки 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
@@ -79,7 +77,6 @@
     {
       devShells = forAllSystems devShell;
       apps = nixpkgs.lib.genAttrs linuxSystems mkLinuxApps // nixpkgs.lib.genAttrs darwinSystems mkDarwinApps;
-
       darwinConfigurations = nixpkgs.lib.genAttrs darwinSystems (system:
         darwin.lib.darwinSystem {
           inherit system;
@@ -123,6 +120,6 @@
             ];
           }
         );
-     };
+    };
 }
 
