@@ -14,6 +14,13 @@
 (defvar default-config-file "~/.emacs.d/default-config.org")
 (defvar default-config-url "https://raw.githubusercontent.com/dustinlyons/nixos-config/9ad810c818b895c1f67f4daf21bbef31d8b5e8cd/shared/config/emacs/config.org")
 
+(setq telega-server-command
+      (executable-find "telega-server"))
+
+(setq telega-server-args
+      '("--eval=(setq telega-app '(38023252 . \"25b30c0339ba45df5458e8e15f2d5840\"))"))
+
+
 ;; -------------------------
 ;; Package Manager Setup
 ;; -------------------------

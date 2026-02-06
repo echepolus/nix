@@ -14,4 +14,5 @@ shared-packages ++ [
   xclip
   zip
   tg
+  tdlib
 ]

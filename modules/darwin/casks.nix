@@ -17,6 +17,7 @@
   
   # A
   "anki"
+  "ayugram"
  
   # B
 

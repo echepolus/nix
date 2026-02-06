@@ -103,8 +103,8 @@ let
         exec-path-from-shell
         pdf-tools   
         tablist # required by pdf-tools
-        saveplace-pdf-view
-
+        pdf-view-restore
+        
         # I
         indent-bars
         ivy-rich
@@ -115,7 +115,7 @@ let
         lsp-ivy
 
         # M
-        mood-line
+
         # N
         nov
 
@@ -127,7 +127,8 @@ let
         quick-sdcv
 
         # T
-
+        telega
+        
         # W
         wgrep
   ]);
