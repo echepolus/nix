@@ -634,6 +634,7 @@
 (global-set-key (kbd "<C-tab>") 'next-buffer)
 (global-set-key (kbd "<C-S-tab>") 'previous-buffer) 
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+(windmove-default-keybindings)
 
 ;; Needed for `:after char-fold' to work
 (use-package char-fold

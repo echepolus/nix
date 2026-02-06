@@ -55,6 +55,7 @@ with pkgs; [
   gh # GitHub CLI
   glow # Markdown renderer for terminal
   ghostscript # PDF to images converter
+  gdb
     
   # H
   htop # Interactive process viewer

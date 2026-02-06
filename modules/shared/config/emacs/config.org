@@ -1,4 +1,4 @@
-#+TITLE: Emacs
+d#+TITLE: Emacs
 #+STARTUP: content
 
 * Package Sources & Definitions
@@ -785,6 +785,7 @@
   (global-set-key (kbd "<C-tab>") 'next-buffer)
   (global-set-key (kbd "<C-S-tab>") 'previous-buffer) 
   (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+  (windmove-default-keybindings)
 
 #+END_SRC
 
