@@ -1,7 +1,8 @@
-{ lib }:
-
-self: super: {
-
+self: super:
+let
+  lib = super.lib;
+in
+{
   # Backpin tdlib to a version compatible with telega
   tdlibForTelega = super.tdlib.overrideAttrs (_: {
     version = "1.8.45";
