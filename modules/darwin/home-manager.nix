@@ -32,7 +32,7 @@ in
       "tesseract"
       "tesseract-lang"
       "imagemagick"
-      "tdlib"
+      "tdlib --HEAD"
     ];
   };
 
