@@ -13,5 +13,4 @@ shared-packages ++ [
   xray
   xclip
   zip
-  # tg
 ]
