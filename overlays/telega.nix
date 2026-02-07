@@ -4,7 +4,7 @@ self: super: with super;{
   emacsPackagesFor = emacs: (
     (super.emacsPackagesFor emacs).overrideScope (eself: esuper: {
       
-      checkedTelega =
+      telega =
         esuper.telega.overrideAttrs (finalAttrs: oldAttrs:
           let
             usedTdlibVersion = builtins.getAttr "version" (
