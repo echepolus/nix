@@ -80,7 +80,7 @@ in
 
       bindkey '^[c' fzf-cd-widget
       bindkey '^R' fzf-history-widget
-      bindkey '^T' fzf-file-widget  
+      bindkey '^T' fzf-file-widget 
 
       shell() {
           nix-shell '<nixpkgs>' -A "$1"
