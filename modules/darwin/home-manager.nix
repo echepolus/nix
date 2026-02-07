@@ -32,10 +32,6 @@ in
       "tesseract"
       "tesseract-lang"
       "imagemagick"
-      # {
-      #   name = "tdlib";
-      #   args = [ "HEAD" ];
-      # }
     ];
   };
 
@@ -51,7 +47,7 @@ in
             { "emacs-launcher.command".source = myEmacsLauncher; }
             # { ".terminfo".source = "${pkgs.ghostty-bin}/Applications/Ghostty.app/Contents/Resources/terminfo"; }
         ];
-        stateVersion = "25.11";
+        stateVersion = "23.11";
       };
       programs = {} // import ../shared/home-manager.nix { inherit config pkgs lib; };
     };
