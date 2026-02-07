@@ -9,7 +9,7 @@ shared-packages ++ [
   kanata-with-cmd
   gnupg
   gcc
-  libclang
+  # libclang
   xray
   xclip
   zip

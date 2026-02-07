@@ -45,7 +45,6 @@ in
             sharedFiles
             additionalFiles
             { "emacs-launcher.command".source = myEmacsLauncher; }
-            # { ".terminfo".source = "${pkgs.ghostty-bin}/Applications/Ghostty.app/Contents/Resources/terminfo"; }
         ];
         stateVersion = "23.11";
       };
