@@ -100,7 +100,7 @@
             ./hosts/darwin
           ];
         }
-      );
+      );                
 
       nixosConfigurations =
         nixpkgs.lib.genAttrs linuxSystems (system:

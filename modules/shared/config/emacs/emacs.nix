@@ -127,7 +127,7 @@ let
         quick-sdcv
 
         # T
-        telega
+        melpaPackages.telega
         
         # W
         wgrep

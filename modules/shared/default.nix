@@ -26,6 +26,9 @@ in
       ++ [(import (builtins.fetchTarball {
         url = "https://github.com/nix-community/emacs-overlay/archive/master.tar.gz";
         sha256 = emacsOverlaySha256;
-      }))];
+      }))]
+      ++ [(import (builtins.fetchTarball {
+        url = https://github.com/ipvych/telega-overlay/archive/main.tar.gz;
+      }))]
   };
 }
