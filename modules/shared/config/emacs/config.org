@@ -1139,7 +1139,12 @@
      :config
      (setq telega-app '(38023252 . "25b30c0339ba45df5458e8e15f2d5840"))
      :defer t)
-  
+
+  (add-hook 'telega-load-hook
+          (lambda ()
+            (define-key global-map (kbd "C-c t") telega-prefix-map)))
+
+
 
 
 #+end_src
