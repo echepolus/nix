@@ -1,20 +1,6 @@
 _:
 
 [
-  # Development Tools
-  "v2rayu"
-  "wireshark-app"
-  "tailscale-app"
-
-  # Communication Tools
-  "zoom"
-
-  # Utility Tools
-  "pearcleaner"
-
-  # Entertainment Tools
-  "vlc"
-  
   # A
   "anki"
  
@@ -43,13 +29,27 @@ _:
 
   # Q
 
+  # P
+  "pearcleaner"
+  
   # R
 
   # S
   "utm"
 
-  # Z
-  "zen"
+  # T
+  "tailscale-app"
+  
+  # V
+  "v2rayu"
+  "vlc"
+  
+  # W
+  "wireshark-app"
 
   # X
+
+  # Z
+  "zen"
+  "zoom"
 ]

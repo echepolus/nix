@@ -17,7 +17,6 @@ let
     inflect
     unidecode
     pyaml
-    # pypandoc
     feedparser
     python-dateutil
   ]);
