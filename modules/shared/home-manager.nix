@@ -59,6 +59,8 @@ in
       export PYTHONPATH="$HOME/.local-pip/packages:$PYTHONPATH"
       export CONFIG_DIR="$HOME/.config:$CONFIG_DIR"
 
+      export PKG_CONFIG="$HOME/.nix-profile/bin/pkg-config"
+      export PKG_CONFIG_PATH="$HOME/.nix-profile/lib/pkgconfig:$HOME/.nix-profile/share/pkgconfig"
       # Remove history data we don't want to see
       export HISTIGNORE="pwd:ls:cd"
 

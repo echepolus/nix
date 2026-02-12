@@ -41,7 +41,8 @@ with pkgs; [
   # B
   bash-completion # Bash completion scripts
   bat # Cat clone with syntax highlighting
-
+  bear
+  
   # C
   coreutils # Basic file/text/shell utilities
 
@@ -49,6 +50,7 @@ with pkgs; [
   direnv # Environment variable management per directory
   difftastic # Structural diff tool
   djvulibre
+  docker
   
   # E
 
@@ -62,6 +64,8 @@ with pkgs; [
   glow # Markdown renderer for terminal
   ghostscript # PDF to images converter
   gdb
+  gcc
+  gnupg
     
   # H
   htop # Interactive process viewer
@@ -99,18 +103,14 @@ with pkgs; [
   pass # Stores, retrieves, generates, synchronizes passwords
   pandoc # Document converter
   poppler # PDF to plain text tool
-  php82Packages.composer # PHP dependency manager
-  deployer # PHP deployment tool
-  php82Packages.php-cs-fixer # PHP code style fixer
-  php82Packages.phpstan # PHP static analysis tool
-  phpactor # PHP language server with better refactoring support
-  phpunit # PHP testing framework
+  pkg-config
 
   # Q
   qt5.qtbase
 
   # R
   ripgrep # Fast text search tool
+  rbenv
 
   # S
   sqlite # SQL database engine

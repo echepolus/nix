@@ -22,8 +22,6 @@ in
     casks = pkgs.callPackage ./casks.nix {};
     brews = [
       "gitlab-runner"
-      "rbenv"
-      "bear"
       "tesseract"
       "tesseract-lang"
       "imagemagick"
