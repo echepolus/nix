@@ -339,42 +339,7 @@
           ("C-x C-q" . wgrep-change-to-wgrep-mode)
           ("C-c C-c" . wgrep-finish-edit)))
 
-;; (use-package ivy
-;;    :diminish
-;;    :bind (("C-s" . swiper)
-;;           :map ivy-minibuffer-map
-;;           ("TAB" . ivy-alt-done)
-;;           ("C-l" . ivy-alt-done)
-;;           ("C-j" . ivy-next-line)
-;;           ("C-k" . ivy-previous-line)
-;;           :map ivy-switch-buffer-map
-;;           ("C-k" . ivy-previous-line)
-;;           ("C-l" . ivy-done)
-;;           ("C-d" . ivy-switch-buffer-kill)
-;;           :map ivy-reverse-i-search-map
-;;           ("C-k" . ivy-previous-line)
-;;           ("C-d" . ivy-reverse-i-search-kill))
-;;    :config
-;;    (ivy-mode 1))
-
-;;  (use-package ivy-rich
-;;    :init
-;;    (ivy-rich-mode 1))
-
-(use-package dashboard
-  :ensure nil
-  :config
-  (dashboard-setup-startup-hook)
-  (setq dashboard-startup-banner 'ascii
-        dashboard-center-content t
-        dashboard-items '((projects . 5)
-                           (recents  . 5)))
-  (setq dashboard-set-footer nil))
-  (setq dashboard-set-file-icons t)
-  (setq dashboard-projects-backend 'projectile)
-  (setq initial-buffer-choice (lambda ()
-                                  (get-buffer-create "*dashboard*")
-                                  (dashboard-refresh-buffer)))
+(add-hook 'after-init-hook 'global-company-mode)
 
 (use-package doric-themes
   :ensure nil
@@ -486,14 +451,6 @@
   :config
   (setq denote-directory (expand-file-name "~/Documents/notes/"))
   (denote-rename-buffer-mode 1))
-
-(use-package denote-markdown
-  :ensure nil
-  ;; Bind these commands to key bindings of your choice.
-  :commands ( denote-markdown-convert-links-to-file-paths
-              denote-markdown-convert-links-to-denote-type
-              denote-markdown-convert-links-to-obsidian-type
-              denote-markdown-convert-obsidian-links-to-denote-type ))
 
 (use-package consult-denote
   :ensure nil
@@ -643,6 +600,11 @@
 (global-set-key (kbd "<C-S-tab>") 'previous-buffer) 
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 ;; (windmove-default-keybindings)
+  (use-package indent-bars
+  :ensure nil
+  :custom
+  (indent-bars-treesit-support t)
+  (indent-bars-treesit-wrap '((c argument_list parameter_list init_declarator parenthesized_expression))))
 
 ;; Needed for `:after char-fold' to work
 (use-package char-fold
@@ -667,28 +629,15 @@
   :config
   (reverse-im-mode t)) ; turn the mode on
 
-;; (use-package evil
-;;   :init
-;;   (setq evil-want-integration t)
-;;   (setq evil-want-keybinding nil)
-;;   (setq evil-want-C-u-scroll t)
-;;   (setq evil-want-C-i-jump nil)
-;;   :config
-;;   (evil-mode 1)
-;;   (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
-;;   (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
+(use-package telega
+   :commands (telega)
+   :config
+   (setq telega-app '(38023252 . "25b30c0339ba45df5458e8e15f2d5840"))
+   :defer t)
 
-;;   ;; Use visual line motions even outside of visual-line-mode buffers
-;;   (evil-global-set-key 'motion "j" 'evil-next-visual-line)
-;;   (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
-
-;;   (evil-set-initial-state 'messages-buffer-mode 'normal)
-;;   (evil-set-initial-state 'dashboard-mode 'normal))
-
-;; (use-package evil-collection
-;;   :after evil
-;;   :config
-;;   (evil-collection-init))
+(add-hook 'telega-load-hook
+        (lambda ()
+          (define-key global-map (kbd "C-c t") telega-prefix-map)))
 
 (use-package math-preview
   :custom (math-preview-command "/Users/alexeykotomin/.nix-profile/bin/math-preview"))
@@ -709,52 +658,28 @@
          ((agenda "" ((org-agenda-span 1)))
           (todo "NEXT")))))
 
-(defun efs/lsp-mode-setup ()
-  (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
-  (lsp-headerline-breadcrumb-mode))
+(add-to-list 'auto-mode-alist '("\\.env" . shell-script-mode))
+(add-to-list 'auto-mode-alist '("\\.kbd\\'" . lisp-mode))
+(use-package nix-mode
+  :mode "\\.nix\\'")
+(with-eval-after-load 'org
+  (org-babel-do-load-languages
+  'org-babel-load-languages
+  '((emacs-lisp . t) (python . t) (sql . t) (shell . t))))
 
 (use-package lsp-mode
   :commands (lsp lsp-deferred)
   :init (setq lsp-keymap-prefix "C-c l")
   :config (lsp-enable-which-key-integration t))
 
-(use-package lsp-ui
-  :hook (lsp-mode . lsp-ui-mode)
-  :custom
-  (lsp-ui-doc-position 'bottom))
+(use-package lsp-ui :commands lsp-ui-mode)
 
-(use-package lsp-ivy)
+(use-package ccls
+  :hook ((c-mode c++-mode) .
+         (lambda () (require 'ccls) (lsp))))
+(setq ccls-executable "~/.nix-profile/bin/ccls")
 
-(use-package lsp-treemacs
-  :after lsp)
 
-(use-package indent-bars
-  :ensure nil
-  :custom
-  (indent-bars-treesit-support t)
-  (indent-bars-treesit-wrap '((c argument_list parameter_list init_declarator parenthesized_expression))))
-                                        ; alternative to wrap:
-  ; (indent-bars-no-descend-lists '(?\[ ?\()) ; prevent {} from being treated like lists!
-
-(add-to-list 'auto-mode-alist '("\\.env" . shell-script-mode))
-
-(add-to-list 'auto-mode-alist '("\\.kbd\\'" . lisp-mode))
-
-(use-package nix-mode
-  :mode "\\.nix\\'")
-
-(setq ede-project-directories-file
-    (expand-file-name "ede-projects.el" user-emacs-directory))
-(load ede-project-directories-file 'noerror)
-
-(with-eval-after-load 'org
-  (org-babel-do-load-languages
-  'org-babel-load-languages
-  '(
-    (emacs-lisp . t)
-    (python . t)
-    (sql . t)
-    (shell . t))))
 
 (use-package which-key
   :ensure nil
@@ -774,145 +699,134 @@
   ([remap describe-key]      . helpful-key))
 
 ;; Key bindings:
-     ;; - Toggle Hebrew (biblical-sil): C-\
-     ;; - Toggle Greek (babel): C-|
+;; - Toggle Hebrew (biblical-sil): C-\
+;; - Toggle Greek (babel): C-|
 
-     ;; Type hard break for Hebrew to English
-     (define-key 'iso-transl-ctl-x-8-map "f" [?‎])
-     (setq alternative-input-methods
-           '(("greek-babel" . [?\C-|])))
+;; Type hard break for Hebrew to English
+(define-key 'iso-transl-ctl-x-8-map "f" [?‎])
+(setq alternative-input-methods
+      '(("greek-babel" . [?\C-|])))
 
-     (setq default-input-method
-           (caar alternative-input-methods))
+(setq default-input-method
+      (caar alternative-input-methods))
 
-     (defun toggle-alternative-input-method (method &optional arg interactive)
-       "Toggle input METHOD similar to `toggle-input-method'.
-     Uses METHOD instead of `default-input-method'.
-     With ARG, behaves like standard toggle-input-method."
-       (if arg
-           (toggle-input-method arg interactive)
-         (let ((previous-input-method current-input-method))
-           (when current-input-method
-             (deactivate-input-method))
-           (unless (and previous-input-method
-                        (string= previous-input-method method))
-             (activate-input-method method)))))
+(defun toggle-alternative-input-method (method &optional arg interactive)
+  "Toggle input METHOD similar to `toggle-input-method'.
+Uses METHOD instead of `default-input-method'.
+With ARG, behaves like standard toggle-input-method."
+  (if arg
+      (toggle-input-method arg interactive)
+    (let ((previous-input-method current-input-method))
+      (when current-input-method
+        (deactivate-input-method))
+      (unless (and previous-input-method
+                   (string= previous-input-method method))
+        (activate-input-method method)))))
 
-     (defun reload-alternative-input-methods ()
-       "Set up global key bindings for alternative input methods.
-     Creates toggle functions for each method in `alternative-input-methods'."
-       (dolist (config alternative-input-methods)
-         (let ((method (car config)))
-           (global-set-key (cdr config)
-                           `(lambda (&optional arg interactive)
-                              ,(concat "Behaves similar to `toggle-input-method', but uses \""
-                                       method "\" instead of `default-input-method'")
-                              (interactive "P\np")
-                              (toggle-alternative-input-method ,method arg interactive))))))
+(defun reload-alternative-input-methods ()
+  "Set up global key bindings for alternative input methods.
+Creates toggle functions for each method in `alternative-input-methods'."
+  (dolist (config alternative-input-methods)
+    (let ((method (car config)))
+      (global-set-key (cdr config)
+                      `(lambda (&optional arg interactive)
+                         ,(concat "Behaves similar to `toggle-input-method', but uses \""
+                                  method "\" instead of `default-input-method'")
+                         (interactive "P\np")
+                         (toggle-alternative-input-method ,method arg interactive))))))
 
-     (reload-alternative-input-methods)
+(reload-alternative-input-methods)
 
-     ;;; Dynamic Cursor Adjustment
+;;; Dynamic Cursor Adjustment
 
-     (defun my-adjust-cursor-for-language ()
-       "Set cursor to bar in Greek/Hebrew region, box otherwise.
-     Checks characters within 5 positions before and after point."
-       (let ((greek-or-hebrew-nearby nil))
-         ;; Check characters within 5 positions before and after
-         (save-excursion
-           (let ((start (max (point-min) (- (point) 5)))
-                 (end (min (point-max) (+ (point) 5))))
-             (goto-char start)
-             (while (and (< (point) end) (not greek-or-hebrew-nearby))
-               (let ((char (char-after)))
-                 (when (and char
-                            (memq (char-table-range char-script-table char)
-                                  '(greek hebrew)))
-                   (setq greek-or-hebrew-nearby t)))
-               (forward-char 1))))
-         (setq-local cursor-type (if greek-or-hebrew-nearby '(bar . 2) 'box))))
+(defun my-adjust-cursor-for-language ()
+  "Set cursor to bar in Greek/Hebrew region, box otherwise.
+Checks characters within 5 positions before and after point."
+  (let ((greek-or-hebrew-nearby nil))
+    ;; Check characters within 5 positions before and after
+    (save-excursion
+      (let ((start (max (point-min) (- (point) 5)))
+            (end (min (point-max) (+ (point) 5))))
+        (goto-char start)
+        (while (and (< (point) end) (not greek-or-hebrew-nearby))
+          (let ((char (char-after)))
+            (when (and char
+                       (memq (char-table-range char-script-table char)
+                             '(greek hebrew)))
+              (setq greek-or-hebrew-nearby t)))
+          (forward-char 1))))
+    (setq-local cursor-type (if greek-or-hebrew-nearby '(bar . 2) 'box))))
 
-     (add-hook 'post-command-hook #'my-adjust-cursor-for-language)
+(add-hook 'post-command-hook #'my-adjust-cursor-for-language)
 
-     (defun strip-numbers-and-brackets (beg end)
-       "Remove numbers and brackets from selected region between BEG and END.
-     Also removes leading/trailing spaces and collapses multiple spaces between words.
-     Useful for cleaning up Greek/Hebrew text with verse numbers."
-       (interactive "r")
-       (save-excursion
-         (save-restriction
-           (narrow-to-region beg end)
-           ;; Remove numbers and brackets
-           (goto-char (point-min))
-           (while (re-search-forward "\\([0-9]+\\|\\[\\|\\]\\)" nil t)
-             (replace-match ""))
-           ;; Collapse multiple spaces into single space
-           (goto-char (point-min))
-           (while (re-search-forward " \\{2,\\}" nil t)
-             (replace-match " "))
-           ;; Remove leading and trailing whitespace from each line
-           (goto-char (point-min))
-           (while (re-search-forward "^[[:space:]]+" nil t)
-             (replace-match ""))
-           (goto-char (point-min))
-           (while (re-search-forward "[[:space:]]+$" nil t)
-             (replace-match "")))))
+(defun strip-numbers-and-brackets (beg end)
+  "Remove numbers and brackets from selected region between BEG and END.
+Also removes leading/trailing spaces and collapses multiple spaces between words.
+Useful for cleaning up Greek/Hebrew text with verse numbers."
+  (interactive "r")
+  (save-excursion
+    (save-restriction
+      (narrow-to-region beg end)
+      ;; Remove numbers and brackets
+      (goto-char (point-min))
+      (while (re-search-forward "\\([0-9]+\\|\\[\\|\\]\\)" nil t)
+        (replace-match ""))
+      ;; Collapse multiple spaces into single space
+      (goto-char (point-min))
+      (while (re-search-forward " \\{2,\\}" nil t)
+        (replace-match " "))
+      ;; Remove leading and trailing whitespace from each line
+      (goto-char (point-min))
+      (while (re-search-forward "^[[:space:]]+" nil t)
+        (replace-match ""))
+      (goto-char (point-min))
+      (while (re-search-forward "[[:space:]]+$" nil t)
+        (replace-match "")))))
 
-     (defalias 'grk 'strip-numbers-and-brackets)
+(defalias 'grk 'strip-numbers-and-brackets)
 
-     (defun greek-hebrew-flyspell-verify ()
-       "Return nil if word at point contains Greek or Hebrew characters.
-     This tells flyspell to skip checking this word."
-       (save-excursion
-         (let ((case-fold-search t)
-               (pos (point))
-               (greek-hebrew-found nil))
-           ;; Check if current word contains Greek or Hebrew
-           (skip-chars-backward "^ \t\n\r")
-           (while (and (< (point) pos) (not greek-hebrew-found))
-             (let* ((char (char-after))
-                    (script (and char (char-table-range char-script-table char))))
-               (when (memq script '(greek hebrew))
-                 (setq greek-hebrew-found t)))
-             (forward-char 1))
-           ;; Return t to check word, nil to skip
-           (not greek-hebrew-found))))
+(defun greek-hebrew-flyspell-verify ()
+  "Return nil if word at point contains Greek or Hebrew characters.
+This tells flyspell to skip checking this word."
+  (save-excursion
+    (let ((case-fold-search t)
+          (pos (point))
+          (greek-hebrew-found nil))
+      ;; Check if current word contains Greek or Hebrew
+      (skip-chars-backward "^ \t\n\r")
+      (while (and (< (point) pos) (not greek-hebrew-found))
+        (let* ((char (char-after))
+               (script (and char (char-table-range char-script-table char))))
+          (when (memq script '(greek hebrew))
+            (setq greek-hebrew-found t)))
+        (forward-char 1))
+      ;; Return t to check word, nil to skip
+      (not greek-hebrew-found))))
 
-     ;; Advice to add Greek/Hebrew checking to existing flyspell predicates
-     (defun greek-hebrew-flyspell-advice (orig-fun &rest args)
-       "Advice to skip Greek/Hebrew words in addition to mode-specific checks."
-       (and (greek-hebrew-flyspell-verify)
-            (apply orig-fun args)))
+;; Advice to add Greek/Hebrew checking to existing flyspell predicates
+(defun greek-hebrew-flyspell-advice (orig-fun &rest args)
+  "Advice to skip Greek/Hebrew words in addition to mode-specific checks."
+  (and (greek-hebrew-flyspell-verify)
+       (apply orig-fun args)))
 
-     ;; Apply advice to markdown-mode's flyspell predicate
-     (with-eval-after-load 'markdown-mode
-       (advice-add 'markdown-flyspell-check-word-p :around
-                   #'greek-hebrew-flyspell-advice))
+;; Apply advice to markdown-mode's flyspell predicate
+(with-eval-after-load 'markdown-mode
+  (advice-add 'markdown-flyspell-check-word-p :around
+              #'greek-hebrew-flyspell-advice))
 
-     ;; For text-mode and org-mode, set the predicate directly
-     (add-hook 'text-mode-hook
-               (lambda ()
-                 (unless (derived-mode-p 'markdown-mode)
-                   (setq-local flyspell-generic-check-word-predicate
-                               #'greek-hebrew-flyspell-verify))))
+;; For text-mode and org-mode, set the predicate directly
+(add-hook 'text-mode-hook
+          (lambda ()
+            (unless (derived-mode-p 'markdown-mode)
+              (setq-local flyspell-generic-check-word-predicate
+                          #'greek-hebrew-flyspell-verify))))
 
-     (add-hook 'org-mode-hook
-               (lambda ()
-                 (setq-local flyspell-generic-check-word-predicate
-                             #'greek-hebrew-flyspell-verify)))
+(add-hook 'org-mode-hook
+          (lambda ()
+            (setq-local flyspell-generic-check-word-predicate
+                        #'greek-hebrew-flyspell-verify)))
 
-     (set-fontset-font "fontset-default" 'greek (font-spec :family "SBL BibLit" :size 22))
-     (set-fontset-font "fontset-default" 'hebrew (font-spec :family "SBL BibLit" :size 20))
+(set-fontset-font "fontset-default" 'greek (font-spec :family "SBL BibLit" :size 22))
+(set-fontset-font "fontset-default" 'hebrew (font-spec :family "SBL BibLit" :size 20))
 
-     (provide 'my-ancient-greek-tweaks)
-
-
-(use-package telega
-   :commands (telega)
-   :config
-   (setq telega-app '(38023252 . "25b30c0339ba45df5458e8e15f2d5840"))
-   :defer t)
-
-(add-hook 'telega-load-hook
-        (lambda ()
-          (define-key global-map (kbd "C-c t") telega-prefix-map)))
+(provide 'my-ancient-greek-tweaks)

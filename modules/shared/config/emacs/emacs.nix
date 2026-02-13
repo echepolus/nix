@@ -18,7 +18,9 @@ let
         calibredb
         citar
         counsel
-
+        company
+        ccls
+        
         # E
         evil
         evil-collection
@@ -27,7 +29,6 @@ let
         doric-themes
         doom-modeline
         all-the-icons
-        all-the-icons-ivy
         all-the-icons-dired
         dashboard
         rainbow-delimiters
@@ -107,12 +108,10 @@ let
         
         # I
         indent-bars
-        ivy-rich
         
         # G
-
+        gruber-darker-theme
         # L
-        lsp-ivy
 
         # M
 
@@ -131,6 +130,11 @@ let
         
         # W
         wgrep
+
+        # Y
+        yasnippet
+        # Z
+
   ]);
 in 
 emacsWithPackages

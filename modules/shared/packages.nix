@@ -45,6 +45,7 @@ with pkgs; [
   
   # C
   coreutils # Basic file/text/shell utilities
+  ccls
 
   # D
   direnv # Environment variable management per directory
@@ -140,5 +141,5 @@ with pkgs; [
   zsh-powerlevel10k # Zsh theme
   zoxide
   zlib
-  zeal
+
 ] ++ myFonts
