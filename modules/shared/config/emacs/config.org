@@ -795,6 +795,13 @@
   (global-set-key (kbd "<C-S-tab>") 'previous-buffer) 
   (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
   ;; (windmove-default-keybindings)
+    (use-package indent-bars
+    :ensure nil
+    :custom
+    (indent-bars-treesit-support t)
+    (indent-bars-treesit-wrap '((c argument_list parameter_list init_declarator parenthesized_expression))))
+                                          ; alternative to wrap:
+    ; (indent-bars-no-descend-lists '(?\[ ?\()) ; prevent {} from being treated like lists!
 
 #+END_SRC
 
@@ -888,89 +895,31 @@
 #+end_src
 
 * Code
+** Languages
+#+name: lang-setup
+#+begin_src emacs-lisp
+
+  (add-to-list 'auto-mode-alist '("\\.env" . shell-script-mode))
+  (add-to-list 'auto-mode-alist '("\\.kbd\\'" . lisp-mode))
+  (use-package nix-mode
+    :mode "\\.nix\\'")
+  (with-eval-after-load 'org
+    (org-babel-do-load-languages
+    'org-babel-load-languages
+    '((emacs-lisp . t) (python . t) (sql . t) (shell . t))))
+
+#+end_src
+
 ** LSP-mode
 #+name: lsp-mode
 #+begin_src emacs-lisp
-
-  (defun efs/lsp-mode-setup ()
-    (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
-    (lsp-headerline-breadcrumb-mode))
 
   (use-package lsp-mode
     :commands (lsp lsp-deferred)
     :init (setq lsp-keymap-prefix "C-c l")
     :config (lsp-enable-which-key-integration t))
-
-  (use-package lsp-ui
-    :hook (lsp-mode . lsp-ui-mode)
-    :custom
-    (lsp-ui-doc-position 'bottom))
-
-  (use-package lsp-ivy)
-
-  (use-package lsp-treemacs
-    :after lsp)
   
 #+end_src
-
-** C/C++
-#+name: c-language
-#+begin_src emacs-lisp
-
-  (use-package indent-bars
-    :ensure nil
-    :custom
-    (indent-bars-treesit-support t)
-    (indent-bars-treesit-wrap '((c argument_list parameter_list init_declarator parenthesized_expression))))
-                                          ; alternative to wrap:
-    ; (indent-bars-no-descend-lists '(?\[ ?\()) ; prevent {} from being treated like lists!
-
-#+end_src
-** Shell scripts
-#+NAME: shell-scripts
-#+BEGIN_SRC emacs-lisp
-
-  (add-to-list 'auto-mode-alist '("\\.env" . shell-script-mode))
-
-#+END_SRC
-
-** kbd
-#+NAME: kbd
-#+BEGIN_SRC emacs-lisp
-  (add-to-list 'auto-mode-alist '("\\.kbd\\'" . lisp-mode))
-#+END_SRC
-
-** Nix
-#+NAME: nix-mode
-#+begin_src emacs-lisp
-  (use-package nix-mode
-    :mode "\\.nix\\'")
-#+end_src
-
-** Emacs Development Evironment
-#+name: ede-mode
-#+begin_src emacs-lisp
-
-  (setq ede-project-directories-file
-      (expand-file-name "ede-projects.el" user-emacs-directory))
-  (load ede-project-directories-file 'noerror)
-
-#+end_src
-
-** Load languages to run in org mode code blocks
-#+name: lang-org
-#+BEGIN_SRC emacs-lisp
-
-  (with-eval-after-load 'org
-    (org-babel-do-load-languages
-    'org-babel-load-languages
-    '(
-      (emacs-lisp . t)
-      (python . t)
-      (sql . t)
-      (shell . t))))
-
-#+END_SRC
 
 * Learning Emacs
 #+name: popup

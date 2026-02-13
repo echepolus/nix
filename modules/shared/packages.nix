@@ -140,4 +140,5 @@ with pkgs; [
   zsh-powerlevel10k # Zsh theme
   zoxide
   zlib
+  zeal
 ] ++ myFonts
