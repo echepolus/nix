@@ -40,9 +40,11 @@
 #+BEGIN_SRC emacs-lisp
 
   (column-number-mode)
+  (tab-bar-mode)
   (scroll-bar-mode 0)
   (menu-bar-mode -1)
   (tool-bar-mode 0)
+  (tooltip-mode -1)
   (winner-mode 1)
   (blink-cursor-mode -1)
   (use-package rainbow-delimiters
@@ -64,6 +66,14 @@
   (dolist (mode '(prog-mode-hook))
     (add-hook mode #'display-line-numbers-mode 0))
   (setq frame-resize-pixelwise t)
+  (add-hook 'window-setup-hook 'toggle-frame-maximized t)
+
+#+END_SRC
+** Tabs
+#+NAME: tab-bar-mode
+#+BEGIN_SRC emacs-lisp
+
+  
 
 #+END_SRC
 
@@ -71,15 +81,18 @@
 #+NAME: modeline
 #+BEGIN_SRC emacs-lisp
 
-  (use-package all-the-icons)
+    (use-package all-the-icons)
 
-  (use-package f
-    :ensure nil
-    :demand t)
+    (use-package f
+      :ensure nil
+      :demand t)
 
-  (use-package doom-modeline
-    :after f
-    :init (doom-modeline-mode 1))
+    (use-package doom-modeline
+      :after f
+      :init (doom-modeline-mode 1)
+      :config
+      (setq doom-modeline-icon t))
+    
 
 #+END_SRC
 
@@ -781,6 +794,15 @@
     :config
     (reverse-im-mode t)) ; turn the mode on
 
+#+END_SRC
+
+** Viper
+#+NAME: viper
+#+BEGIN_SRC emacs-lisp
+
+  (setq viper-mode t)
+     (require 'viper)
+  
 #+END_SRC
 
 * Apps

@@ -105,7 +105,9 @@ let
         pdf-tools   
         tablist # required by pdf-tools
         pdf-view-restore
-        
+
+        # D
+        dap-mode
         # I
         indent-bars
         

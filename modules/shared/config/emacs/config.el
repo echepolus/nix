@@ -26,9 +26,11 @@
                            exec-path))))
 
 (column-number-mode)
+(tab-bar-mode)
 (scroll-bar-mode 0)
 (menu-bar-mode -1)
 (tool-bar-mode 0)
+(tooltip-mode -1)
 (winner-mode 1)
 (blink-cursor-mode -1)
 (use-package rainbow-delimiters
@@ -50,6 +52,9 @@
 (dolist (mode '(prog-mode-hook))
   (add-hook mode #'display-line-numbers-mode 0))
 (setq frame-resize-pixelwise t)
+(add-hook 'window-setup-hook 'toggle-frame-maximized t)
+
+
 
 (use-package all-the-icons)
 
@@ -59,7 +64,9 @@
 
 (use-package doom-modeline
   :after f
-  :init (doom-modeline-mode 1))
+  :init (doom-modeline-mode 1)
+  :config
+  (setq doom-modeline-icon t))
 
 (global-unset-key (kbd "M-o"))
 
@@ -628,6 +635,9 @@
   (reverse-im-input-methods '("russian-computer" "greek"))
   :config
   (reverse-im-mode t)) ; turn the mode on
+
+(setq viper-mode t)
+   (require 'viper)
 
 (use-package telega
    :commands (telega)
