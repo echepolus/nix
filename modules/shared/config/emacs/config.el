@@ -224,62 +224,9 @@
   (setq vertico-cycle t
         vertico-scroll-margin 0
         vertico-count 10
-        vertico-resize nil)
+        vertico-resize t)
   (vertico-mode 1)
   (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy))
-
-;; (use-package emacs
-;; :custom
-;; ;; Enable context menu. `vertico-multiform-mode' adds a menu in the minibuffer
-;; ;; to switch display modes.
-;; (context-menu-mode t)
-;; ;; Support opening new minibuffers from inside existing minibuffers.
-;; (enable-recursive-minibuffers t)
-;; ;; Hide commands in M-x which do not work in the current mode.  Vertico
-;; ;; commands are hidden in normal buffers. This setting is useful beyond
-;; ;; Vertico.
-;; (read-extended-command-predicate #'command-completion-default-include-p)
-;; ;; Do not allow the cursor in the minibuffer prompt
-;; (minibuffer-prompt-properties
-;;  '(read-only t cursor-intangible t face minibuffer-prompt)))
-
-;; TAB-only configuration
-(use-package corfu
-  :custom
-  (corfu-auto t)               ;; Enable auto completion
-  (corfu-preselect 'directory) ;; Select the first candidate, except for directories
-
-  :init
-  (global-corfu-mode)
-
-  :config
-  ;; Free the RET key for less intrusive behavior.
-  ;; Option 1: Unbind RET completely
-  ;; (keymap-unset corfu-map "RET")
-  ;; Option 2: Use RET only in shell modes
-  (keymap-set corfu-map "RET" `( menu-item "" nil :filter
-                                 ,(lambda (&optional _)
-                                    (and (derived-mode-p 'eshell-mode 'comint-mode)
-                                         #'corfu-send)))))
-
-  ;; A few more useful configurations...
-  (use-package emacs
-    :custom
-    ;; TAB cycle if there are only few candidates
-    ;; (completion-cycle-threshold 3)
-
-    ;; Enable indentation+completion using the TAB key.
-    ;; `completion-at-point' is often bound to M-TAB.
-    (tab-always-indent 'complete)
-
-    ;; Emacs 30 and newer: Disable Ispell completion function.
-    ;; Try `cape-dict' as an alternative.
-    (text-mode-ispell-word-completion nil)
-
-    ;; Hide commands in M-x which do not apply to the current mode.  Corfu
-    ;; commands are hidden, since they are not used via M-x. This setting is
-    ;; useful beyond Corfu.
-    (read-extended-command-predicate #'command-completion-default-include-p))
 
 (use-package marginalia
   :bind (:map minibuffer-local-map
@@ -393,8 +340,6 @@
           ("C-x C-q" . wgrep-change-to-wgrep-mode)
           ("C-c C-c" . wgrep-finish-edit)))
 
-;; (add-hook 'after-init-hook 'global-company-mode)
-
 (use-package doric-themes
   :ensure nil
   :demand t
@@ -472,7 +417,7 @@
               (interactive)
               (nerd-icons-dired-mode 1)
               (hl-line-mode 1))))
-(add-hook 'dired-mode-hook 'dired-hide-details-mode)t
+(add-hook 'dired-mode-hook 'dired-hide-details-mode)
 
 (use-package dired-ranger)
 (use-package dired-collapse)
@@ -584,9 +529,6 @@
 
 (use-package calibredb
   :ensure nil
-  :commands (calibredb)
-  :bind
-  (("C-c c c" . calibredb-find-counsel))
   :init
   (setq calibredb-root-dir "~/Documents/calibrary")
   (setq calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir))
@@ -596,7 +538,8 @@
   (setq calibredb-comment-width 0)
   (setq calibredb-size-show t)
   (setq calibredb-format-all-the-icons t)
-  (setq calibredb-program "/Applications/calibre.app/Contents/MacOS/calibredb"))
+  (setq calibredb-program "/Applications/calibre.app/Contents/MacOS/calibredb")
+  :commands (calibredb))
 
 (use-package pdf-tools
   :defer t
@@ -752,8 +695,6 @@
   :hook ((c-mode c++-mode) .
          (lambda () (require 'ccls) (lsp))))
 (setq ccls-executable "~/.nix-profile/bin/ccls")
-
-
 
 (use-package which-key
   :ensure nil

@@ -535,7 +535,7 @@
                 (interactive)
                 (nerd-icons-dired-mode 1)
                 (hl-line-mode 1))))
-  (add-hook 'dired-mode-hook 'dired-hide-details-mode t)
+  (add-hook 'dired-mode-hook 'dired-hide-details-mode)
 
   (use-package dired-ranger)
   (use-package dired-collapse)
@@ -659,7 +659,6 @@
 
   (use-package calibredb
     :ensure nil
-    :commands (calibredb)
     :init
     (setq calibredb-root-dir "~/Documents/calibrary")
     (setq calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir))
@@ -669,7 +668,8 @@
     (setq calibredb-comment-width 0)
     (setq calibredb-size-show t)
     (setq calibredb-format-all-the-icons t)
-    (setq calibredb-program "/Applications/calibre.app/Contents/MacOS/calibredb"))
+    (setq calibredb-program "/Applications/calibre.app/Contents/MacOS/calibredb")
+    :commands (calibredb))
 
 #+END_SRC
 
