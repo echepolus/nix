@@ -108,9 +108,6 @@
 	(set-frame-parameter nil 'undecorated-round t)
 	(add-to-list 'default-frame-alist '(undecorated-round . t)))))
 
-
-
-(add-hook 'window-setup-hook 'toggle-frame-maximized t)
 ;; -------------------------
 ;; Copy to Clipboard in TTY 
 ;; -------------------------

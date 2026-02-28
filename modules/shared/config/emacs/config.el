@@ -52,9 +52,11 @@
 (dolist (mode '(prog-mode-hook))
   (add-hook mode #'display-line-numbers-mode 0))
 (setq frame-resize-pixelwise t)
-(add-hook 'window-setup-hook 'toggle-frame-maximized t)
 
-
+(use-package ultra-scroll
+  :init (setq scroll-conservatively 3 
+              scroll-margin 0)     
+  :config (ultra-scroll-mode 1))
 
 (use-package all-the-icons)
 
@@ -66,7 +68,7 @@
   :after f
   :init (doom-modeline-mode 1)
   :config
-  (setq doom-modeline-icon t))
+  (setq doom-modeline-icon nil))
 
 (global-unset-key (kbd "M-o"))
 
@@ -220,19 +222,64 @@
   :ensure nil
   :config
   (setq vertico-cycle t
-          vertico-count 10
-          vertico-resize t)
+        vertico-scroll-margin 0
+        vertico-count 10
+        vertico-resize nil)
   (vertico-mode 1)
   (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy))
 
-(use-package vertico-posframe
-  :after vertico
+;; (use-package emacs
+;; :custom
+;; ;; Enable context menu. `vertico-multiform-mode' adds a menu in the minibuffer
+;; ;; to switch display modes.
+;; (context-menu-mode t)
+;; ;; Support opening new minibuffers from inside existing minibuffers.
+;; (enable-recursive-minibuffers t)
+;; ;; Hide commands in M-x which do not work in the current mode.  Vertico
+;; ;; commands are hidden in normal buffers. This setting is useful beyond
+;; ;; Vertico.
+;; (read-extended-command-predicate #'command-completion-default-include-p)
+;; ;; Do not allow the cursor in the minibuffer prompt
+;; (minibuffer-prompt-properties
+;;  '(read-only t cursor-intangible t face minibuffer-prompt)))
+
+;; TAB-only configuration
+(use-package corfu
+  :custom
+  (corfu-auto t)               ;; Enable auto completion
+  (corfu-preselect 'directory) ;; Select the first candidate, except for directories
+
+  :init
+  (global-corfu-mode)
+
   :config
-  (vertico-posframe-mode 1)
-  (setq vertico-posframe-parameters
-        '((left-fringe . 5)
-          (right-fringe . 5)))
-  (setq vertico-posframe-poshandler #'posframe-poshandler-frame-center))
+  ;; Free the RET key for less intrusive behavior.
+  ;; Option 1: Unbind RET completely
+  ;; (keymap-unset corfu-map "RET")
+  ;; Option 2: Use RET only in shell modes
+  (keymap-set corfu-map "RET" `( menu-item "" nil :filter
+                                 ,(lambda (&optional _)
+                                    (and (derived-mode-p 'eshell-mode 'comint-mode)
+                                         #'corfu-send)))))
+
+  ;; A few more useful configurations...
+  (use-package emacs
+    :custom
+    ;; TAB cycle if there are only few candidates
+    ;; (completion-cycle-threshold 3)
+
+    ;; Enable indentation+completion using the TAB key.
+    ;; `completion-at-point' is often bound to M-TAB.
+    (tab-always-indent 'complete)
+
+    ;; Emacs 30 and newer: Disable Ispell completion function.
+    ;; Try `cape-dict' as an alternative.
+    (text-mode-ispell-word-completion nil)
+
+    ;; Hide commands in M-x which do not apply to the current mode.  Corfu
+    ;; commands are hidden, since they are not used via M-x. This setting is
+    ;; useful beyond Corfu.
+    (read-extended-command-predicate #'command-completion-default-include-p))
 
 (use-package marginalia
   :bind (:map minibuffer-local-map
@@ -346,7 +393,7 @@
           ("C-x C-q" . wgrep-change-to-wgrep-mode)
           ("C-c C-c" . wgrep-finish-edit)))
 
-(add-hook 'after-init-hook 'global-company-mode)
+;; (add-hook 'after-init-hook 'global-company-mode)
 
 (use-package doric-themes
   :ensure nil
@@ -585,13 +632,13 @@
 (defun my-projects-visit ()
   (interactive)
   (find-file "/Users/alexeykotomin/org/20260105T151859--действующие-проекты-и-книги__задачи_книги_проекты.org"))
-(global-set-key (kbd "C-c d") 'config-visit)
-(global-set-key (kbd "C-c p") 'my-projects-visit)
+(global-set-key (kbd "C-c v c") 'config-visit)
+(global-set-key (kbd "C-c v p") 'my-projects-visit)
 ;; Scroll up and down
 (global-set-key (kbd "s-<down>") (kbd "C-u 1 C-v"))
 (global-set-key (kbd "s-<up>") (kbd "C-u 1 M-v"))
 ;; Kill this buffer
-(global-set-key (kbd "C-1") 'kill-this-buffer)
+(global-set-key (kbd "C-1") 'kill-current-buffer)
 ;; Clean whitespace
 (global-set-key (kbd "C-c w") 'whitespace-cleanup)
 ;; Hippie expand
@@ -603,15 +650,25 @@
 (setq-default indent-tabs-mode nil
             js-indent-level 2
             tab-width 2)
-(global-set-key (kbd "<C-tab>") 'next-buffer)
-(global-set-key (kbd "<C-S-tab>") 'previous-buffer) 
+(global-set-key (kbd "<s-right>") 'next-buffer)
+(global-set-key (kbd "<s-left>") 'previous-buffer)
+(global-set-key (kbd "<S-s-right>") 'tab-next)
+(global-set-key (kbd "<S-s-left>") 'tab-previous)
+(global-set-key (kbd "<C-tab>") 'tab-next)
+(global-set-key (kbd "<C-S-tab>") 'tab-previous)
+(global-set-key (kbd "<C-s-tab>") 'tab-new)
+(global-set-key (kbd "<C-s-w>") 'tab-close)
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
-;; (windmove-default-keybindings)
-  (use-package indent-bars
+
+(use-package indent-bars
   :ensure nil
   :custom
   (indent-bars-treesit-support t)
   (indent-bars-treesit-wrap '((c argument_list parameter_list init_declarator parenthesized_expression))))
+
+(global-set-key (kbd "C-M-j") 'consult-switch-buffer)
+(use-package command-log-mode)
+(global-command-log-mode)
 
 ;; Needed for `:after char-fold' to work
 (use-package char-fold
@@ -636,18 +693,21 @@
   :config
   (reverse-im-mode t)) ; turn the mode on
 
-(setq viper-mode t)
-   (require 'viper)
+(require 'evil)
 
 (use-package telega
-   :commands (telega)
-   :config
-   (setq telega-app '(38023252 . "25b30c0339ba45df5458e8e15f2d5840"))
-   :defer t)
+  :commands (telega)
+  ;; :bind ("C-c t" . telega)
+  :init
+  (define-prefix-command 'my-telega-prefix)
+  (global-set-key (kbd "C-c t") 'my-telega-prefix)
 
-(add-hook 'telega-load-hook
-        (lambda ()
-          (define-key global-map (kbd "C-c t") telega-prefix-map)))
+  :config
+  (setq telega-app '(38023252 . "25b30c0339ba45df5458e8e15f2d5840"))
+
+  (define-key my-telega-prefix (kbd "t") #'telega)
+  (define-key my-telega-prefix (kbd "c") #'telega-chat-with)
+  (define-key my-telega-prefix (kbd "s") #'telega-search))
 
 (use-package math-preview
   :custom (math-preview-command "/Users/alexeykotomin/.nix-profile/bin/math-preview"))
@@ -667,6 +727,10 @@
       '(("d" "Daily"
          ((agenda "" ((org-agenda-span 1)))
           (todo "NEXT")))))
+
+(use-package org-noter
+  :ensure nil
+  :demand t)
 
 (add-to-list 'auto-mode-alist '("\\.env" . shell-script-mode))
 (add-to-list 'auto-mode-alist '("\\.kbd\\'" . lisp-mode))
@@ -694,8 +758,8 @@
 (use-package which-key
   :ensure nil
   :init
-  (setq which-key-idle-delay 0.3
-        which-key-idle-secondary-delay 0.1)
+  (setq which-key-idle-delay 0
+        which-key-idle-secondary-delay 0)
   :config
   (which-key-mode))
 

@@ -80,10 +80,28 @@ in
 
       [ -f ${pkgs.fzf}/share/fzf/key-bindings.zsh ] && source ${pkgs.fzf}/share/fzf/key-bindings.zsh
       [ -f ${pkgs.fzf}/share/fzf/completion.zsh ] && source ${pkgs.fzf}/share/fzf/completion.zsh
+      
+      export FZF_CTRL_T_OPTS="--height 60% \
+      --border sharp \
+      --layout reverse \
+      --prompt '∷ ' \
+      --pointer ▶ \
+      --marker ⇒ \
+      --preview '(bat --paging=never --color=always --style=plain --theme-base16 {} 2>/dev/null || tree -C {}) 2> /dev/null | head -200'"
+
+      export FZF_ALT_C_OPTS="--preview 'tree -C {} | head -200'"
+      export FZF_COMPLETION_TRIGGER='**'
+      export FZF_DEFAULT_OPTS="--bind=tab:accept"
 
       bindkey '^[c' fzf-cd-widget
       bindkey '^R' fzf-history-widget
-      bindkey '^T' fzf-file-widget 
+      bindkey '^T' fzf-file-widget
+      
+      _fzf_complete_git() {
+        _fzf_complete -- "$@" < <(
+          git --help -a | grep -E '^\s+' | awk '{print $1}'
+        )
+      }
 
       shell() {
           nix-shell '<nixpkgs>' -A "$1"

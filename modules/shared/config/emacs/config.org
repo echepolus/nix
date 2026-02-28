@@ -66,14 +66,17 @@
   (dolist (mode '(prog-mode-hook))
     (add-hook mode #'display-line-numbers-mode 0))
   (setq frame-resize-pixelwise t)
-  (add-hook 'window-setup-hook 'toggle-frame-maximized t)
 
 #+END_SRC
-** Tabs
-#+NAME: tab-bar-mode
+
+** Scroll
+#+NAME: scrolling
 #+BEGIN_SRC emacs-lisp
 
-  
+  (use-package ultra-scroll
+    :init (setq scroll-conservatively 3 
+                scroll-margin 0)     
+    :config (ultra-scroll-mode 1))
 
 #+END_SRC
 
@@ -91,7 +94,7 @@
       :after f
       :init (doom-modeline-mode 1)
       :config
-      (setq doom-modeline-icon t))
+      (setq doom-modeline-icon nil))
     
 
 #+END_SRC
@@ -283,20 +286,12 @@
     :ensure nil
     :config
     (setq vertico-cycle t
-            vertico-count 10
-            vertico-resize t)
+          vertico-scroll-margin 0
+          vertico-count 10
+          vertico-resize t)
     (vertico-mode 1)
     (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy))
-
-  (use-package vertico-posframe
-    :after vertico
-    :config
-    (vertico-posframe-mode 1)
-    (setq vertico-posframe-parameters
-          '((left-fringe . 5)
-            (right-fringe . 5)))
-    (setq vertico-posframe-poshandler #'posframe-poshandler-frame-center))
-
+    
 #+END_SRC
 
 *** Marginalia
@@ -435,14 +430,6 @@
 
 #+END_SRC
 
-*** Company
-#+NAME: company-mode
-#+BEGIN_SRC emacs-lisp
-
-  (add-hook 'after-init-hook 'global-company-mode)
-
-#+END_SRC
-
 ** Themes
 #+NAME: doric-themes-autothemer
 #+BEGIN_SRC emacs-lisp
@@ -548,7 +535,7 @@
                 (interactive)
                 (nerd-icons-dired-mode 1)
                 (hl-line-mode 1))))
-  (add-hook 'dired-mode-hook 'dired-hide-details-mode)t
+  (add-hook 'dired-mode-hook 'dired-hide-details-mode t)
 
   (use-package dired-ranger)
   (use-package dired-collapse)
@@ -673,8 +660,6 @@
   (use-package calibredb
     :ensure nil
     :commands (calibredb)
-    :bind
-    (("C-c c c" . calibredb-find-counsel))
     :init
     (setq calibredb-root-dir "~/Documents/calibrary")
     (setq calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir))
@@ -728,6 +713,7 @@
 #+END_SRC
 
 * Keyboard
+** General
 #+NAME: general-keyboard-config
 #+BEGIN_SRC emacs-lisp
 
@@ -737,13 +723,13 @@
   (defun my-projects-visit ()
     (interactive)
     (find-file "/Users/alexeykotomin/org/20260105T151859--действующие-проекты-и-книги__задачи_книги_проекты.org"))
-  (global-set-key (kbd "C-c d") 'config-visit)
-  (global-set-key (kbd "C-c p") 'my-projects-visit)
+  (global-set-key (kbd "C-c v c") 'config-visit)
+  (global-set-key (kbd "C-c v p") 'my-projects-visit)
   ;; Scroll up and down
   (global-set-key (kbd "s-<down>") (kbd "C-u 1 C-v"))
   (global-set-key (kbd "s-<up>") (kbd "C-u 1 M-v"))
   ;; Kill this buffer
-  (global-set-key (kbd "C-1") 'kill-this-buffer)
+  (global-set-key (kbd "C-1") 'kill-current-buffer)
   ;; Clean whitespace
   (global-set-key (kbd "C-c w") 'whitespace-cleanup)
   ;; Hippie expand
@@ -755,15 +741,26 @@
   (setq-default indent-tabs-mode nil
               js-indent-level 2
               tab-width 2)
-  (global-set-key (kbd "<C-tab>") 'next-buffer)
-  (global-set-key (kbd "<C-S-tab>") 'previous-buffer) 
+  (global-set-key (kbd "<s-right>") 'next-buffer)
+  (global-set-key (kbd "<s-left>") 'previous-buffer)
+  (global-set-key (kbd "<S-s-right>") 'tab-next)
+  (global-set-key (kbd "<S-s-left>") 'tab-previous)
+  (global-set-key (kbd "<C-tab>") 'tab-next)
+  (global-set-key (kbd "<C-S-tab>") 'tab-previous)
+  (global-set-key (kbd "<C-s-tab>") 'tab-new)
+  (global-set-key (kbd "<C-s-w>") 'tab-close)
   (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
-  ;; (windmove-default-keybindings)
-    (use-package indent-bars
+
+  (use-package indent-bars
     :ensure nil
     :custom
     (indent-bars-treesit-support t)
     (indent-bars-treesit-wrap '((c argument_list parameter_list init_declarator parenthesized_expression))))
+
+  (global-set-key (kbd "C-M-j") 'consult-switch-buffer)
+  (use-package command-log-mode)
+  (global-command-log-mode)
+
 
 #+END_SRC
 
@@ -796,31 +793,33 @@
 
 #+END_SRC
 
-** Viper
-#+NAME: viper
+** Evil
+#+NAME: evil
 #+BEGIN_SRC emacs-lisp
 
-  (setq viper-mode t)
-     (require 'viper)
-  
+  (require 'evil)
+
 #+END_SRC
 
 * Apps
 ** Telega
 #+name: telega-config
 #+begin_src emacs-lisp
-
   (use-package telega
-     :commands (telega)
-     :config
-     (setq telega-app '(38023252 . "25b30c0339ba45df5458e8e15f2d5840"))
-     :defer t)
+    :commands (telega)
+    ;; :bind ("C-c t" . telega)
+    :init
+    (define-prefix-command 'my-telega-prefix)
+    (global-set-key (kbd "C-c t") 'my-telega-prefix)
 
-  (add-hook 'telega-load-hook
-          (lambda ()
-            (define-key global-map (kbd "C-c t") telega-prefix-map)))
+    :config
+    (setq telega-app '(38023252 . "25b30c0339ba45df5458e8e15f2d5840"))
 
-#+end_src
+    (define-key my-telega-prefix (kbd "t") #'telega)
+    (define-key my-telega-prefix (kbd "c") #'telega-chat-with)
+    (define-key my-telega-prefix (kbd "s") #'telega-search))
+
+  #+end_src
 
 * Org
 #+NAME: org-mode-quick-entry
@@ -831,7 +830,7 @@
 
 #+END_SRC
 
-** ORG-agenda
+** org-agenda
 #+name: org-agenda
 #+begin_src emacs-lisp
 
@@ -850,6 +849,16 @@
         '(("d" "Daily"
            ((agenda "" ((org-agenda-span 1)))
             (todo "NEXT")))))
+
+#+end_src
+
+** org-noter
+#+name: org-noter
+#+begin_src emacs-lisp
+
+  (use-package org-noter
+    :ensure nil
+    :demand t)
 
 #+end_src
 
@@ -887,14 +896,6 @@
 
 #+end_src
 
-** Documentation
-#+name: code-docs
-#+begin_src emacs-lisp
-
-  
-
-#+end_src
-
 * Learning Emacs
 #+name: popup
 #+BEGIN_SRC emacs-lisp
@@ -902,8 +903,8 @@
   (use-package which-key
     :ensure nil
     :init
-    (setq which-key-idle-delay 0.3
-          which-key-idle-secondary-delay 0.1)
+    (setq which-key-idle-delay 0
+          which-key-idle-secondary-delay 0)
     :config
     (which-key-mode))
 

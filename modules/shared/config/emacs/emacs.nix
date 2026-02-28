@@ -17,9 +17,10 @@ let
         # C
         calibredb
         citar
-        counsel
         company
         ccls
+        command-log-mode
+        corfu
         
         # E
         evil
@@ -30,7 +31,6 @@ let
         doom-modeline
         all-the-icons
         all-the-icons-dired
-        dashboard
         rainbow-delimiters
         ace-window
         which-key
@@ -40,7 +40,6 @@ let
         nerd-icons-completion
         nerd-icons-dired
         nerd-icons-ibuffer
-        nerd-icons-ivy-rich
         tab-line-nerd-icons
         fontaine
         pulsar
@@ -48,7 +47,6 @@ let
 
         # Minibuffers framework
         vertico
-        vertico-posframe
         marginalia
         consult
         orderless
@@ -108,6 +106,10 @@ let
 
         # D
         dap-mode
+
+        # H
+        helm
+        
         # I
         indent-bars
         
@@ -117,11 +119,13 @@ let
 
         # M
 
+        
         # N
         nov
 
         # O
         org-modern
+        org-noter
         
         # S
         sdcv
@@ -129,7 +133,9 @@ let
 
         # T
         melpaPackages.telega
-        
+
+        # U
+        ultra-scroll
         # W
         wgrep
 
