@@ -17,7 +17,9 @@ let
         # C
         calibredb
         citar
+        counsel
         ccls
+
 
         # D
         djvu
@@ -71,8 +73,6 @@ let
         denote-journal
         
         # Programming - Language servers
-        lsp-mode
-        lsp-ui
         
         # Programming - Languages
         nix-mode
@@ -101,7 +101,9 @@ let
         gruber-darker-theme
         
         # L
-
+        lsp-mode
+        lsp-ui
+        lsp-treemacs
         
         # M
 
@@ -113,6 +115,7 @@ let
         org-modern
         org-superstar
         org-noter
+        
         
         # S
         sdcv

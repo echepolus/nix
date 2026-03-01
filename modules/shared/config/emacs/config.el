@@ -29,10 +29,10 @@
 (tab-bar-mode)
 (scroll-bar-mode 0)
 (menu-bar-mode -1)
-(tool-bar-mode -1)
+(tool-bar-mode 0)
 (tooltip-mode -1)
 (winner-mode 1)
-(blink-cursor-mode -1)
+(blink-cursor-mode 0)
 (global-hl-line-mode)
 (use-package rainbow-delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
@@ -46,6 +46,7 @@
 (setq use-short-answers t)
 (global-visual-line-mode t)
 (global-auto-revert-mode t)
+(line-number-mode t)
 (show-paren-mode t)
 (setq show-paren-style 'mixed)
 (setq show-paren-delay 0)
@@ -481,6 +482,7 @@
 
 (use-package calibredb
   :ensure nil
+  :commands (calibredb)
   :init
   (setq calibredb-root-dir "~/Documents/calibrary")
   (setq calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir))
@@ -490,8 +492,7 @@
   (setq calibredb-comment-width 0)
   (setq calibredb-size-show t)
   (setq calibredb-format-all-the-icons t)
-  (setq calibredb-program "/Applications/calibre.app/Contents/MacOS/calibredb")
-  :commands (calibredb))
+  (setq calibredb-program "/Applications/calibre.app/Contents/MacOS/calibredb"))
 
 (use-package pdf-tools
   :defer t
@@ -599,6 +600,8 @@
   (define-key my-telega-prefix (kbd "c") #'telega-chat-with)
   (define-key my-telega-prefix (kbd "s") #'telega-search))
 
+(org-superstar-mode)
+
 (use-package math-preview
   :custom (math-preview-command "/Users/alexeykotomin/.nix-profile/bin/math-preview"))
 
@@ -631,6 +634,28 @@
   'org-babel-load-languages
   '((emacs-lisp . t) (python . t) (sql . t) (shell . t))))
 
+(require 'eglot)
+(add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd"))
+(add-hook 'c-mode-hook 'eglot-ensure)
+(add-hook 'c++-mode-hook 'eglot-ensure)
+(use-package lsp-mode
+  :commands lsp lsp-deferred
+  :init
+  (setq lsp-keymap-prefix "C-c l")
+  (setq lsp-restart 'ignore)
+  (setq lsp-headerline-breadcrumb-enable nil)
+  (setq lsp-auto-guess-root t)
+  (setq lsp-enable-which-key-integration t))
+
+(use-package lsp-ui
+  :hook (lsp-mode . lsp-ui-mode)
+  :custom
+  (lsp-ui-doc-position 'bottom))
+
+(use-package lsp-treemacs
+  :after lsp)
+
+(add-hook 'lsp-mode-hook #'lsp-headerline-breadcrumb-mode)
 (use-package lsp-mode
   :commands (lsp lsp-deferred)
   :init (setq lsp-keymap-prefix "C-c l")
@@ -638,10 +663,10 @@
 
 (use-package lsp-ui :commands lsp-ui-mode)
 
-(use-package ccls
-  :hook ((c-mode c++-mode) .
-         (lambda () (require 'ccls) (lsp))))
-(setq ccls-executable "~/.nix-profile/bin/ccls")
+;; (use-package ccls
+;;   :hook ((c-mode c++-mode) .
+;;          (lambda () (require 'ccls) (lsp))))
+;; (setq ccls-executable "~/.nix-profile/bin/ccls")
 
 (dap-mode 1)
 (dap-ui-mode 1)
