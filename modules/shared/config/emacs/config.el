@@ -29,10 +29,11 @@
 (tab-bar-mode)
 (scroll-bar-mode 0)
 (menu-bar-mode -1)
-(tool-bar-mode 0)
+(tool-bar-mode -1)
 (tooltip-mode -1)
 (winner-mode 1)
 (blink-cursor-mode -1)
+(global-hl-line-mode)
 (use-package rainbow-delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
 (setq inhibit-startup-screen t)
@@ -54,8 +55,8 @@
 (setq frame-resize-pixelwise t)
 
 (use-package ultra-scroll
-  :init (setq scroll-conservatively 3 
-              scroll-margin 0)     
+  :init (setq scroll-conservatively 3
+              scroll-margin 0)
   :config (ultra-scroll-mode 1))
 
 (use-package all-the-icons)
@@ -68,7 +69,7 @@
   :after f
   :init (doom-modeline-mode 1)
   :config
-  (setq doom-modeline-icon nil))
+  (setq doom-modeline-icon 1))
 
 (global-unset-key (kbd "M-o"))
 
@@ -106,86 +107,42 @@
   ((after-init . fontaine-mode)
    (after-init . (lambda ()
                    (fontaine-set-preset (or (fontaine-restore-latest-preset) 'regular)))))
-  :bind (("C-c f" . fontaine-set-preset)
-         ("C-c F" . fontaine-toggle-preset))
+  :bind ("C-c f" . fontaine-set-preset)
   :config
-(defconst my/mono "Geist Mono")
-(defconst my/var  "SF Pro Text")
+  (defconst my/mono "Geist Mono")
   (setq fontaine-presets
-      `(
-        ;; компактный
-        (small
-         :default-family ,my/mono
-         :default-weight light 
-         :default-height 110
-         :fixed-pitch-family ,my/mono
-         :variable-pitch-family ,my/var)
-
-        (regular
-         :default-family ,my/mono
-         :default-weight regular 
-         :default-height 160
-         :fixed-pitch-family ,my/mono
-         :variable-pitch-family ,my/var)
-
-        (medium
-         :inherit regular
-         :default-height 150)
-
-        (large
-         :inherit regular
-         :default-height 180)
-
-        (presentation
-         :inherit regular
-         :default-height 200)
-
-        (jumbo
-         :inherit regular
-         :default-height 230)
-
-        (coding
-         :inherit regular
-         :default-height 150)
-
-        ;; fallback по умолчанию (используется как база для наследования)
-        (t
-         :default-family ,my/mono
-         :default-weight regular
-         :default-slant normal
-         :default-width normal
-         :default-height 140
-
-         :fixed-pitch-family ,my/mono
-         :fixed-pitch-height 1.0
-
-         :variable-pitch-family ,my/var
-         :variable-pitch-height 1.0
-
-         :mode-line-active-height 1.0
-         :mode-line-inactive-height 1.0
-         :header-line-height 1.0
-         :line-number-height 1.0
-         :tab-bar-height 1.0
-         :tab-line-height 1.0
-         :bold-weight bold
-         :italic-slant italic)))
-
-(with-eval-after-load 'pulsar
-  (add-hook 'fontaine-set-preset-hook #'pulsar-pulse-line)))
+        `((regular
+           :default-family ,my/mono
+           :default-weight semilight
+           :default-height 155
+           :fixed-pitch-family ,my/mono)
+          (large
+           :inherit regular
+           :default-height 180)
+          (t
+           :default-family ,my/mono
+           :default-weight semilight
+           :default-slant normal
+           :default-width normal
+           :default-height 155
+           :fixed-pitch-family ,my/mono
+           :bold-weight medium
+           :italic-weight light
+           :italic-slant italic)))
+  (with-eval-after-load 'pulsar
+    (add-hook 'fontaine-set-preset-hook #'pulsar-pulse-line)))
 
 (use-package spacious-padding
   :ensure nil
   :config
   (setq spacious-padding-widths
         '( :internal-border-width 15
-           :header-line-width 4
-           :mode-line-width 6
+           :header-line-width 5
+           :mode-line-width 5
            :custom-button-width 3
-           :tab-width 4
-           :right-divider-width 30
-           :scroll-bar-width 8
-           :fringe-width 8))
+           :tab-width 5
+           :right-divider-width 10
+           :fringe-width 15))
   (spacious-padding-mode 1))
 
 (use-package minibuffer
@@ -229,9 +186,7 @@
   (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy))
 
 (use-package marginalia
-  :bind (:map minibuffer-local-map
-              ("M-A" . marginalia-cycle))
-  :init (marginalia-mode 1))
+  :init (marginalia-mode))
 
 (use-package consult
   :bind (;; C-c bindings in `mode-specific-map'
@@ -397,8 +352,6 @@
 
 (global-set-key (kbd "C-x C-r") 'recentf-open-files)
 
-(use-package nerd-icons-dired)
-
 (use-package dired
   :ensure nil
   :defer 1
@@ -415,7 +368,6 @@
   (add-hook 'dired-mode-hook
             (lambda ()
               (interactive)
-              (nerd-icons-dired-mode 1)
               (hl-line-mode 1))))
 (add-hook 'dired-mode-hook 'dired-hide-details-mode)
 
@@ -609,11 +561,6 @@
   (indent-bars-treesit-support t)
   (indent-bars-treesit-wrap '((c argument_list parameter_list init_declarator parenthesized_expression))))
 
-(global-set-key (kbd "C-M-j") 'consult-switch-buffer)
-(use-package command-log-mode)
-(global-command-log-mode)
-
-;; Needed for `:after char-fold' to work
 (use-package char-fold
   :custom
   (char-fold-symmetric t)
@@ -695,6 +642,12 @@
   :hook ((c-mode c++-mode) .
          (lambda () (require 'ccls) (lsp))))
 (setq ccls-executable "~/.nix-profile/bin/ccls")
+
+(dap-mode 1)
+(dap-ui-mode 1)
+(dap-ui-controls-mode 1)
+(require 'dap-lldb)
+(setq dap-lldb-debug-program '("/Users/alexeykotomin/.nix-profile/bin/lldb-dap"))
 
 (use-package which-key
   :ensure nil

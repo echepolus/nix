@@ -86,6 +86,7 @@ with pkgs; [
   # L
   lnav # Log file navigator
   libpng
+  lldb
 
   # M
   myPHP # Custom PHP with extensions

@@ -85,7 +85,6 @@
         (winner-mode 1)
         (when (system-is-mac)
           (add-to-list 'default-frame-alist '(ns-transparent-titlebar . nil))
-          ;; (add-to-list 'default-frame-alist '(ns-appearance . dark))
           (add-to-list 'default-frame-alist '(undecorated . t))
           (setq ns-use-proxy-icon t))
         (setq frame-title-format nil)
@@ -101,10 +100,8 @@
 	(set-frame-parameter nil 'alpha '(85 . 80))     ; For older Emacs versions
 	(add-to-list 'default-frame-alist '(alpha-background . 100))
 	(add-to-list 'default-frame-alist '(alpha . (85 . 80)))
-	;; Enable rounded corners carefully to not interfere with window management
 	(when (and (boundp 'ns-appearance)
 		(not (getenv "AEROSPACE_STARTUP")))
-	    ;; Only apply rounded corners if not in aerospace startup to avoid conflicts
 	(set-frame-parameter nil 'undecorated-round t)
 	(add-to-list 'default-frame-alist '(undecorated-round . t)))))
 
@@ -131,8 +128,8 @@
         (variable-pitch-mode 1)
         (auto-fill-mode 0)
         (visual-line-mode 1)
-        (org-superstar-mode 1)
         ;; (setq evil-auto-indent nil)
+        (org-superstar-mode)
         (message "Org mode setup completed successfully."))
     (error (message "Error occurred in Org mode setup."))))
 
