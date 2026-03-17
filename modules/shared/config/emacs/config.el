@@ -1,11 +1,11 @@
 (require 'package)
 (unless (assoc-default "melpa" package-archives)
-   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t))
+  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t))
 (unless (assoc-default "nongnu" package-archives)
-   (add-to-list 'package-archives '("nongnu" . "https://elpa.nongnu.org/nongnu/") t))
+  (add-to-list 'package-archives '("nongnu" . "https://elpa.nongnu.org/nongnu/") t))
 
 (setq user-full-name "echepolus"
-  user-mail-address "a.kotominn@gmail.com")
+      user-mail-address "a.kotominn@gmail.com")
 
 (defun system-is-mac ()
   (string-equal system-type "darwin"))
@@ -17,15 +17,16 @@
   (let ((home-dir (getenv "HOME")))
     (setenv "PATH" (concat (getenv "PATH") ":" home-dir "/.nix-profile/bin:/usr/bin"))
     (setq exec-path (append (list (concat home-dir "/bin")
-                                 "/profile/bin"
-                                 (concat home-dir "/.npm-packages/bin")
-                                 (concat home-dir "/.nix-profile/bin")
-                                 "/nix/var/nix/profiles/default/bin"
-                                 "/usr/local/bin"
-                                 "/usr/bin")
-                           exec-path))))
+                                  "/profile/bin"
+                                  (concat home-dir "/.npm-packages/bin")
+                                  (concat home-dir "/.nix-profile/bin")
+                                  "/nix/var/nix/profiles/default/bin"
+                                  "/usr/local/bin"
+                                  "/usr/bin")
+                            exec-path))))
 
-(column-number-mode)
+(column-number-mode 0)
+(line-number-mode 0)
 (tab-bar-mode)
 (scroll-bar-mode 0)
 (menu-bar-mode -1)
@@ -46,7 +47,6 @@
 (setq use-short-answers t)
 (global-visual-line-mode t)
 (global-auto-revert-mode t)
-(line-number-mode t)
 (show-paren-mode t)
 (setq show-paren-style 'mixed)
 (setq show-paren-delay 0)
@@ -55,34 +55,17 @@
   (add-hook mode #'display-line-numbers-mode 0))
 (setq frame-resize-pixelwise t)
 
-(use-package ultra-scroll
-  :init (setq scroll-conservatively 3
-              scroll-margin 0)
-  :config (ultra-scroll-mode 1))
-
-(use-package all-the-icons)
-
-(use-package f
-  :ensure nil
-  :demand t)
-
-(use-package doom-modeline
-  :after f
-  :init (doom-modeline-mode 1)
-  :config
-  (setq doom-modeline-icon 1))
-
 (global-unset-key (kbd "M-o"))
 
 (use-package ace-window
   :bind (("M-o" . ace-window))
   :custom
-    (aw-scope 'frame)
-    (aw-keys '(?a ?r ?s ?t ?g ?m ?n ?e ?i ?o))
-    (aw-minibuffer-flag t)
+  (aw-scope 'frame)
+  (aw-keys '(?a ?r ?s ?t ?g ?m ?n ?e ?i ?o))
+  (aw-minibuffer-flag t)
   :config
-    (ace-window-display-mode 1)
-    (advice-add 'ace-select-window :after #'eu/auto-resize))
+  (ace-window-display-mode 1)
+  (advice-add 'ace-select-window :after #'eu/auto-resize))
 
 (setopt auto-resize-ratio 0.7)
 
@@ -102,34 +85,63 @@
 (advice-add 'windmove-right :after 'eu/auto-resize)
 (advice-add 'windmove-left  :after 'eu/auto-resize)
 
+(use-package ultra-scroll
+  :init (setq scroll-conservatively 3
+              scroll-margin 0)
+  :config (ultra-scroll-mode 1))
+
+(use-package all-the-icons)
+
+(use-package f
+  :ensure nil
+  :demand t)
+
+(use-package doom-modeline
+  :after f
+  :init (doom-modeline-mode 1)
+  :config
+  (setq doom-modeline-icon 1))
+
 (use-package fontaine
   :ensure nil
   :hook
   ((after-init . fontaine-mode)
    (after-init . (lambda ()
-                   (fontaine-set-preset (or (fontaine-restore-latest-preset) 'regular)))))
-  :bind ("C-c f" . fontaine-set-preset)
+                   (fontaine-set-preset
+                  (or (fontaine-restore-latest-preset) 'regular)))))
+  :bind (("C-c f" . fontaine-set-preset)
+         ("C-c F" . fontaine-toggle-preset))
   :config
   (defconst my/mono "Geist Mono")
   (setq fontaine-presets
-        `((regular
+        `(
+          (regular
            :default-family ,my/mono
-           :default-weight semilight
-           :default-height 155
+           :default-weight light
+           :default-height 170
            :fixed-pitch-family ,my/mono)
-          (large
+
+          (presentation
            :inherit regular
-           :default-height 180)
+           :default-height 200)
+
           (t
            :default-family ,my/mono
-           :default-weight semilight
-           :default-slant normal
-           :default-width normal
-           :default-height 155
+           :default-weight light
+           :default-height 170
+
            :fixed-pitch-family ,my/mono
-           :bold-weight medium
-           :italic-weight light
+           :fixed-pitch-weight light
+         :fixed-pitch-serif-weight regular
+         :variable-pitch-weight regular
+
+           :mode-line-active-weight regular
+           :mode-line-inactive-weight regular
+         :header-line-weight regular
+         :italic-weight regular
+         :bold-weight regular
            :italic-slant italic)))
+
   (with-eval-after-load 'pulsar
     (add-hook 'fontaine-set-preset-hook #'pulsar-pulse-line)))
 
@@ -137,13 +149,15 @@
   :ensure nil
   :config
   (setq spacious-padding-widths
-        '( :internal-border-width 15
-           :header-line-width 5
-           :mode-line-width 5
+        '( :internal-border-width 25
+           :header-line-width 4
+           :mode-line-width 4
            :custom-button-width 3
-           :tab-width 5
+           :tab-width 6
            :right-divider-width 10
-           :fringe-width 15))
+           :scroll-bar-width 15
+           :fringe-width 0
+           :right-fringe-width 0))
   (spacious-padding-mode 1))
 
 (use-package minibuffer
@@ -200,20 +214,20 @@
          ;; C-x bindings in `ctl-x-map'
          ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
          ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
-         ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
-         ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
-         ("C-x t b" . consult-buffer-other-tab)    ;; orig. switch-to-buffer-other-tab
-         ("C-x r b" . consult-bookmark)            ;; orig. bookmark-jump
+         ("C-x 4 b" . consult-buffer-other-window) ;; switch-to-buffer-other-window
+         ("C-x 5 b" . consult-buffer-other-frame)  ;; switch-to-buffer-other-frame
+         ("C-x t b" . consult-buffer-other-tab)    ;; switch-to-buffer-other-tab
+         ("C-x r b" . consult-bookmark)            ;; bookmark-jump
          ("C-x p b" . consult-project-buffer)      ;; orig. project-switch-to-buffer
          ;; Custom M-# bindings for fast register access
          ("M-#" . consult-register-load)
-         ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
+         ("M-'" . consult-register-store)          ;; abbrev-prefix-mark(unrelated)
          ("C-M-#" . consult-register)
          ;; Other custom bindings
          ("M-y" . consult-yank-pop)                ;; orig. yank-pop
          ;; M-g bindings in `goto-map'
          ("M-g e" . consult-compile-error)
-         ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
+         ("M-g f" . consult-flycheck)               ;; Alternative: consult-flycheck
          ("M-g g" . consult-goto-line)             ;; orig. goto-line
          ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
          ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
@@ -278,7 +292,7 @@
   ;; Optionally make narrowing help available in the minibuffer.
   ;; You may want to use `embark-prefix-help-command' or which-key instead.
   ;; (keymap-set consult-narrow-map (concat consult-narrow-key " ?") #'consult-narrow-help)
-)
+  )
 
 (use-package embark
   :ensure nil
@@ -309,8 +323,8 @@
   :ensure nil
   :bind
   (:map global-map
-    ("C-x l" . pulsar-pulse-line)
-    ("C-x L" . pulsar-highlight-permanently-dwim))
+        ("C-x l" . pulsar-pulse-line)
+        ("C-x L" . pulsar-highlight-permanently-dwim))
   :init (pulsar-global-mode 1)
   :config
   (setq pulsar-delay 0.055)
@@ -379,16 +393,7 @@
   (setq insert-directory-program
         (expand-file-name ".nix-profile/bin/ls" (getenv "HOME"))))
 
-(use-package tramp
-  :ensure nil
-  :config
-  (setq tramp-shell-prompt-pattern "^[^$>\n]*[#$%>] *\\(\[[0-9;]*[a-zA-Z] *\\)*")
-  (setq tramp-connection-timeout 10)
-  (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
-  (setq vc-ignore-dir-regexp
-        (format "\\(%s\\)\\|\\(%s\\)"
-                vc-ignore-dir-regexp
-                tramp-file-name-regexp)))
+
 
 (use-package denote
   :ensure nil
@@ -401,7 +406,7 @@
    ("C-c n d" . denote-dired)
    ("C-c n g" . denote-grep))
   :config
-  (setq denote-directory (expand-file-name "~/Documents/notes/"))
+  (setq denote-directory (expand-file-name "~/org/inbox/"))
   (denote-rename-buffer-mode 1))
 
 (use-package consult-denote
@@ -415,9 +420,6 @@
 (use-package denote-org
   :ensure nil
   :commands
-  ;; I list the commands here so that you can discover them more
-  ;; easily.  You might want to bind the most frequently used ones to
-  ;; the `org-mode-map'.
   ( denote-org-link-to-heading
     denote-org-backlinks-for-heading
 
@@ -434,48 +436,15 @@
 
 (use-package denote-journal
   :ensure nil
-  ;; Bind those to some key for your convenience.
   :commands ( denote-journal-new-entry
               denote-journal-new-or-existing-entry
               denote-journal-link-or-create-entry )
   :hook (calendar-mode . denote-journal-calendar-mode)
   :config
-  ;; Use the "journal" subdirectory of the `denote-directory'.  Set this
-  ;; to nil to use the `denote-directory' instead.
   (setq denote-journal-directory
         (expand-file-name "journal" denote-directory))
-  ;; Default keyword for new journal entries. It can also be a list of
-  ;; strings.
   (setq denote-journal-keyword "journal")
-  ;; Read the doc string of `denote-journal-title-format'.
   (setq denote-journal-title-format 'day-date-month-year))
-
-(use-package denote-sequence
-  :ensure t
-  :bind
-  ( :map global-map
-    ;; Here we make "C-c n s" a prefix for all "[n]otes with [s]equence".
-    ;; This is just for demonstration purposes: use the key bindings
-    ;; that work for you.  Also check the commands:
-    ;;
-    ;; - `denote-sequence-new-parent'
-    ;; - `denote-sequence-new-sibling'
-    ;; - `denote-sequence-new-child'
-    ;; - `denote-sequence-new-child-of-current'
-    ;; - `denote-sequence-new-sibling-of-current'
-    ("C-c n s s" . denote-sequence)
-    ("C-c n s f" . denote-sequence-find)
-    ("C-c n s l" . denote-sequence-link)
-    ("C-c n s d" . denote-sequence-dired)
-    ("C-c n s r" . denote-sequence-reparent)
-    ("C-c n s c" . denote-sequence-convert))
-  :config
-  ;; The default sequence scheme is `numeric'.
-  (setq denote-sequence-scheme 'alphanumeric))
-
-(use-package citar
-  :custom
-  (citar-bibliography '("~/Documents/library/references.bib")))
 
 (use-package nov
   :mode ("\\.epub\\'" . nov-mode))
@@ -515,6 +484,13 @@
   (add-hook 'pdf-view-mode-hook 'pdf-view-restore-mode)
   (setq pdf-view-restore-filename "~/.emacs.d/.pdf-view-restore"))
 
+(use-package markdown-mode
+  :ensure nil
+  :mode ("README\\.md\\'" . gfm-view-mode)
+  :init (setq markdown-command "multimarkdown")
+  :bind (:map markdown-mode-map
+            ("C-c C-e" . markdown-do)))
+
 (use-package vterm
   :commands vterm
   :config
@@ -522,30 +498,12 @@
   (setq vterm-shell "zsh")
   (setq vterm-max-scrollback 10000))
 
-(defun config-visit ()
-  (interactive)
-  (find-file "/Users/alexeykotomin/.config/nix/modules/shared/config/emacs/config.org"))
-(defun my-projects-visit ()
-  (interactive)
-  (find-file "/Users/alexeykotomin/org/20260105T151859--действующие-проекты-и-книги__задачи_книги_проекты.org"))
-(global-set-key (kbd "C-c v c") 'config-visit)
-(global-set-key (kbd "C-c v p") 'my-projects-visit)
-;; Scroll up and down
-(global-set-key (kbd "s-<down>") (kbd "C-u 1 C-v"))
-(global-set-key (kbd "s-<up>") (kbd "C-u 1 M-v"))
-;; Kill this buffer
+(global-set-key (kbd "s-<down>") (kbd "C-u 1 C-v")) ;; scroll up
+(global-set-key (kbd "s-<up>") (kbd "C-u 1 M-v")) ;; scroll down
 (global-set-key (kbd "C-1") 'kill-current-buffer)
-;; Clean whitespace
-(global-set-key (kbd "C-c w") 'whitespace-cleanup)
-;; Hippie expand
 (global-set-key (kbd "M-/") 'hippie-expand)
-;; Remember-mode
 (global-set-key (kbd "C-c r") 'remember)
-;; Quickly access my fav folder in dired
 (global-set-key (kbd "<f5>") (lambda() (interactive)(find-file "~/")))
-(setq-default indent-tabs-mode nil
-            js-indent-level 2
-            tab-width 2)
 (global-set-key (kbd "<s-right>") 'next-buffer)
 (global-set-key (kbd "<s-left>") 'previous-buffer)
 (global-set-key (kbd "<S-s-right>") 'tab-next)
@@ -555,12 +513,50 @@
 (global-set-key (kbd "<C-s-tab>") 'tab-new)
 (global-set-key (kbd "<C-s-w>") 'tab-close)
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+(global-set-key (kbd "C-x C-3 C-f") 'find-file-other-tab)
+(global-unset-key (kbd "C-,"))
+(global-set-key (kbd "C-,") 'duplicate-line)
 
-(use-package indent-bars
-  :ensure nil
-  :custom
-  (indent-bars-treesit-support t)
-  (indent-bars-treesit-wrap '((c argument_list parameter_list init_declarator parenthesized_expression))))
+(global-unset-key (kbd "C-f"))
+(use-package general
+  :ensure t)
+
+(general-create-definer eu/leader-keys
+  :prefix "C-f")
+
+(defun eu/projects-visit ()
+  (interactive)
+  (find-file "/Users/alexeykotomin/org/20260105T151859--действующие-проекты-и-книги__задачи_книги_проекты.org"))
+
+(defun eu/emacs-help-notes ()
+  (interactive)
+  (find-file "/Users/alexeykotomin/org/help-notes/20260317T163943--emacs-help-notes__emacs.org"))
+
+(defun eu/org-help-notes ()
+  (interactive)
+  (find-file "/Users/alexeykotomin/org/help-notes/20260317T164018--org-help-notes__emacs.org"))
+
+(defun eu/emacs-config ()
+  (interactive)
+  (find-file "/Users/alexeykotomin/.config/nix/modules/shared/config/emacs/config.org"))
+
+(defun eu/kanata-config ()
+  (interactive)
+  (find-file "/Users/alexeykotomin/.config/kanata/main.kbd"))
+
+(defun eu/aerospace-config ()
+  (interactive)
+  (find-file "/Users/alexeykotomin/.config/aerospace/aerospace.toml"))
+
+(eu/leader-keys
+ "p p" #'eu/projects-visit
+
+ "h e" #'eu/emacs-help-notes
+ "h o" #'eu/org-help-notes
+
+ "c e" #'eu/emacs-config
+ "c k" #'eu/kanata-config
+ "c a" #'eu/aerospace-config)
 
 (use-package char-fold
   :custom
@@ -574,7 +570,6 @@
   :bind
   ("M-Τ" . reverse-im-translate-word) ; to fix a word written in the wrong layout
   :custom
-  ;; cache generated keymaps
   (reverse-im-cache-file (locate-user-emacs-file "reverse-im-cache.el"))
   ;; use lax matching
   (reverse-im-char-fold t)
@@ -584,7 +579,7 @@
   :config
   (reverse-im-mode t)) ; turn the mode on
 
-(require 'evil)
+(setq reverse-im-fix-shortcuts t)
 
 (use-package telega
   :commands (telega)
@@ -600,30 +595,62 @@
   (define-key my-telega-prefix (kbd "c") #'telega-chat-with)
   (define-key my-telega-prefix (kbd "s") #'telega-search))
 
+(setq org-M-RET-may-split-line nil)
+
+(global-set-key (kbd "C-c l") #'org-store-link)
+(global-set-key (kbd "C-c a") #'org-agenda)
+(global-set-key (kbd "C-c c") #'org-capture)
+
 (org-superstar-mode)
 
 (use-package math-preview
-  :custom (math-preview-command "/Users/alexeykotomin/.nix-profile/bin/math-preview"))
+  :custom
+  (math-preview-command "/Users/alexeykotomin/.nix-profile/bin/math-preview"))
+
+(defun eu/org-mode-visual-fill ()
+  (setq visual-fill-column-width 90
+	visual-fill-column-center-text t)
+  (visual-fill-column-mode 1))
+
+(use-package visual-fill-column
+  :hook
+  (org-mode . eu/org-mode-visual-fill)
+  (markdown-mode . eu/org-mode-visual-fill))
 
 (setq org-directory "~/org")
 (setq org-agenda-files '("~/org"))
 (setq org-todo-keywords
       '((sequence "TODO" "DONE")))
-(setq org-log-done 'time)
+;;(setq org-log-done 'time)
 (setq org-archive-location "~/org/archive.org::")
-(setq org-capture-templates
-      '(("i" "Inbox" entry
-         (file "~/org/inbox.org")
-         "* TODO %?\n  %U")))
+;; (setq org-capture-templates
+;;       '(("i" "Inbox" entry
+;;          (file "~/org/inbox.org")
+;;          "* TODO %?\n  %U")))
 
-(setq org-agenda-custom-commands
-      '(("d" "Daily"
-         ((agenda "" ((org-agenda-span 1)))
-          (todo "NEXT")))))
+;; (setq org-agenda-custom-commands
+;;       '(("d" "Daily"
+;;          ((agenda "" ((org-agenda-span 1)))
+;;           (todo "NEXT")))))
 
 (use-package org-noter
   :ensure nil
   :demand t)
+
+(require 'plantuml-mode)
+
+;; (setq plantuml-executable-path "/nix/store/ysk4b6xr6clcl0pwcgjf2gka2pwr6fvy-plantuml-1.2025.9/bin/plantuml")
+;; (setq plantuml-default-exec-mode 'executable)
+
+(setq org-plantuml-jar-path "/Users/alexeykotomin/.nix-profile/lib/plantuml.jar")
+  (setq plantuml-default-exec-mode 'jar)
+
+
+
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((plantuml . t)))
+(add-to-list 'auto-mode-alist '("\\.plantuml\\'" . plantuml-mode))
 
 (add-to-list 'auto-mode-alist '("\\.env" . shell-script-mode))
 (add-to-list 'auto-mode-alist '("\\.kbd\\'" . lisp-mode))
@@ -631,48 +658,51 @@
   :mode "\\.nix\\'")
 (with-eval-after-load 'org
   (org-babel-do-load-languages
-  'org-babel-load-languages
-  '((emacs-lisp . t) (python . t) (sql . t) (shell . t))))
+   'org-babel-load-languages
+   '((emacs-lisp . t) (python . t) (sql . t) (shell . t) (plantuml . t))))
+
+(defun eu/c-help-at-point ()
+  (interactive)
+  (let ((sym (thing-at-point 'symbol t)))
+    (when sym
+      (man sym))))
+
+(eu/leader-keys
+  "m" #'eu/c-help-at-point)
+
+(add-to-list 'display-buffer-alist
+           '("\\*\\(Help\\|Man\\).*\\*"
+             (display-buffer-in-side-window)
+             (side . right)
+             (window-width . 0.5)))
+
+(global-set-key "\C-cw"
+                   (lambda ()
+                     (interactive)
+                     (let ((woman-use-topic-at-point t))
+                       (woman))))
 
 (require 'eglot)
 (add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd"))
 (add-hook 'c-mode-hook 'eglot-ensure)
 (add-hook 'c++-mode-hook 'eglot-ensure)
-(use-package lsp-mode
-  :commands lsp lsp-deferred
-  :init
-  (setq lsp-keymap-prefix "C-c l")
-  (setq lsp-restart 'ignore)
-  (setq lsp-headerline-breadcrumb-enable nil)
-  (setq lsp-auto-guess-root t)
-  (setq lsp-enable-which-key-integration t))
 
-(use-package lsp-ui
-  :hook (lsp-mode . lsp-ui-mode)
-  :custom
-  (lsp-ui-doc-position 'bottom))
+(use-package flycheck
+  :ensure nil
+  :config
+  (add-hook 'after-init-hook #'global-flycheck-mode))
 
-(use-package lsp-treemacs
-  :after lsp)
+(use-package flycheck-eglot
+  :ensure t
+  :after (flycheck eglot)
+  :config
+  (global-flycheck-eglot-mode 1))
 
-(add-hook 'lsp-mode-hook #'lsp-headerline-breadcrumb-mode)
-(use-package lsp-mode
-  :commands (lsp lsp-deferred)
-  :init (setq lsp-keymap-prefix "C-c l")
-  :config (lsp-enable-which-key-integration t))
-
-(use-package lsp-ui :commands lsp-ui-mode)
-
-;; (use-package ccls
-;;   :hook ((c-mode c++-mode) .
-;;          (lambda () (require 'ccls) (lsp))))
-;; (setq ccls-executable "~/.nix-profile/bin/ccls")
-
-(dap-mode 1)
-(dap-ui-mode 1)
-(dap-ui-controls-mode 1)
-(require 'dap-lldb)
-(setq dap-lldb-debug-program '("/Users/alexeykotomin/.nix-profile/bin/lldb-dap"))
+;; (dap-mode 1)
+;; (dap-ui-mode 1)
+;; (dap-ui-controls-mode 1)
+;; (require 'dap-lldb)
+;; (setq dap-lldb-debug-program '("/Users/alexeykotomin/.nix-profile/bin/lldb-dap"))
 
 (use-package which-key
   :ensure nil

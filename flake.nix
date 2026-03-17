@@ -35,9 +35,9 @@
       linuxSystems = [ "x86_64-linux" "aarch64-linux" ];
       darwinSystems = [ "aarch64-darwin" "x86_64-darwin" ];
       forAllSystems = f: nixpkgs.lib.genAttrs (linuxSystems ++ darwinSystems) f;
-      devShell = system: 
-        let 
-          pkgs = nixpkgs.legacyPackages.${system}; 
+      devShell = system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
         in {
           default = with pkgs; mkShell {
             nativeBuildInputs = with pkgs; [ bashInteractive git age ];
@@ -83,8 +83,7 @@
           specialArgs = inputs // { inherit user; };
           modules = [
             home-manager.darwinModules.home-manager
-            nix-homebrew.darwinModules.nix-homebrew
-            {
+            nix-homebrew.darwinModules.nix-homebrew {
               nix-homebrew = {
                 inherit user;
                 enable = true;
@@ -100,7 +99,7 @@
             ./hosts/darwin
           ];
         }
-      );                
+      );
 
       nixosConfigurations =
         nixpkgs.lib.genAttrs linuxSystems (system:
@@ -122,4 +121,3 @@
         );
     };
 }
-

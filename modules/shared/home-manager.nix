@@ -76,6 +76,7 @@ in
       e() {
           emacsclient -t "$@"
       }
+
       export NVIM="/Users/alexeykotomin/.nix-profile/bin/nvim"  
 
       [ -f ${pkgs.fzf}/share/fzf/key-bindings.zsh ] && source ${pkgs.fzf}/share/fzf/key-bindings.zsh

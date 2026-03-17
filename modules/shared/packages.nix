@@ -37,6 +37,7 @@ with pkgs; [
   aspellDicts.el # Modern Greek dictionary for aspell
   aspellDicts.grc # Ancient Greek dictionary for aspell
   aspellDicts.la # Latin dictionary for aspell
+  
 
   # B
   bash-completion # Bash completion scripts
@@ -45,7 +46,9 @@ with pkgs; [
   
   # C
   coreutils # Basic file/text/shell utilities
-  ccls
+  clang-tools
+  cppcheck
+  check
 
   # D
   direnv # Environment variable management per directory
@@ -67,6 +70,7 @@ with pkgs; [
   gdb
   gcc
   gnupg
+  graphviz
     
   # H
   htop # Interactive process viewer
@@ -92,6 +96,8 @@ with pkgs; [
   myPHP # Custom PHP with extensions
   myPython # Custom Python with packages
   math-preview
+  multimarkdown
+  mermaid-cli
 
   # N
   ncurses
@@ -100,15 +106,18 @@ with pkgs; [
 
   # O
   openssh # SSH client and server
+  openjdk
 
   # P
   pass # Stores, retrieves, generates, synchronizes passwords
   pandoc # Document converter
   poppler # PDF to plain text tool
   pkg-config
+  plantuml
 
   # Q
   qt5.qtbase
+  
 
   # R
   ripgrep # Fast text search tool
@@ -128,9 +137,11 @@ with pkgs; [
   uv # Python package installer
 
   # V
-
+  
+  
   # W
   wget # File downloader
+  w3m
 
   # X
 

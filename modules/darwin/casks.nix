@@ -3,6 +3,8 @@ _:
 [
   # A
   "anki"
+  "android-platform-tools"
+
  
   # B
 

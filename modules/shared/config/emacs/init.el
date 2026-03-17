@@ -1,11 +1,8 @@
-;; -------------------------
-;; Evil early setup (must be before evil or evil-collection is loaded!)
-;; -------------------------
-(setq evil-want-integration t)      ;; default = t
-(setq evil-want-keybinding nil)     ;; disable default bindings so evil-collection can set them
-(setq evil-want-fine-undo 'fine)    ;; granular undo
-(setq evil-want-Y-yank-to-eol t)    ;; Y yanks to end of line
-(setq evil-want-C-u-scroll t)       ;; C-u scrolls like in Vim
+;(setq evil-want-integration t)      ;; default = t
+;(setq evil-want-keybinding nil)     ;; disable default bindings so evil-collection can set them
+;(setq evil-want-fine-undo 'fine)    ;; granular undo
+;(setq evil-want-Y-yank-to-eol t)    ;; Y yanks to end of line
+;(setq evil-want-C-u-scroll t)       ;; C-u scrolls like in Vim
 
 ;; -------------------------
 ;; Variable Declarations
@@ -38,8 +35,8 @@
 (unless (package-installed-p 'use-package)
   (package-initialize)
   (if (package-install 'use-package)
-      (message "use-package installed successfully.")
-    (error "Error: Failed to install use-package."))
+      (message "use-package installed successfully")
+    (error "Error: Failed to install use-package"))
   (setq use-package-verbose t)
   ;; Disable auto-installation since Nix handles packages
   (setq use-package-always-ensure nil)
@@ -60,8 +57,8 @@
   :config
   (setq exec-path-from-shell-variables '("PATH" "GOPATH" "PNPM_HOME"))
   (if (exec-path-from-shell-initialize)
-      (message "Environment variables initialized successfully.")
-    (error "Error: Failed to initialize environment variables.")))
+      (message "Environment variables initialized successfully")
+    (error "Error: Failed to initialize environment variables")))
 
 ;; В случае работы в Emacs daemon добавляем hook
 (when (daemonp)
@@ -129,7 +126,7 @@
         (auto-fill-mode 0)
         (visual-line-mode 1)
         ;; (setq evil-auto-indent nil)
-        (org-superstar-mode)
+        (org-superstar-mode 1)
         (message "Org mode setup completed successfully."))
     (error (message "Error occurred in Org mode setup."))))
 

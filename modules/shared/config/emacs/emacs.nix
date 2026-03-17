@@ -1,139 +1,138 @@
 { pkgs }:
 let
   emacsPackage = pkgs.emacs;
- 
+  
   emacsWithPackages = (pkgs.emacsPackagesFor emacsPackage).emacsWithPackages (epkgs: with epkgs; [
-        gcmh
-        general
-        undo-tree
-        quelpa
-        quelpa-use-package
-        denote-markdown
-        denote-sequence
-        vterm
+    gcmh
+    general
+    quelpa
+    quelpa-use-package
+    vterm
 
-        # B
-        
-        # C
-        calibredb
-        citar
-        counsel
-        ccls
+    # B
+    
+    # C
+    calibredb
+    citar
+    counsel
+    
+    # D
+    #djvu
+    
+    # E
+    evil
+    evil-collection
+    eglot
 
+    # F
+    flycheck
+    flycheck-eglot
+    
+    # UI and themes
+    doric-themes
+    doom-modeline
+    all-the-icons
+    rainbow-delimiters
+    ace-window
+    which-key
+    highlight-indent-guides
+    helpful
+    fontaine
+    pulsar
+    spacious-padding
 
-        # D
-        djvu
-        
-        # E
-        evil
-        evil-collection
-        
-        # UI and themes
-        doric-themes
-        doom-modeline
-        all-the-icons
-        rainbow-delimiters
-        ace-window
-        which-key
-        highlight-indent-guides
-        helpful
-        fontaine
-        pulsar
-        spacious-padding
+    # Minibuffers framework
+    vertico
+    marginalia
+    consult
+    orderless
+    embark
+    embark-consult
+    math-preview
+    dired-ranger
+    dired-collapse
+    key-chord
+    
+    # Project management
+    projectile
+    ripgrep
+    deadgrep
+    
+    # Org mode
+    emacsql
+    sqlite3
+    visual-fill-column
+    
+    # Writing
+    writeroom-mode
+    flyspell-correct
+    reverse-im
+    denote
+    consult-denote
+    denote-org
+    denote-journal
+    
+    # Programming - Language servers
+    
+    # Programming - Languages
+    nix-mode
+    
+    # Python
+    
+    # PHP
+    
+    # Other tools
+    f  # File manipulation library
+    rotate
+    exec-path-from-shell
+    pdf-tools   
+    tablist # required by pdf-tools
+    pdf-view-restore
 
-        # Minibuffers framework
-        vertico
-        marginalia
-        consult
-        orderless
-        embark
-        embark-consult
-        math-preview
-        dired-ranger
-        dired-collapse
-        key-chord
+    # D
+    
+    # H
+    
+    # I
+    indent-bars
+    
+    # G
+    gruber-darker-theme
+    
+    # L
+    
+    # M
+    markdown-mode
+    magit
         
-        # Project management
-        projectile
-        ripgrep
-        deadgrep
-        
-        # Org mode
-        emacsql
-        sqlite3
-        visual-fill-column
-        
-        # Writing
-        writeroom-mode
-        flyspell-correct
-        reverse-im
-        denote
-        consult-denote
-        denote-org
-        denote-journal
-        
-        # Programming - Language servers
-        
-        # Programming - Languages
-        nix-mode
-        
-        # Python
-        
-        # PHP
-        
-        # Other tools
-        f  # File manipulation library
-        rotate
-        exec-path-from-shell
-        pdf-tools   
-        tablist # required by pdf-tools
-        pdf-view-restore
+    # N
+    nov
 
-        # D
-        dap-mode
-        
-        # H
-        
-        # I
-        indent-bars
-        
-        # G
-        gruber-darker-theme
-        
-        # L
-        lsp-mode
-        lsp-ui
-        lsp-treemacs
-        
-        # M
+    # O
+    org-modern
+    org-superstar
+    org-noter
 
-        
-        # N
-        nov
+    # P
+    plantuml-mode
+    
+    # S
+    sdcv
+    quick-sdcv
 
-        # O
-        org-modern
-        org-superstar
-        org-noter
-        
-        
-        # S
-        sdcv
-        quick-sdcv
+    # T
+    melpaPackages.telega
 
-        # T
-        melpaPackages.telega
+    # U
+    ultra-scroll
+    
+    # W
+    wgrep
 
-        # U
-        ultra-scroll
-        
-        # W
-        wgrep
-
-        # Y
-        yasnippet
-        
-        # Z
+    # Y
+    yasnippet
+    
+    # Z
 
   ]);
 in 
